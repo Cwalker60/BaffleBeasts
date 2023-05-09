@@ -375,7 +375,7 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
 
     @Override
     public boolean canJump() {
-        return false;
+        return this.isSaddled();
     }
 
     @Override
