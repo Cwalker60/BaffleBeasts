@@ -53,6 +53,7 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
 
     private static final Logger LOGGER = LogUtils.getLogger();
     public boolean flying;
+    public boolean isJumping;
 
     //Amaro Constructor
     public AmaroEntity(EntityType<? extends Animal> entityType, Level level) {
@@ -342,16 +343,30 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
             if (forwardz <= 0.0f) {
                 forwardz *= 0.5f;
             }
+            // Jump Code
+            Vec3 jvec = this.getDeltaMovement();
+            if (isJumping && this.isOnGround()) {
+                this.setDeltaMovement(jvec.x, 1.2, jvec.z);
+                isJumping = false;
+            }
+            if (flying && isJumping) {
+                 this.setDeltaMovement(jvec.x, 1.2, jvec.z);
+                 isJumping = false;
+            }
 
             // when the rider is controlling, set the movement vector
             if (this.isControlledByLocalInstance()) {
                 this.setSpeed((float)(this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.1)); // set the speed and multiply it by 20%
                 super.travel(new Vec3((double)strafex, vec3.y, (double)forwardz));
-
             }
             // if there is no player movement, don't move the mob
             else if (rider instanceof Player) {
                 this.setDeltaMovement(Vec3.ZERO);
+            }
+
+            if (isOnGround()) {
+                this.flying = false;
+                this.isJumping = false;
             }
         } else {
             super.travel(vec3);
@@ -370,7 +385,10 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
 
     @Override
     public void onPlayerJump(int pJumpPower) {
-
+        if (this.isSaddled()) {
+            this.flying = true;
+            this.isJumping = true;
+        }
     }
 
     @Override
