@@ -252,7 +252,8 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
                 .add(Attributes.MAX_HEALTH, 10)
                 .add(Attributes.ATTACK_DAMAGE, 3.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
+                .add(Attributes.MOVEMENT_SPEED, 0.2f)
+                .add(Attributes.FLYING_SPEED, 0.2f).build();
     }
 
     @Override
@@ -327,7 +328,7 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
     @Override
     public void travel(Vec3 vec3) {
         LivingEntity rider = (LivingEntity) this.getControllingPassenger();
-        if (rider != null) {
+        if (rider != null && this.isVehicle()) {
             this.setYRot(rider.getYRot()); // set the y rotation to the riders rotation
             this.yRotO = this.getYRot();
 
@@ -337,46 +338,58 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
             this.yBodyRot = this.getYRot();
             this.yHeadRot = this.yBodyRot;
 
-            float strafex = rider.xxa * 0.5f;
-            float forwardz = rider.zza;
-            // set an acceleration if forwardx is 0;
+            double strafex = rider.xxa * 0.5f;
+            double yascend = rider.yya;
+            double forwardz = rider.zza;
+            Vec3 jvec = this.getDeltaMovement();
+
+            // make backward movement twice as slow.
             if (forwardz <= 0.0f) {
                 forwardz *= 0.5f;
             }
-            // Jump Code
-            Vec3 jvec = this.getDeltaMovement();
+            // While flying, move towards where the rider is facing.
+            if (flying) {
+                this.moveRelative(0.1F,new Vec3(strafex, yascend, forwardz));
+            }
+
+            // Launch off the ground with more power
             if (isJumping && this.isOnGround()) {
+                this.setDeltaMovement(jvec.x, 1.8, jvec.z);
+                isJumping = false;
+            } // Launch in the air with less power
+            if (flying && isJumping) {
                 this.setDeltaMovement(jvec.x, 1.2, jvec.z);
                 isJumping = false;
             }
-            if (flying && isJumping) {
-                 this.setDeltaMovement(jvec.x, 1.2, jvec.z);
-                 isJumping = false;
-            }
 
-            // when the rider is controlling, set the movement vector
+            // When the rider is controlling, set the movement vector
             if (this.isControlledByLocalInstance()) {
                 this.setSpeed((float)(this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.1)); // set the speed and multiply it by 20%
-                super.travel(new Vec3((double)strafex, vec3.y, (double)forwardz));
+                super.travel(new Vec3(strafex, yascend, forwardz));
+
             }
-            // if there is no player movement, don't move the mob
+            // If there is no player movement, don't move the mob
             else if (rider instanceof Player) {
                 this.setDeltaMovement(Vec3.ZERO);
+                return;
             }
 
             if (isOnGround()) {
                 this.flying = false;
                 this.isJumping = false;
             }
+
         } else {
             super.travel(vec3);
         }
+
     }
 
     @Override
     public void aiStep() {
         super.aiStep();
-        Vec3 vec = this.getDeltaMovement(); // get the vector
+        Vec3 vec = this.getDeltaMovement();
+
         if (!this.onGround && vec.y < 0.0D) {
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
         }
