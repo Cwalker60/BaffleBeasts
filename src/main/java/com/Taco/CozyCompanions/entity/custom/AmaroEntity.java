@@ -1,6 +1,7 @@
 package com.Taco.CozyCompanions.entity.custom;
 
 import com.Taco.CozyCompanions.entity.goal.AmaroIdleGoal;
+import com.Taco.CozyCompanions.entity.goal.AmaroLookAtPlayer;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -11,7 +12,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,6 +22,7 @@ import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -31,7 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.Animation;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.builder.ILoopType;
 import software.bernie.geckolib3.core.controller.AnimationController;
@@ -42,23 +42,42 @@ import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class AmaroEntity extends Animal implements IAnimatable, Saddleable, PlayerRideable, PlayerRideableJumping {
+public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleable, PlayerRideable, PlayerRideableJumping {
 
-    private AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
 
     private static final EntityDataAccessor<Integer> IDLE_POSE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> IDLE_TIMER = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> GOTOSLEEPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> ASLEEP = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
 
     private static final Logger LOGGER = LogUtils.getLogger();
+
+    protected static final AnimationBuilder AMARO_FLY = new AnimationBuilder().addAnimation("animation.amaro.fly", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder AMARO_RUN = new AnimationBuilder().addAnimation("animation.amaro.run", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder AMARO_SIT = new AnimationBuilder().addAnimation("animation.amaro.sit", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder AMARO_NEUTRAL = new AnimationBuilder().addAnimation("animation.amaro.neutral", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder AMARO_IDLE1 = new AnimationBuilder().addAnimation("animation.amaro.idle1", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder AMARO_IDLE2 = new AnimationBuilder().addAnimation("animation.amaro.idle2", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder AMARO_IDLE3 = new AnimationBuilder().addAnimation("animation.amaro.idle3", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder AMARO_IDLE4 = new AnimationBuilder().addAnimation("animation.amaro.idle4", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder AMARO_IDLE5 = new AnimationBuilder().addAnimation("animation.amaro.idle5", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder AMARO_SLEEP = new AnimationBuilder().addAnimation("animation.amaro.sleep", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder AMARO_GOTOSLEEP = new AnimationBuilder().addAnimation("animation.amaro.gotosleep", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
+    protected static final AnimationBuilder AMARO_WAKEUP = new AnimationBuilder().addAnimation("animation.amaro.wakeup");
+    protected static final AnimationBuilder AMARO_BLINK = new AnimationBuilder().addAnimation("animation.amaro.blink", ILoopType.EDefaultLoopTypes.LOOP);
+
     public boolean flying;
     public boolean isJumping;
+    public int animationbuffer = 5;
 
     //Amaro Constructor
-    public AmaroEntity(EntityType<? extends Animal> entityType, Level level) {
+    public AmaroEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
         super(entityType, level);
-
+        this.setTame(false);
     }
 
     @Override
@@ -67,32 +86,46 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
         this.entityData.define(IDLE_POSE, 1);
         this.entityData.define(IDLE_TIMER, 400);
         this.entityData.define(HAS_SADDLE, false);
+        this.entityData.define(ASLEEP, false);
+        this.entityData.define(GOTOSLEEPSTATE, false);
+        this.entityData.define(WAKEUPSTATE, false);
     }
+
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putInt("AmaroIdlePose", this.getIdlePose());
         tag.putInt("AmaroIdleTimer", this.getIdleTimer());
         tag.putBoolean("AmaroHasSaddle", this.isSaddled());
+        tag.putBoolean("AmaroGoToSleep", this.getGoToSleepState());
+        tag.putBoolean("AmaroAsleep", this.isAsleep());
+        tag.putBoolean("AmaroWakeUpState", this.getAmaroWakeUpState());
+
     }
+
+
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.setIdlePose(tag.getInt("AmaroIdlePose"));
         this.setIdleTimer(tag.getInt("AmaroIdleTimer"));
         this.setSaddle(tag.getBoolean("AmaroHasSaddle"));
+        this.setAmaroSleep(tag.getBoolean("AmaroAsleep"));
+        this.setGoToSleepState(tag.getBoolean("AmaroGoToSleep"));
+        this.setAmaroWakeUpState(tag.getBoolean("AmaroWakeUpState"));
     }
 
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new PanicGoal(this, 1.250));
-        this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(4, new AmaroIdleGoal(this));
-        this.goalSelector.addGoal(5, new WaterAvoidingRandomStrollGoal(this, 1.00));
-        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
-        this.targetSelector.addGoal(7, (new HurtByTargetGoal(this)).setAlertOthers());
+        this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(2, new FloatGoal(this));
+        this.goalSelector.addGoal(3, new PanicGoal(this, 1.250));
+        this.goalSelector.addGoal(4, new AmaroLookAtPlayer(this, Player.class, 12F));
+        this.goalSelector.addGoal(5, new AmaroIdleGoal(this));
+        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.00));
+        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(8, (new HurtByTargetGoal(this)).setAlertOthers());
     }
 
     @Nullable
@@ -101,66 +134,78 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
         return null;
     }
 
+    // this plays the walking, neutral, flying, sit, and sleep animations
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        // If the entity is walking, play the run/neutral animation!
+        //If the amaro is moving
         if (event.isMoving() && this.isOnGround()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.run",
-                    ILoopType.EDefaultLoopTypes.LOOP));
+            event.getController().setAnimation(AMARO_RUN);
+            return PlayState.CONTINUE;
+        } else if (!this.isOnGround()) { // Set the amaro to fly
+            event.getController().setAnimation(AMARO_FLY);
             return PlayState.CONTINUE;
         }
-        //If the entity is not on the ground, fly!
-        if (!this.isOnGround()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.fly",
-                    ILoopType.EDefaultLoopTypes.LOOP));
-            return PlayState.CONTINUE;
+        // If the amaro is not moving
+        else {
+            //
+            if (this.isInSittingPose() && !this.isAsleep()) {
+                event.getController().setAnimation(AMARO_SIT);
+                return PlayState.CONTINUE;
+            }
+            if (this.isInSittingPose() && this.isAsleep()) {
+                event.getController().setAnimation(AMARO_SLEEP);
+                return PlayState.CONTINUE;
+            }
+
+            if (this.isOnGround() && !this.isInSittingPose()) {
+                event.getController().setAnimation(AMARO_NEUTRAL);
+                return PlayState.CONTINUE;
+            }
         }
-        // Otherwise, play the neutral pose.
-        if (!event.isMoving() && this.isOnGround()) {
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.neutral",
-                    ILoopType.EDefaultLoopTypes.LOOP));
-            return PlayState.CONTINUE;
-        }
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
-        int idlePose = getIdlePose();
+        int idlePose = this.getIdlePose();
 
-        if (!event.isMoving() && this.isOnGround()) {
+        // Idle Animations
+        if (!event.isMoving() && this.isOnGround() && !this.isInSittingPose()) {
             switch (idlePose) {
-                case 1: event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.idle1",
-                        ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+                case 1: event.getController().setAnimation(AMARO_IDLE1);
                     return PlayState.CONTINUE;
-                case 2: event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.idle2",
-                        ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+                case 2: event.getController().setAnimation(AMARO_IDLE2);
                     return PlayState.CONTINUE;
-                case 3: event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.idle3",
-                        ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+                case 3: event.getController().setAnimation(AMARO_IDLE3);
                     return PlayState.CONTINUE;
-                case 4: event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.idle4",
-                        ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+                case 4: event.getController().setAnimation(AMARO_IDLE4);
                     return PlayState.CONTINUE;
-                case 5: event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.idle5",
-                        ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+                case 5: event.getController().setAnimation(AMARO_IDLE5);
                     return PlayState.CONTINUE;
             }
+        }
+
+        if (!event.isMoving() && this.getAmaroWakeUpState() && this.isInSittingPose()) {
+            event.getController().clearAnimationCache();
+            event.getController().setAnimation(AMARO_WAKEUP);
+            return PlayState.CONTINUE;
         }
 
         return PlayState.CONTINUE;
     }
 
     private <E extends IAnimatable> PlayState blinkPredicate(AnimationEvent<E> event) {
-        event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.amaro.blink",
-                ILoopType.EDefaultLoopTypes.LOOP));
-        return PlayState.CONTINUE;
+        if (!this.isAsleep()) {
+            event.getController().setAnimation(AMARO_BLINK);
+            return PlayState.CONTINUE;
+        }
+        return PlayState.STOP;
     }
 
     @Override
     public void registerControllers(AnimationData data) {
         data.addAnimationController(new AnimationController(this, "walk",
-                0, this::predicate));
+                15, this::predicate));
         data.addAnimationController(new AnimationController(this, "idle",
-                0, this::idlePredicate));
+                15, this::idlePredicate));
         data.addAnimationController(new AnimationController(this, "blink",
                 0, this::blinkPredicate));
     }
@@ -194,8 +239,17 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
     //ints will range from 1-5. if an invalid int is out of this range, it will default to 1.
     public void setIdlePose(int idle) {
         this.entityData.set(IDLE_POSE, idle);
-    }
+        LOGGER.debug("idle pose is " + idle);
+        if (idle <= 3) {
+            this.setGoToSleepState(true);
+        } else {
+            this.setAmaroWakeUpState(true);
+        }
+//        LOGGER.debug("gotosleep is " + this.getGoToSleepState());
+//        LOGGER.debug("sleeping is " + this.isAsleep());
+//        LOGGER.debug("wakeUpState is " + this.getAmaroWakeUpState());
 
+    }
     public int getIdlePose() {
         return this.entityData.get(IDLE_POSE);
     }
@@ -209,6 +263,30 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
         return this.entityData.get(IDLE_TIMER);
     }
 
+    public boolean isAsleep() {
+        return this.entityData.get(ASLEEP);
+    }
+
+    public void setAmaroSleep(boolean b) {
+        this.entityData.set(ASLEEP, b);
+    }
+
+    public void setGoToSleepState(boolean b) {
+        if (this.isAsleep()) {
+            this.entityData.set(GOTOSLEEPSTATE, false);
+        } else {
+            this.entityData.set(GOTOSLEEPSTATE, b);
+        }
+    }
+    public boolean getGoToSleepState() {return this.entityData.get(GOTOSLEEPSTATE); }
+
+    public boolean getAmaroWakeUpState() { return this.entityData.get(WAKEUPSTATE);}
+    public void setAmaroWakeUpState(boolean b) {
+        if (isAsleep()) {
+            this.entityData.set(WAKEUPSTATE, b);
+        }
+    }
+
     protected int getInventorySize() {
         return 2;
     }
@@ -217,31 +295,95 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
     @Override
     public void tick() {
         super.tick();
-
+        // Idle timer
         if (getIdleTimer() > 0) {
             setIdleTimer(getIdleTimer() - 1);
+        }
+
+        if (this.getGoToSleepState()) {
+            this.animationbuffer -= 1;
+            if (this.animationbuffer < 0) {
+                this.setAmaroSleep(true);
+                this.setGoToSleepState(false);
+                this.animationbuffer = 5;
+            }
+        }
+        if (this.getAmaroWakeUpState()) {
+            this.animationbuffer -= 1;
+            if (this.animationbuffer < 0) {
+                this.setAmaroWakeUpState(false);
+                this.setAmaroSleep(false);
+                this.animationbuffer = 5;
+            }
         }
     }
 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        // Boolean to check if the player has a saddle and equip it
-        boolean saddlecheck = !this.isSaddled() && this.isSaddleable() && stack.is(Items.SADDLE);
-        if (saddlecheck) {
-            stack.shrink(1); // remove saddle from players inventory.
-            equipSaddle(getSoundSource());
-            setSaddle(true);
-            return InteractionResult.sidedSuccess(level.isClientSide());
-        }
-        // Check to see if you can ride the Amaro
-        if (isSaddled()) {
-            if (!level.isClientSide) {
-                setRidingPlayer(player);
-                navigation.stop();
-                setTarget(null);
-            }
-            return InteractionResult.sidedSuccess(level.isClientSide());
+        if (this.level.isClientSide) {
+           if (this.isTame() ) {
+               return InteractionResult.SUCCESS;
+           }
+
+        } else {
+            // tamed interactions
+            if (this.isTame()) {
+                // Equip Saddle
+                boolean saddlecheck = !this.isSaddled() && this.isSaddleable() && stack.is(Items.SADDLE);
+                if (saddlecheck) {
+                    stack.shrink(1); // remove saddle from players inventory.
+                    equipSaddle(getSoundSource());
+                    setSaddle(true);
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
+                // Check to see if you can ride the Amaro
+                if (isSaddled() && this.isTame() && !player.isShiftKeyDown() && !isHealItem(stack.getItem())) {
+                    if (!level.isClientSide) {
+                        setRidingPlayer(player);
+                        this.setOrderedToSit(false);
+                        this.setAmaroWakeUpState(true);
+                        navigation.stop();
+                        setTarget(null);
+                    }
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
+                // Heal check
+                if (isHealItem(stack.getItem())) {
+                    stack.shrink(1);
+                    this.setIdlePose(4);//DEBUG LINE
+                    this.heal(4.0f);
+                    this.spawnTamingParticles(true);
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
+                // DEBUG IDLE CHECK
+                if (stack.is(Items.SUGAR)) {
+                    this.setIdlePose(1);//DEBUG LINE
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
+
+                // Sit check
+                InteractionResult emptyhand = super.mobInteract(player, hand);
+                if (player.isShiftKeyDown() && !emptyhand.consumesAction()) {
+                    this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
+                    this.navigation.stop();
+                    this.flying = false;
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
+            // Untamed interactions
+            // Tame check
+            } else if (stack.is(Items.GLISTERING_MELON_SLICE) && !this.isTame()) {
+                    stack.shrink(1);
+                    // Have a 1-3 chance of taming the amaro
+                    if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) {
+                        this.tame(player);
+                        this.navigation.stop();
+                        this.level.broadcastEntityEvent(this, (byte)7);
+                    } else {
+                        this.level.broadcastEntityEvent(this, (byte)6);
+                    }
+                    return InteractionResult.sidedSuccess(level.isClientSide());
+                }
         }
         return super.mobInteract(player,hand);
     }
@@ -256,9 +398,16 @@ public class AmaroEntity extends Animal implements IAnimatable, Saddleable, Play
                 .add(Attributes.FLYING_SPEED, 0.2f).build();
     }
 
+    private boolean isHealItem(Item food) {
+        if (food == Items.MELON || food == Items.APPLE || food == Items.GLOW_BERRIES ) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean isSaddleable() {
-        return this.isAlive();
+        return (this.isAlive() && this.isTame());
     }
 
     @Override

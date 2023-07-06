@@ -10,7 +10,6 @@ public class AmaroIdleGoal extends Goal {
     public AmaroIdleGoal(AmaroEntity mob) {
         this.entity = mob;
     }
-
     // This goal can be used when the amaro is alive, and some time has passed since the last idle.
     @Override
     public boolean canUse() {
