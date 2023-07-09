@@ -2,6 +2,8 @@ package com.Taco.CozyCompanions.entity.custom;
 
 import com.Taco.CozyCompanions.entity.goal.AmaroIdleGoal;
 import com.Taco.CozyCompanions.entity.goal.AmaroLookAtPlayer;
+import com.Taco.CozyCompanions.sound.CustomSoundEvents;
+import com.Taco.CozyCompanions.sound.SoundRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -220,11 +222,11 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     }
 
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.CAT_PURR;
+        return SoundRegistry.AMARO_IDLE.get();
     }
 
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
-        return SoundEvents.CAT_HURT;
+        return SoundRegistry.AMARO_HURT.get();
     }
 
     protected SoundEvent getDeathSound() {
@@ -349,7 +351,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                     return InteractionResult.sidedSuccess(level.isClientSide());
                 }
                 // Heal check
-                if (isHealItem(stack.getItem())) {
+                if (isHealItem(stack.getItem()) &&!player.isShiftKeyDown()) {
                     stack.shrink(1);
                     this.setIdlePose(4);//DEBUG LINE
                     this.heal(4.0f);
@@ -399,7 +401,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     }
 
     private boolean isHealItem(Item food) {
-        if (food == Items.MELON || food == Items.APPLE || food == Items.GLOW_BERRIES ) {
+        if (food == Items.MELON_SLICE || food == Items.APPLE || food == Items.GLOW_BERRIES ) {
             return true;
         }
         return false;

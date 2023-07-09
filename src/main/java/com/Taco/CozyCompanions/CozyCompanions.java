@@ -3,9 +3,11 @@ package com.Taco.CozyCompanions;
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
 import com.Taco.CozyCompanions.entity.client.AmaroRenderer;
 import com.Taco.CozyCompanions.item.ModItems;
+import com.Taco.CozyCompanions.sound.SoundRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -49,9 +51,9 @@ public class CozyCompanions
 
         // Register ourselves for server and other game events we are interested in
 
-
         ModItems.register(modEventBus);
         ModEntityTypes.register(modEventBus);
+        SoundRegistry.register(modEventBus);
 
         GeckoLib.initialize();
 
