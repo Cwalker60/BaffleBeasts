@@ -1,3 +1,6 @@
 {
-  "item.cozycompanions.amaro_spawn_egg": "Amaro Spawn Egg"
+  "item.cozycompanions.amaro_spawn_egg": "Amaro Spawn Egg",
+
+  "key.category.cozycompanions.keybinds": "Cozy Companions",
+  "key.cozycompanions.descend": "Descend"
 }

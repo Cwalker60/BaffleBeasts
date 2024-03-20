@@ -20,7 +20,7 @@ public class SoundGenerator extends SoundDefinitionsProvider {
                 .with(sound(SoundRegistry.AMARO_IDLE.getId(), SoundDefinition.SoundType.SOUND)));
         this.add(CustomSoundEvents.AMARO_HURT, definition()
                 .subtitle("sound.cozycompanions.amaro_hurt")
-                .with(sound(SoundRegistry.AMARO_HURT.getId(), SoundDefinition.SoundType.SOUND)));
+                .with(sound(SoundRegistry.AMARO_HURT.getId(), SoundDefinition.SoundType.SOUND).volume(2.0f)));
 
     }
 }

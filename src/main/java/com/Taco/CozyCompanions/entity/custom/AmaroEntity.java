@@ -2,9 +2,10 @@ package com.Taco.CozyCompanions.entity.custom;
 
 import com.Taco.CozyCompanions.entity.goal.AmaroIdleGoal;
 import com.Taco.CozyCompanions.entity.goal.AmaroLookAtPlayer;
-import com.Taco.CozyCompanions.sound.CustomSoundEvents;
 import com.Taco.CozyCompanions.sound.SoundRegistry;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -37,6 +38,7 @@ import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.builder.ILoopType;
 import software.bernie.geckolib3.core.controller.AnimationController;
+import software.bernie.geckolib3.core.event.SoundKeyframeEvent;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
@@ -202,14 +204,21 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         return PlayState.STOP;
     }
 
+    private <ENTITY extends IAnimatable> void soundListener(SoundKeyframeEvent<ENTITY> event) {
+        this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 3.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
+    }
+
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController(this, "walk",
-                15, this::predicate));
+        AnimationController walkController = new AnimationController(this, "walk", 15, this::predicate);
+        walkController.registerSoundListener(this::soundListener);
+        data.addAnimationController(walkController);
+
         data.addAnimationController(new AnimationController(this, "idle",
                 15, this::idlePredicate));
         data.addAnimationController(new AnimationController(this, "blink",
                 0, this::blinkPredicate));
+
     }
 
     @Override
@@ -506,6 +515,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
             // Launch off the ground with more power
             if (isJumping && this.isOnGround()) {
                 this.setDeltaMovement(jvec.x, 1.8, jvec.z);
+                this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
                 isJumping = false;
             } // Launch in the air with less power
             if (flying && isJumping) {

@@ -1,8 +1,5 @@
 package com.Taco.CozyCompanions.sound;
 
-import net.minecraft.client.resources.sounds.Sound;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 

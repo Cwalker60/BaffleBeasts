@@ -612,6 +612,11 @@
 						}
 					}
 				}
+			},
+			"sound_effects": {
+				"0.5": {
+					"effect": "flap"
+				}
 			}
 		},
 		"animation.amaro.sitdown": {

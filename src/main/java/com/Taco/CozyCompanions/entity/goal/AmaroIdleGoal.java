@@ -1,9 +1,7 @@
 package com.Taco.CozyCompanions.entity.goal;
 
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
-import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.ai.goal.Goal;
-import org.slf4j.Logger;
 
 public class AmaroIdleGoal extends Goal {
     private final AmaroEntity entity;

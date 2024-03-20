@@ -1,7 +1,6 @@
 package com.Taco.CozyCompanions.datagen;
 
 import com.Taco.CozyCompanions.CozyCompanions;
-import com.Taco.CozyCompanions.sound.SoundRegistry;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -16,6 +15,7 @@ public class DataGenerators {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
         generator.addProvider(true, new SoundGenerator(generator, CozyCompanions.MODID, existingFileHelper));
+
     }
 
 }
