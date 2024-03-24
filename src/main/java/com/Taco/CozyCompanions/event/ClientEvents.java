@@ -1,9 +1,13 @@
 package com.Taco.CozyCompanions.event;
 
 import com.Taco.CozyCompanions.CozyCompanions;
+import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
+import com.Taco.CozyCompanions.networking.ModPackets;
+import com.Taco.CozyCompanions.networking.packet.AmaroDescendC2SPacket;
 import com.Taco.CozyCompanions.util.KeyBindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
@@ -18,12 +22,25 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
-            if(KeyBindings.DESCENDING_KEY.consumeClick()) {
-                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Descend test key!"));
+            // Amaro Descend Keybind
+            AmaroEntity amaro = null;
+            if (Minecraft.getInstance().player != null) {
+                if (Minecraft.getInstance().player.getVehicle() instanceof AmaroEntity) {
+                    amaro = (AmaroEntity)Minecraft.getInstance().player.getVehicle();
+                }
             }
 
+            if (amaro != null) {
+                if(KeyBindings.DESCENDING_KEY.isDown() && amaro.isFlying()) {
+                    ModPackets.sendToServer(new AmaroDescendC2SPacket());
+                    amaro.setDescend(true);
+                } else {
+                    amaro.setDescend(false);
+                }
+            }
         }
     }
+
     @Mod.EventBusSubscriber(modid = CozyCompanions.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientModBusEvents {
         @SubscribeEvent

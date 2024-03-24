@@ -3,6 +3,7 @@ package com.Taco.CozyCompanions;
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
 import com.Taco.CozyCompanions.entity.client.AmaroRenderer;
 import com.Taco.CozyCompanions.item.ModItems;
+import com.Taco.CozyCompanions.networking.ModPackets;
 import com.Taco.CozyCompanions.sound.SoundRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -50,9 +51,10 @@ public class CozyCompanions
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            ModPackets.register();
+        });
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

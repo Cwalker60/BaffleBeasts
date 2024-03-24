@@ -18,6 +18,11 @@ public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
     }
     @Override
     public ResourceLocation getTextureLocation(AmaroEntity instance) {
+        switch (instance.getVariant()) {
+            case 1 : return new ResourceLocation(CozyCompanions.MODID, "textures/entity/amaro/amaro_mount1.png");
+            case 2 : return new ResourceLocation(CozyCompanions.MODID, "textures/entity/amaro/amaro_mount2.png");
+            case 3 : return new ResourceLocation(CozyCompanions.MODID, "textures/entity/amaro/amaro_mount3.png");
+        }
         return new ResourceLocation(CozyCompanions.MODID, "textures/entity/amaro/amaro_mount1.png");
     }
     @Override

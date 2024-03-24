@@ -1,0 +1,20 @@
+{
+  "amaro/amaro_hurt": {
+    "sounds": [
+      {
+        "name": "cozycompanions:amaro/amaro_hurt",
+        "volume": 2.0
+      }
+    ],
+    "subtitle": "sound.cozycompanions.amaro_hurt"
+  },
+  "amaro/amaro_idle": {
+    "sounds": [
+      {
+        "name": "cozycompanions:amaro/amaro_idle",
+        "volume": 3.0
+      }
+    ],
+    "subtitle": "sound.cozycompanions.amaro_idle"
+  }
+}

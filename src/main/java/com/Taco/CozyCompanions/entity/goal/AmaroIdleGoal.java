@@ -1,10 +1,13 @@
 package com.Taco.CozyCompanions.entity.goal;
 
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
+import com.mojang.logging.LogUtils;
 import net.minecraft.world.entity.ai.goal.Goal;
+import org.slf4j.Logger;
 
 public class AmaroIdleGoal extends Goal {
     private final AmaroEntity entity;
+
     public AmaroIdleGoal(AmaroEntity mob) {
         this.entity = mob;
     }
@@ -22,6 +25,7 @@ public class AmaroIdleGoal extends Goal {
         int pose = (int)(Math.random() * 5) + 1;
         this.entity.setIdlePose(pose);
         this.entity.setIdleTimer(400);
+
     }
 
 
