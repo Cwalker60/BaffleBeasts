@@ -2,10 +2,19 @@ package com.Taco.CozyCompanions.entity.custom;
 
 import com.Taco.CozyCompanions.entity.goal.AmaroIdleGoal;
 import com.Taco.CozyCompanions.entity.goal.AmaroLookAtPlayer;
+import com.Taco.CozyCompanions.flight.AmaroFlight;
+import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
+import com.Taco.CozyCompanions.networking.ModPackets;
+import com.Taco.CozyCompanions.networking.packet.AmaroFlightDashC2SPacket;
+import com.Taco.CozyCompanions.networking.packet.AmaroFlightPowerC2SPacket;
 import com.Taco.CozyCompanions.sound.SoundRegistry;
+import com.Taco.CozyCompanions.util.ElytraGlideCalculation;
 import com.Taco.CozyCompanions.util.KeyBindings;
 import com.mojang.logging.LogUtils;
+import com.mojang.math.Vector3d;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Rotations;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -14,6 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -24,16 +34,21 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
+import org.w3c.dom.Attr;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -58,7 +73,6 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     private static final EntityDataAccessor<Boolean> ASLEEP = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
 
-
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static final AnimationBuilder AMARO_FLY = new AnimationBuilder().addAnimation("animation.amaro.fly", ILoopType.EDefaultLoopTypes.LOOP);
@@ -74,12 +88,15 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     protected static final AnimationBuilder AMARO_GOTOSLEEP = new AnimationBuilder().addAnimation("animation.amaro.gotosleep", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
     protected static final AnimationBuilder AMARO_WAKEUP = new AnimationBuilder().addAnimation("animation.amaro.wakeup");
     protected static final AnimationBuilder AMARO_BLINK = new AnimationBuilder().addAnimation("animation.amaro.blink", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final AnimationBuilder AMARO_NONE = new AnimationBuilder().addAnimation("animation.amaro.blink", ILoopType.EDefaultLoopTypes.LOOP);
 
     public boolean flying = false;
     public boolean isJumping = false;
     public boolean descend = false;
+    public boolean elytraFlying = false;
 
     public int animationbuffer = 5;
+    public int flightRechargeBuffer = 100;
 
     //Amaro Constructor
     public AmaroEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
@@ -159,8 +176,11 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         if (event.isMoving() && this.isOnGround()) {
             event.getController().setAnimation(AMARO_RUN);
             return PlayState.CONTINUE;
-        } else if (!this.isOnGround()) { // Set the amaro to fly
+        } else if (!this.isOnGround() && !this.isElytraFlying()) { // Set the amaro to fly
             event.getController().setAnimation(AMARO_FLY);
+            return PlayState.CONTINUE;
+        } else if (!this.isOnGround() && this.isElytraFlying()) {
+            event.getController().setAnimation(AMARO_NONE);
             return PlayState.CONTINUE;
         }
         // If the amaro is not moving
@@ -185,7 +205,11 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
 
     private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
         int idlePose = this.getIdlePose();
-
+        // Stop idle animations if the amaro is flying.
+//        if (this.isFlying()) {
+//            event.getController().markNeedsReload();
+//            return PlayState.STOP;
+//        }
         // Idle Animations
         if (!event.isMoving() && this.isOnGround() && !this.isInSittingPose()) {
             switch (idlePose) {
@@ -271,6 +295,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         } else {
             this.setAmaroWakeUpState(true);
         }
+
 //        LOGGER.debug("gotosleep is " + this.getGoToSleepState());
 //        LOGGER.debug("sleeping is " + this.isAsleep());
 //        LOGGER.debug("wakeUpState is " + this.getAmaroWakeUpState());
@@ -333,10 +358,38 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         return 2;
     }
 
+    public void setElytraFlying(boolean b) {
+        this.elytraFlying = b;
+        if (b == true) {
+            this.setSharedFlag(7, true);
+        } else {
+            this.setSharedFlag(7, false);
+        }
+    }
+
+    public boolean isElytraFlying() {
+        return this.elytraFlying;
+    }
+
 
     @Override
     public void tick() {
         super.tick();
+        getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
+           if (amaroFlight.getFlightPower() < 6) {
+               if (this.isOnGround()) {
+                   this.flightRechargeBuffer -= 5;
+               } else {
+                   this.flightRechargeBuffer--;
+               }
+           }
+
+           if (flightRechargeBuffer < 0) {
+                this.flightRechargeBuffer = 100;
+                amaroFlight.addFlightPower(1);
+           }
+        });
+
         // Idle timer
         if (getIdleTimer() > 0) {
             setIdleTimer(getIdleTimer() - 1);
@@ -436,8 +489,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                 .add(Attributes.MAX_HEALTH, 10)
                 .add(Attributes.ATTACK_DAMAGE, 3.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.2f)
-                .add(Attributes.FLYING_SPEED, 0.2f).build();
+                .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
     }
 
     private boolean isHealItem(Item food) {
@@ -520,10 +572,11 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     public void travel(Vec3 vec3) {
         LivingEntity rider = (LivingEntity) this.getControllingPassenger();
         if (rider != null && this.isVehicle()) {
+
             this.setYRot(rider.getYRot()); // set the y rotation to the riders rotation
             this.yRotO = this.getYRot();
 
-            this.setXRot(rider.getXRot() * 0.5f); // set the x rotation to the riders rotation
+            this.setXRot(rider.getXRot()); // set the x rotation to the riders rotation
             this.setRot(this.getYRot(), this.getXRot());
 
             this.yBodyRot = this.getYRot();
@@ -540,29 +593,44 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                 forwardz *= 0.5f;
             }
             // While flying, move towards where the rider is facing.
-            if (flying) {
+            if (flying && !isElytraFlying()) {
                 this.moveRelative(0.1F,new Vec3(strafex, yascend, forwardz));
+                //LOGGER.debug("deltamovement is " + jvec.x + "," + jvec.y + "," + jvec.z);
             }
 
             // Launch off the ground with more power
-            if (this.isJumping && this.isOnGround()) {
+            if (this.isJumping && this.isOnGround() && !this.isElytraFlying()) {
                 this.setDeltaMovement(jvec.x, 1.8, jvec.z);
                 this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
                 this.isJumping = false;
             } // Launch in the air with less power
-            if (this.flying && this.isJumping) {
-                this.setDeltaMovement(jvec.x, 1.2, jvec.z);
+            if (this.flying && this.isJumping && !this.isElytraFlying()) {
+                this.setDeltaMovement(jvec.x, jvec.y + 1.5, jvec.z);
                 this.isJumping = false;
             }
+            // Launch the amaro forward in the air with elytra gliding, similar to a minecraft rocket.
+            if (this.flying && this.isJumping && this.isElytraFlying()) {
+                ModPackets.sendToServer(new AmaroFlightDashC2SPacket());
+                this.isJumping = false;
+            }
+
             // Descend the amaro if the Descend key is called
-            if (this.flying && this.descend) {
+            if (this.flying && this.descend && !this.isElytraFlying()) {
                 this.moveRelative(0.1F, new Vec3(strafex, -20, forwardz));
             }
 
             // When the rider is controlling, set the movement vector
             if (this.isControlledByLocalInstance()) {
-                this.setSpeed((float)(this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.1)); // set the speed and multiply it by 20%
-                super.travel(new Vec3(strafex, yascend, forwardz));
+                this.setSpeed((float) (this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.2)); // set the speed and multiply it by 20%
+                // While gliding, use the look vector to elytra glide.
+                if (this.isElytraFlying()) {
+                    Vec3 look = this.getLookAngle();
+                    ElytraGlideCalculation.calculateGlide(this, look);
+
+                } else {
+                    super.travel(new Vec3(strafex, yascend, forwardz));
+                }
+
             }
 
             // If there is no player movement, don't move the mob
@@ -575,6 +643,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                 this.flying = false;
                 this.isJumping = false;
                 this.descend = false;
+                this.setElytraFlying(false);
             }
 
         } else {
@@ -587,8 +656,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     public void aiStep() {
         super.aiStep();
         Vec3 vec = this.getDeltaMovement();
-
-        if (!this.onGround && vec.y < 0.0D) {
+        if (!this.onGround && vec.y < 0.0D && !this.isElytraFlying()) {
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
             this.flying = true;
         }
@@ -597,10 +665,14 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
 
     @Override
     public void onPlayerJump(int pJumpPower) {
-        if (this.isSaddled()) {
-            this.flying = true;
-            this.isJumping = true;
-        }
+        this.getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
+            if (this.isSaddled() && amaroFlight.getFlightPower() > 0) {
+                this.flying = true;
+                this.isJumping = true;
+                //ModPackets.sendToServer(new AmaroFlightPowerC2SPacket(-1));
+                amaroFlight.subFlightPower(1);
+            }
+        });
     }
 
     @Override
