@@ -47,6 +47,14 @@ public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
             model.getBone("saddle").get().setHidden(false);
         }
 
+        if (entity.isBaby()) {
+            poseStack.scale(0.4f,0.4f,0.4f);
+            model.getBone("head").get().setScale(1.6f,1.6f,1.6f);
+        } else {
+
+        }
+
+
         if (entity.isElytraFlying()) {
             float f1 = (float)entity.getFallFlyingTicks() + partialTick;
             float f2 = Mth.clamp(f1 * f1 / 100.0F, 0.0F, 1.0F);
@@ -64,6 +72,8 @@ public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
                 poseStack.mulPose(Vector3f.ZP.rotation((float)(-Math.signum(d3) * Math.acos(d2))));
             }
         }
+
+
 
         super.render(model, entity, partialTick, type, poseStack, bufferSource, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }

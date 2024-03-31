@@ -2,6 +2,7 @@ package com.Taco.CozyCompanions.networking.packet;
 
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
 import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
+import com.Taco.CozyCompanions.networking.ModPackets;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerEntity;
@@ -12,44 +13,34 @@ import java.util.function.Supplier;
 
 public class AmaroFlightPowerC2SPacket {
     public int flightPower;
-
+    public int id;
     public AmaroFlightPowerC2SPacket() {
 
     }
 
-    public AmaroFlightPowerC2SPacket(int power) {
+    public AmaroFlightPowerC2SPacket(int power, int i) {
         this.flightPower = power;
+        this.id = i;
     }
 
 
     public AmaroFlightPowerC2SPacket(FriendlyByteBuf buf) {
         this.flightPower = buf.readInt();
+        this.id = buf.readInt();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeInt(flightPower);
+        buf.writeInt(id);
     }
 
-    public void encode() {
-
-    }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null) {
-                if (player.getVehicle() instanceof AmaroEntity amaro) {
-
-                    amaro.getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent((amaroFlight -> {
-                        if (flightPower < 0) {
-                            amaroFlight.subFlightPower(flightPower);
-                        } else if (flightPower > 0) {
-                            amaroFlight.addFlightPower(flightPower);
-                        }
-                        player.sendSystemMessage(Component.literal("Current Flight Power " + amaroFlight.getFlightPower()));
-                    }));
-                }
+                ModPackets.sendToPlayer(new AmaroGUISyncS2CPacket(flightPower, id), player);
             } else {
                 return;
             }

@@ -1,5 +1,7 @@
 package com.Taco.CozyCompanions.entity.custom;
 
+import com.Taco.CozyCompanions.entity.ModEntityTypes;
+import com.Taco.CozyCompanions.entity.client.AmaroFlightHud;
 import com.Taco.CozyCompanions.entity.goal.AmaroIdleGoal;
 import com.Taco.CozyCompanions.entity.goal.AmaroLookAtPlayer;
 import com.Taco.CozyCompanions.flight.AmaroFlight;
@@ -15,6 +17,7 @@ import com.mojang.math.Vector3d;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Rotations;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -34,11 +37,13 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Rotation;
@@ -61,6 +66,7 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
+import java.util.UUID;
 
 public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleable, PlayerRideable, PlayerRideableJumping {
 
@@ -72,7 +78,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     private static final EntityDataAccessor<Boolean> GOTOSLEEPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> ASLEEP = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
-
+    private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.MELON_SLICE, Items.GLISTERING_MELON_SLICE);
     private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static final AnimationBuilder AMARO_FLY = new AnimationBuilder().addAnimation("animation.amaro.fly", ILoopType.EDefaultLoopTypes.LOOP);
@@ -94,9 +100,11 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     public boolean isJumping = false;
     public boolean descend = false;
     public boolean elytraFlying = false;
+    public boolean flightGUIFlicker = false;
 
     public int animationbuffer = 5;
     public int flightRechargeBuffer = 100;
+    public int guiFlickerBUffer = 1;
 
     //Amaro Constructor
     public AmaroEntity(EntityType<? extends TamableAnimal> entityType, Level level) {
@@ -158,16 +166,47 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         this.goalSelector.addGoal(2, new FloatGoal(this));
         this.goalSelector.addGoal(3, new PanicGoal(this, 1.250));
         this.goalSelector.addGoal(4, new AmaroLookAtPlayer(this, Player.class, 12F));
-        this.goalSelector.addGoal(5, new AmaroIdleGoal(this));
-        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.00));
-        this.goalSelector.addGoal(7, new RandomLookAroundGoal(this));
-        this.targetSelector.addGoal(8, (new HurtByTargetGoal(this)).setAlertOthers());
+        this.goalSelector.addGoal(5, new BreedGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new AmaroIdleGoal(this));
+        this.goalSelector.addGoal(7, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
+        this.goalSelector.addGoal(8, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, false));
+        this.goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 1.00));
+        this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(11, (new HurtByTargetGoal(this)).setAlertOthers());
+    }
+
+    @Override
+    public boolean canMate(Animal pOtherAnimal) {
+        if (pOtherAnimal == this) {
+            return false;
+        } else if (!this.isTame()) {
+            return false;
+        } else if (!(pOtherAnimal instanceof AmaroEntity)) {
+            return false;
+        } else {
+            AmaroEntity otherAmaro = (AmaroEntity)pOtherAnimal;
+            if (!otherAmaro.isTame()) {
+                return false;
+            } else if (otherAmaro.isInSittingPose()) {
+                return false;
+            } else {
+                return this.isInLove() && otherAmaro.isInLove();
+            }
+        }
+    }
+
+    @Override
+    public boolean isFood(ItemStack pStack) {
+        Item item = pStack.getItem();
+        return (item == Items.MELON_SLICE);
     }
 
     @Nullable
     @Override
-    public AgeableMob getBreedOffspring(ServerLevel p_146743_, AgeableMob p_146744_) {
-        return null;
+    public AmaroEntity getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
+        AmaroEntity baby = ModEntityTypes.Amaro.get().create(pLevel);
+
+        return baby;
     }
 
     // this plays the walking, neutral, flying, sit, and sleep animations
@@ -384,10 +423,21 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                }
            }
 
-           if (flightRechargeBuffer < 0) {
-                this.flightRechargeBuffer = 100;
-                amaroFlight.addFlightPower(1);
+           if (this.flightRechargeBuffer < 0) {
+               this.flightRechargeBuffer = 100;
+               amaroFlight.addFlightPower(1);
+               //ModPackets.sendToPlayer(new AmaroFlightPowerC2SPacket(1, this.);
+               this.flightGUIFlicker = true;
            }
+
+            if (this.flightGUIFlicker == true) {
+                AmaroFlightHud.updateFlightPowerGUI();
+                if (AmaroFlightHud.getFlightAnimationDrawstate() > 16) {
+                    this.flightGUIFlicker = false;
+                    AmaroFlightHud.FLIGHT_ANIMATION_DRAWSTATE = -1;
+                }
+            }
+
         });
 
         // Idle timer
@@ -424,14 +474,35 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         } else {
             // tamed interactions
             if (this.isTame()) {
+                // Breeding Interactions
+                int age = this.getAge();
+                if (stack.is(Items.MELON_SLICE)) {
+                    if (!this.level.isClientSide && age == 0 && this.canFallInLove()) {
+                        this.usePlayerItem(player, hand, stack);
+                        this.setInLove(player);
+                        return InteractionResult.SUCCESS;
+                    }
+                    // Baby Growth Interaction
+                    if (this.isBaby()) {
+                        this.usePlayerItem(player, hand, stack);
+                        this.ageUp(getSpeedUpSecondsWhenFeeding(-age), true);
+                        return InteractionResult.sidedSuccess(this.level.isClientSide);
+                    }
+
+                    if (this.level.isClientSide) {
+                        return InteractionResult.CONSUME;
+                    }
+                }
+
                 // Equip Saddle
-                boolean saddlecheck = !this.isSaddled() && this.isSaddleable() && stack.is(Items.SADDLE);
+                boolean saddlecheck = !this.isSaddled() && this.isSaddleable() && stack.is(Items.SADDLE) && !this.isBaby();
                 if (saddlecheck) {
                     stack.shrink(1); // remove saddle from players inventory.
                     equipSaddle(getSoundSource());
                     setSaddle(true);
                     return InteractionResult.sidedSuccess(level.isClientSide());
                 }
+
                 // Check to see if you can ride the Amaro
                 if (isSaddled() && this.isTame() && !player.isShiftKeyDown() && !isHealItem(stack.getItem())) {
                     if (!level.isClientSide) {
@@ -493,7 +564,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
     }
 
     private boolean isHealItem(Item food) {
-        if (food == Items.MELON_SLICE || food == Items.APPLE || food == Items.GLOW_BERRIES ) {
+        if (food == Items.APPLE || food == Items.GLOW_BERRIES ) {
             return true;
         }
         return false;
@@ -626,7 +697,6 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                 if (this.isElytraFlying()) {
                     Vec3 look = this.getLookAngle();
                     ElytraGlideCalculation.calculateGlide(this, look);
-
                 } else {
                     super.travel(new Vec3(strafex, yascend, forwardz));
                 }
@@ -660,7 +730,6 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
             this.flying = true;
         }
-
     }
 
     @Override

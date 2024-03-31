@@ -4,6 +4,7 @@ import com.Taco.CozyCompanions.CozyCompanions;
 import com.Taco.CozyCompanions.networking.packet.AmaroDescendC2SPacket;
 import com.Taco.CozyCompanions.networking.packet.AmaroFlightDashC2SPacket;
 import com.Taco.CozyCompanions.networking.packet.AmaroFlightPowerC2SPacket;
+import com.Taco.CozyCompanions.networking.packet.AmaroGUISyncS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -44,6 +45,12 @@ public class ModPackets {
                 .decoder(AmaroFlightDashC2SPacket::new)
                 .encoder(AmaroFlightDashC2SPacket::toBytes)
                 .consumerMainThread((AmaroFlightDashC2SPacket::handle))
+                .add();
+
+        net.messageBuilder(AmaroGUISyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(AmaroGUISyncS2CPacket::new)
+                .encoder(AmaroGUISyncS2CPacket::toBytes)
+                .consumerMainThread((AmaroGUISyncS2CPacket::handle))
                 .add();
     }
 
