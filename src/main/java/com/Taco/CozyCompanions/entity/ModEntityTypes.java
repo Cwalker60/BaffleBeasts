@@ -21,12 +21,6 @@ public class ModEntityTypes {
                     () -> EntityType.Builder.of(AmaroEntity::new, MobCategory.CREATURE)
             .sized(1.5f, 3.2f)
             .build(new ResourceLocation(CozyCompanions.MODID, "amaro").toString()));
-// TODO - FIX AMARO FIREWORK ENTITY
-//    public static final RegistryObject<EntityType<FlightFireworkEntity>> FlightFirework =
-//            ENTITY_TYPES.register("flightfirework",
-//                    () -> EntityType.Builder.of(FlightFireworkEntity::new, MobCategory.MISC)
-//                    .sized(0.25f, 0.25f)
-//                    .build(new ResourceLocation(ResourceLocation.DEFAULT_NAMESPACE, "firework_rocket").toString()));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

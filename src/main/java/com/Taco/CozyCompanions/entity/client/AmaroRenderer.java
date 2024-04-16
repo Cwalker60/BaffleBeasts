@@ -4,6 +4,7 @@ import com.Taco.CozyCompanions.CozyCompanions;
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.logging.LogUtils;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -11,10 +12,14 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
 import software.bernie.geckolib3.geo.render.built.GeoModel;
 import software.bernie.geckolib3.renderers.geo.GeoEntityRenderer;
 
 public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
+
+    public static Logger LOGGER = LogUtils.getLogger();
+
     public AmaroRenderer(EntityRendererProvider.Context renderManager) {
         super(renderManager, new AmaroModel());
         this.shadowRadius = 1.0F;
@@ -54,7 +59,6 @@ public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
 
         }
 
-
         if (entity.isElytraFlying()) {
             float f1 = (float)entity.getFallFlyingTicks() + partialTick;
             float f2 = Mth.clamp(f1 * f1 / 100.0F, 0.0F, 1.0F);
@@ -72,8 +76,6 @@ public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
                 poseStack.mulPose(Vector3f.ZP.rotation((float)(-Math.signum(d3) * Math.acos(d2))));
             }
         }
-
-
 
         super.render(model, entity, partialTick, type, poseStack, bufferSource, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }

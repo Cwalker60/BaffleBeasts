@@ -2,22 +2,17 @@ package com.Taco.CozyCompanions.entity.custom;
 
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
 import com.Taco.CozyCompanions.entity.client.AmaroFlightHud;
+import com.Taco.CozyCompanions.entity.goal.AmaroFollowOwnerGoal;
 import com.Taco.CozyCompanions.entity.goal.AmaroIdleGoal;
 import com.Taco.CozyCompanions.entity.goal.AmaroLookAtPlayer;
-import com.Taco.CozyCompanions.flight.AmaroFlight;
 import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
 import com.Taco.CozyCompanions.networking.ModPackets;
 import com.Taco.CozyCompanions.networking.packet.AmaroFlightDashC2SPacket;
-import com.Taco.CozyCompanions.networking.packet.AmaroFlightPowerC2SPacket;
 import com.Taco.CozyCompanions.sound.SoundRegistry;
 import com.Taco.CozyCompanions.util.ElytraGlideCalculation;
-import com.Taco.CozyCompanions.util.KeyBindings;
 import com.mojang.logging.LogUtils;
-import com.mojang.math.Vector3d;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Rotations;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -26,19 +21,18 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Wolf;
-import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -46,14 +40,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import org.w3c.dom.Attr;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -66,7 +56,6 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.List;
-import java.util.UUID;
 
 public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleable, PlayerRideable, PlayerRideableJumping {
 
@@ -164,12 +153,12 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
         super.registerGoals();
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new FloatGoal(this));
+        this.goalSelector.addGoal(3, new AmaroFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
         this.goalSelector.addGoal(3, new PanicGoal(this, 1.250));
         this.goalSelector.addGoal(4, new AmaroLookAtPlayer(this, Player.class, 12F));
         this.goalSelector.addGoal(5, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(6, new AmaroIdleGoal(this));
         this.goalSelector.addGoal(7, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
-        this.goalSelector.addGoal(8, new FollowOwnerGoal(this, 1.0D, 10.0F, 2.0F, false));
         this.goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 1.00));
         this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
         this.targetSelector.addGoal(11, (new HurtByTargetGoal(this)).setAlertOthers());
@@ -507,6 +496,8 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                 if (isSaddled() && this.isTame() && !player.isShiftKeyDown() && !isHealItem(stack.getItem())) {
                     if (!level.isClientSide) {
                         setRidingPlayer(player);
+
+
                         this.setOrderedToSit(false);
                         this.setAmaroWakeUpState(true);
                         navigation.stop();
@@ -621,18 +612,19 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
             // Set the position of the rider to the current amaro position
             passenger.setPos(this.getX(), this.getY() + (this.getBbHeight() - 1.75),
                     this.getZ());
+
             // Face the rider the same direction the amaro is facing.
             if (rider instanceof LivingEntity) {
                 ((LivingEntity) rider).yBodyRot = this.yBodyRot;
             }
         }
 
-        if (getFirstPassenger() instanceof LivingEntity) {
-            LivingEntity r = ((LivingEntity) rider);
-            r.xRotO = r.getXRot();
-            r.yRotO = r.getYRot();
-            rider.setYBodyRot(yBodyRot);
-        }
+//        if (getFirstPassenger() instanceof LivingEntity) {
+//            LivingEntity r = ((LivingEntity) rider);
+//            r.xRotO = r.getXRot();
+//            r.yRotO = r.getYRot();
+//            rider.setYBodyRot(yBodyRot);
+//        }
     }
     @Override
     public boolean causeFallDamage(float pFallDistance, float pMultiplier, DamageSource pSource) {
@@ -647,6 +639,9 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
             this.setYRot(rider.getYRot()); // set the y rotation to the riders rotation
             this.yRotO = this.getYRot();
 
+            AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
+            double gravityValue = gravity.getValue();
+
             this.setXRot(rider.getXRot()); // set the x rotation to the riders rotation
             this.setRot(this.getYRot(), this.getXRot());
 
@@ -658,6 +653,11 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
             double forwardz = rider.zza;
 
             Vec3 jvec = this.getDeltaMovement();
+            // Add gravity to no gravity. This allows minecraft servers to not kick the player for floating the vehicle.
+            // Alternative solution may be to inject code into ServerGamePacketListener to add a check to flying vehicles.
+            if (this.isNoGravity()) {
+                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue / 4.0D, 0.0D));
+            }
 
             // make backward movement twice as slow.
             if (forwardz <= 0.0f) {
@@ -713,6 +713,7 @@ public class AmaroEntity extends TamableAnimal implements IAnimatable, Saddleabl
                 this.flying = false;
                 this.isJumping = false;
                 this.descend = false;
+                this.setNoGravity(false);
                 this.setElytraFlying(false);
             }
 

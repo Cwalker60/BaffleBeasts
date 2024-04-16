@@ -5,8 +5,10 @@ import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
 import com.Taco.CozyCompanions.networking.ModPackets;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundPlayerAbilitiesPacket;
 import net.minecraft.server.level.ServerEntity;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -39,8 +41,8 @@ public class AmaroFlightPowerC2SPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player != null) {
-                ModPackets.sendToPlayer(new AmaroGUISyncS2CPacket(flightPower, id), player);
+            if (player != null && player.connection != null) {
+
             } else {
                 return;
             }
