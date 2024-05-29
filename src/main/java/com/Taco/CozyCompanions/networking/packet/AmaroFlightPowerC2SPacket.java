@@ -1,6 +1,7 @@
 package com.Taco.CozyCompanions.networking.packet;
 
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
+import com.Taco.CozyCompanions.entity.custom.RideableFlightEntity;
 import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
 import com.Taco.CozyCompanions.networking.ModPackets;
 import net.minecraft.network.FriendlyByteBuf;
@@ -42,7 +43,11 @@ public class AmaroFlightPowerC2SPacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null && player.connection != null) {
+                if (player.getVehicle() != null) {
+                    if (player.getVehicle() instanceof RideableFlightEntity) {
 
+                    }
+                }
             } else {
                 return;
             }

@@ -1,5 +1,6 @@
 package com.Taco.CozyCompanions.util;
 
+import com.Taco.CozyCompanions.CozyCompanions;
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
@@ -70,7 +71,7 @@ public class ElytraGlideCalculation {
 
         // see if the amaro is dashing by finding the nearest firework rocket
         AABB box = entity.getBoundingBox().inflate(1.5);
-        List<Entity> nearby = entity.getLevel().getEntities(entity, box);
+        List<Entity> nearby = Minecraft.getInstance().level.getEntities(entity, box);//entity.getLevel().getEntities(entity, box);
         boolean dashflag = false;
         // iterate through the entities to see if there's a firework rocket.
         for (Entity listEntity : nearby) {

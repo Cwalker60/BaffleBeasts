@@ -3,6 +3,8 @@ package com.Taco.CozyCompanions.event;
 import com.Taco.CozyCompanions.CozyCompanions;
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
+import com.Taco.CozyCompanions.entity.custom.JellyBatEntity;
+import com.Taco.CozyCompanions.entity.custom.RideableFlightEntity;
 import com.Taco.CozyCompanions.flight.AmaroFlight;
 import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
 import com.Taco.CozyCompanions.networking.ModPackets;
@@ -27,10 +29,11 @@ import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
 @Mod.EventBusSubscriber(modid = CozyCompanions.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-public class ModEventBusEvents {
+public class ModEvents {
     @SubscribeEvent
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntityTypes.Amaro.get(), AmaroEntity.setAttributes());
+        event.put(ModEntityTypes.JellyBat.get(), JellyBatEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -47,12 +50,13 @@ public class ModEventBusEvents {
                 Entity rider = event.getEntityMounting();
                 Entity mount = event.getEntityBeingMounted();
                 if (event.isMounting()) {
-                    if (rider instanceof Player p && mount instanceof AmaroEntity a) {
+                    if (rider instanceof Player p && mount instanceof RideableFlightEntity a) {
                         a.setNoGravity(true);
                     }
                 } else {
-                    if (rider instanceof Player p && mount instanceof AmaroEntity a) {
+                    if (rider instanceof Player p && mount instanceof RideableFlightEntity a) {
                         a.setNoGravity(false);
+                        a.setElytraFlying(false);
                     }
                 }
 

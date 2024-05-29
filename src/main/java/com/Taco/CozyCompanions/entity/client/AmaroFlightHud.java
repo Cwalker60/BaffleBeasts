@@ -1,16 +1,16 @@
 package com.Taco.CozyCompanions.entity.client;
 
 import com.Taco.CozyCompanions.CozyCompanions;
+import com.Taco.CozyCompanions.config.CozyClientConfig;
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
+import com.Taco.CozyCompanions.entity.custom.RideableFlightEntity;
 import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
-import org.slf4j.Logger;
 
 public class AmaroFlightHud {
     private static final ResourceLocation FILLED_FLIGHTBAR = new ResourceLocation(CozyCompanions.MODID,
@@ -26,38 +26,40 @@ public class AmaroFlightHud {
         int x = screenWidth;
         int y = screenHeight;
         // (x-16*6)/2 is the distance 6 feathers are drawn from the center
-        int xOffset = (x - 16*6)/2;
 
-        if (Minecraft.getInstance().player.getVehicle() instanceof AmaroEntity amaro) {
+        if (Minecraft.getInstance().player.getVehicle() instanceof RideableFlightEntity flightEntity) {
+            int feathers = flightEntity.flightPower;
+            int xOffset = (x - 16 * feathers)/2;
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0f,1.0f,1.0f,1.0f);
             RenderSystem.setShaderTexture(0,EMPTY_FLIGHTBAR);
             // Draw Empty Feathers
             // 360 was last hard coded
-            for (int i = 0; i < 6; i++) {
-                GuiComponent.blit(poseStack, 0 + xOffset + (i*14), y - 60, 0, 0, 16, 16, 16, 16);
+            for (int i = 0; i < feathers; i++) {
+                GuiComponent.blit(poseStack, xOffset + (i*14) + CozyClientConfig.FLIGHT_HUD_X_OFFSET.get(), y - 60 - CozyClientConfig.FLIGHT_HUD_Y_OFFSET.get(),
+                        0, 0, 16, 16, 16, 16);
             }
             // Draw Filled Feathers
             RenderSystem.setShaderTexture(0,FILLED_FLIGHTBAR);
 
-            amaro.getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
+            flightEntity.getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
                 int filledFeathers = amaroFlight.getFlightPower();
-                int gradualFill = amaro.flightRechargeBuffer / 6; // amount of the filled feather to draw
-                for (int i = 0; i < 6; i++) {
+                int gradualFill = flightEntity.flightRechargeBuffer / (flightEntity.maxFlightRechargeBuffer / 16); // amount of the filled feather to draw
+                for (int i = 0; i < feathers; i++) {
                     // Feathers "filling up" slowly
                     if (filledFeathers == i) {
-                        GuiComponent.blit(poseStack, 0 + xOffset + (i*14), y - 60 + (gradualFill), 0,  gradualFill, 16,  16 - gradualFill, 16, 16);
+                        GuiComponent.blit(poseStack, xOffset + (i*14) + CozyClientConfig.FLIGHT_HUD_X_OFFSET.get(), y - 60 + (gradualFill) - CozyClientConfig.FLIGHT_HUD_Y_OFFSET.get(), 0,  gradualFill, 16,  16 - gradualFill, 16, 16);
                     }
                     // Full Feathers
                     if (filledFeathers > i) {
-                        GuiComponent.blit(poseStack, 0 + xOffset + (i*14), y - 60, 0, 0, 16, 16, 16, 16);
+                        GuiComponent.blit(poseStack, xOffset + (i*14) + CozyClientConfig.FLIGHT_HUD_X_OFFSET.get(), y - 60 - CozyClientConfig.FLIGHT_HUD_Y_OFFSET.get(), 0, 0, 16, 16, 16, 16);
                     }
                 }
 
                 //Draw the animated texture on when flight power is available.
                 RenderSystem.setShaderTexture(0, ANIMATED_FLIGHTBAR);
                 if (!STOP_DRAW && amaroFlight.getFlightPower() != 0)  {
-                    GuiComponent.blit(poseStack, 0 + xOffset + ((amaroFlight.getFlightPower() - 1)*14), y - 60, 0,
+                    GuiComponent.blit(poseStack, xOffset + ((amaroFlight.getFlightPower() - 1)*14) + CozyClientConfig.FLIGHT_HUD_X_OFFSET.get(), y - 60 - CozyClientConfig.FLIGHT_HUD_Y_OFFSET.get(), 0,
                             FLIGHT_ANIMATION_DRAWSTATE * 16 , 16, 16, 16, 256);
                 }
 
@@ -67,7 +69,9 @@ public class AmaroFlightHud {
 
 
     }));
-
+    // This method is fired in the tick of the Amaro to fill the pixels of the
+    // feather for what value of FLIGHT_ANIMATION_DRAWSTATE is in.
+    // once it is over 18, it will stop being called by setting STOP_DRAW to true
     public static void updateFlightPowerGUI() {
         STOP_DRAW = false;
         FLIGHT_ANIMATION_DRAWSTATE++;

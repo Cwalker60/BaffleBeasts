@@ -1,13 +1,8 @@
 package com.Taco.CozyCompanions.networking.packet;
 
-import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
-import net.minecraft.client.Minecraft;
+import com.Taco.CozyCompanions.entity.custom.RideableFlightEntity;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerEntity;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -41,9 +36,9 @@ public class AmaroDescendC2SPacket {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             if (player != null) {
-                if (player.getVehicle() instanceof AmaroEntity amaro) {
-                    if (amaro.isFlying()) {
-                        amaro.setDescend(true);
+                if (player.getVehicle() instanceof RideableFlightEntity flightEntity) {
+                    if (flightEntity.isFlying()) {
+                        flightEntity.setDescend(true);
                     }
                 }
             } else {

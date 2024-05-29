@@ -7,12 +7,21 @@ public class AmaroFlight {
     // the Amaro glide.
 
     // flight power will be represented in a GUI with 6 feathers.
-    private int flightPower = 6;
     private final int MIN_FLIGHTPOWER = 0;
-    private final int MAX_FLIGHTPOWER = 6;
+    private int MAX_FLIGHTPOWER = 6;
+    private int flightPower;
+
+    public void setFlightPower(int max) {
+        this.MAX_FLIGHTPOWER = max;
+        flightPower = max;
+    }
 
     public int getFlightPower() {
         return this.flightPower;
+    }
+
+    public int getMaXFlightPower() {
+        return this.MAX_FLIGHTPOWER;
     }
 
     public void addFlightPower(int power) {

@@ -1,6 +1,7 @@
 package com.Taco.CozyCompanions.networking.packet;
 
 import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
+import com.Taco.CozyCompanions.entity.custom.RideableFlightEntity;
 import com.Taco.CozyCompanions.util.ElytraGlideCalculation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -55,11 +56,11 @@ public class AmaroFlightDashC2SPacket {
             ServerLevel level = context.getSender().getLevel();
 
             if (player != null) {
-                if (player.getVehicle() instanceof AmaroEntity amaro) {
+                if (player.getVehicle() instanceof RideableFlightEntity flightEntity) {
 
                     ItemStack itemstack = ElytraGlideCalculation.createAmaroFirework();
                     if (!level.isClientSide()) {
-                        FireworkRocketEntity amarofirework = new FireworkRocketEntity(level, itemstack, amaro);
+                        FireworkRocketEntity amarofirework = new FireworkRocketEntity(level, itemstack, flightEntity);
                         amarofirework.setInvisible(true);
                         amarofirework.setSilent(true);
                         level.addFreshEntity(amarofirework);

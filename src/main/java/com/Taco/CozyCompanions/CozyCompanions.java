@@ -1,8 +1,10 @@
 package com.Taco.CozyCompanions;
 
-import com.Taco.CozyCompanions.datagen.CozyCompanionsConfig;
+import com.Taco.CozyCompanions.config.CozyClientConfig;
+import com.Taco.CozyCompanions.config.CozyServerConfig;
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
 import com.Taco.CozyCompanions.entity.client.AmaroRenderer;
+import com.Taco.CozyCompanions.entity.client.JellyBatRenderer;
 import com.Taco.CozyCompanions.item.ModItems;
 import com.Taco.CozyCompanions.networking.ModPackets;
 import com.Taco.CozyCompanions.sound.SoundRegistry;
@@ -49,9 +51,14 @@ public class CozyCompanions
         GeckoLib.initialize();
 
         //Config
-        CozyCompanionsConfig.createConfig(CozyCompanionsConfig.BUILDER);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CozyCompanionsConfig.COZY_COMPANIONS_CONFIG,
+        CozyServerConfig.createConfig(CozyServerConfig.BUILDER);
+        CozyClientConfig.createConfig(CozyClientConfig.BUILDER);
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, CozyServerConfig.COZY_COMPANIONS_CONFIG,
                 "cozy_companions_config.toml");
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CozyClientConfig.COZY_CLIENT_CONFIG,
+                "cozy_companions_client_config.toml");
 
         MinecraftForge.EVENT_BUS.register(this);
 
@@ -83,6 +90,7 @@ public class CozyCompanions
             MAIN_LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
 
             EntityRenderers.register(ModEntityTypes.Amaro.get(), AmaroRenderer::new);
+            EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);
         }
     }
 }
