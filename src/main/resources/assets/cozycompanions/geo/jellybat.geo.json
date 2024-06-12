@@ -124,8 +124,15 @@
 					"parent": "body",
 					"pivot": [0, 0, -5],
 					"cubes": [
-						{"origin": [-6, 0.5, -9], "size": [12, 12, 7], "uv": [0, 41]},
 						{"origin": [-5, 1, -9.5], "size": [10, 11, 16], "uv": [0, 0]}
+					]
+				},
+				{
+					"name": "chest_fur",
+					"parent": "chest",
+					"pivot": [0, 0, -5],
+					"cubes": [
+						{"origin": [-6, 0.5, -9], "size": [12, 12, 7], "uv": [0, 41]}
 					]
 				},
 				{

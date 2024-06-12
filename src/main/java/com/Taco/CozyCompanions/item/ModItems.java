@@ -2,6 +2,7 @@ package com.Taco.CozyCompanions.item;
 
 import com.Taco.CozyCompanions.CozyCompanions;
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
+import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -21,6 +22,10 @@ public class ModItems {
     public static final RegistryObject<Item> JELLYBAT_SPAWN_EGG = ITEMS.register("jellybat_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntityTypes.JellyBat, 0xe07a56, 0xe07a56,
                     new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+
+    public static final RegistryObject<Item> JELLYBAT_DONUT = ITEMS.register("jellybat_donut",
+            () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_FOOD)
+                .food(new FoodProperties.Builder().nutrition(6).saturationMod(1.0f).build())));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

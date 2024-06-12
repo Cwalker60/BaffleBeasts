@@ -29,11 +29,11 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     public int flightRechargeBuffer;
     public int flightPower;
 
-    private static final EntityDataAccessor<Boolean> GOTOSLEEPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> ASLEEP = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> IDLE_POSE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> IDLE_TIMER = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> GOTOSLEEPSTATE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> ASLEEP = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> IDLE_POSE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> IDLE_TIMER = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.INT);
 
     public RideableFlightEntity(EntityType<? extends TamableAnimal> pEntityType, Level pLevel, int flightP, int flightRecharge) {
         super(pEntityType, pLevel);

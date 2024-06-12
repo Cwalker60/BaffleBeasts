@@ -24,7 +24,7 @@ public class ModEntityTypes {
     public static final RegistryObject<EntityType<JellyBatEntity>> JellyBat =
             ENTITY_TYPES.register("jellybat",
                     () -> EntityType.Builder.of(JellyBatEntity::new, MobCategory.CREATURE)
-            .sized(1.0f, 1.0f)
+            .sized(0.8f, 0.8f)
             .build(new ResourceLocation(CozyCompanions.MODID, "jellybat").toString()));
 
     public static void register(IEventBus eventBus) {

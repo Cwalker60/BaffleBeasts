@@ -16,6 +16,8 @@ public class DataGenerators {
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
 
         MobSpawnRulesGenerator.onGatherData(event);
+
+        generator.addProvider(event.includeClient(), new ModItemModelGenerator(generator, existingFileHelper));
         generator.addProvider(true, new SoundGenerator(generator, CozyCompanions.MODID, existingFileHelper));
 
     }

@@ -16,6 +16,10 @@ public class SoundRegistry {
     // Amaro sound effects
     public static final RegistryObject<SoundEvent> AMARO_IDLE = createSoundEvent("amaro/amaro_idle");
     public static final RegistryObject<SoundEvent> AMARO_HURT = createSoundEvent("amaro/amaro_hurt");
+    // Jellybat Sound effects
+    public static final RegistryObject<SoundEvent> JELLYBAT_IDLE = createSoundEvent("jellybat/jellybat_idle1");
+    public static final RegistryObject<SoundEvent> JELLYBAT_HURT = createSoundEvent("jellybat/jellybat_hurt1");
+    public static final RegistryObject<SoundEvent> JELLYBAT_DEATH = createSoundEvent("jellybat/jellybat_death");
 
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {

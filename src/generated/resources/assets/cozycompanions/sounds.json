@@ -10,11 +10,37 @@
   },
   "amaro/amaro_idle": {
     "sounds": [
-      {
-        "name": "cozycompanions:amaro/amaro_idle",
-        "volume": 3.0
-      }
+      "cozycompanions:amaro/amaro_idle"
     ],
     "subtitle": "sound.cozycompanions.amaro_idle"
+  },
+  "jellybat/jellybat_death": {
+    "sounds": [
+      "cozycompanions:jellybat/jellybat_death"
+    ],
+    "subtitle": "sound.cozycompanions.jellybat_death1"
+  },
+  "jellybat/jellybat_hurt1": {
+    "sounds": [
+      "cozycompanions:jellybat/jellybat_hurt1"
+    ],
+    "subtitle": "sound.cozycompanions.jellybat_hurt1"
+  },
+  "jellybat/jellybat_idle1": {
+    "sounds": [
+      {
+        "name": "cozycompanions:jellybat/jellybat_idle1",
+        "volume": 0.8
+      },
+      {
+        "name": "cozycompanions:jellybat/jellybat_idle2",
+        "volume": 0.8
+      },
+      {
+        "name": "cozycompanions:jellybat/jellybat_idle3",
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "sound.cozycompanions.jellybat_idle"
   }
 }
