@@ -44,6 +44,12 @@ public class JellyBatRenderer extends GeoEntityRenderer<JellyBatEntity> {
         } else {
             model.getBone("chest_fur").get().setHidden(false);
         }
+        // If supersized, make the bat BIG
+        if (entity.getSuperSize() == true) {
+            poseStack.scale(2.0f,2.0f,2.0f);
+        } else {
+            poseStack.scale(1.0f,1.0f,1.0f);
+        }
         super.render(model, entity, partialTick, type, poseStack, bufferSource, buffer, packedLight, packedOverlay, red, green, blue, alpha);
     }
 

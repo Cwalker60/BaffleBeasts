@@ -16,13 +16,15 @@ public class ModItemModelGenerator extends ItemModelProvider {
     }
 
     public  void registerModels() {
-        basicItem(ModItems.JELLYBAT_DONUT.get());
+        basicLayerItem(ModItems.JELLYBAT_DONUT.getId());
+        basicItem(ModItems.SUPER_SHAKE.get());
     }
 
-    public ItemModelBuilder basicItem(ResourceLocation item)
-    {
+    public ItemModelBuilder basicLayerItem(ResourceLocation item) {
         return getBuilder(item.toString())
                 .parent(new ModelFile.UncheckedModelFile("item/generated"))
-                .texture("layer0", new ResourceLocation(item.getNamespace(), "item/" + item.getPath()));
+                .texture("layer0", new ResourceLocation(item.getNamespace(), "item/" + item.getPath() + "_layer"));
     }
+
+
 }

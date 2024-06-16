@@ -6,20 +6,21 @@ import com.Taco.CozyCompanions.entity.custom.AmaroEntity;
 import com.Taco.CozyCompanions.entity.custom.RideableFlightEntity;
 import com.Taco.CozyCompanions.flight.AmaroFlight;
 import com.Taco.CozyCompanions.flight.AmaroFlightProvider;
+import com.Taco.CozyCompanions.item.JellyDonutItem;
+import com.Taco.CozyCompanions.item.ModItems;
 import com.Taco.CozyCompanions.networking.ModPackets;
 import com.Taco.CozyCompanions.networking.packet.AmaroDescendC2SPacket;
 import com.Taco.CozyCompanions.util.KeyBindings;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -56,6 +57,7 @@ public class ClientEvents {
                 }
             }
         }
+
         //AmaroFlightPower capability
         @SubscribeEvent
         public static void entityAttributeCreationEvent(AttachCapabilitiesEvent<Entity> event) {
@@ -124,5 +126,7 @@ public class ClientEvents {
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerAboveAll("flightgui", AmaroFlightHud.HUD_AMARO_FLIGHTBAR);
         }
+
+
     }
 }

@@ -1,10 +1,11 @@
 {
-  "entity.cozycompanions.jellybat" : "JellyBat",
+  "entity.cozycompanions.jellybat" : "Jelly Bat",
   "entity.cozycompanions.amaro": "Amaro",
 
   "item.cozycompanions.amaro_spawn_egg": "Amaro Spawn Egg",
-  "item.cozycompanions.jellybat_spawn_egg": "JellyBat Spawn Egg",
+  "item.cozycompanions.jellybat_spawn_egg": "Jelly Bat Spawn Egg",
   "item.cozycompanions.jellybat_donut": "Jelly Donut",
+  "item.cozycompanions.super_shake": "Super Shake",
 
   "key.category.cozycompanions.keybinds": "Cozy Companions",
   "key.cozycompanions.descend": "Descend",

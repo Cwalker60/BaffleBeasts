@@ -5,15 +5,21 @@ import com.Taco.CozyCompanions.config.CozyServerConfig;
 import com.Taco.CozyCompanions.entity.ModEntityTypes;
 import com.Taco.CozyCompanions.entity.client.AmaroRenderer;
 import com.Taco.CozyCompanions.entity.client.JellyBatRenderer;
+import com.Taco.CozyCompanions.event.ItemColorsEvent;
 import com.Taco.CozyCompanions.item.ModItems;
 import com.Taco.CozyCompanions.networking.ModPackets;
+import com.Taco.CozyCompanions.recipes.ModPotionRecipes;
 import com.Taco.CozyCompanions.sound.SoundRegistry;
 import com.Taco.CozyCompanions.world.BiomeModifierRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -43,6 +49,7 @@ public class CozyCompanions
         // Register the Deferred Register to the mod event bus so items get registered
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(ItemColorsEvent::registerItemColors);
 
         ModItems.register(modEventBus);
         ModEntityTypes.register(modEventBus);
@@ -67,6 +74,8 @@ public class CozyCompanions
     private void commonSetup(final FMLCommonSetupEvent event) {
         event.enqueueWork(() -> {
             ModPackets.register();
+            BrewingRecipeRegistry.addRecipe(new ModPotionRecipes(Potions.STRONG_HEALING, Items.GOLDEN_CARROT,
+                    ModItems.SUPER_SHAKE.get()));
         });
     }
 
@@ -88,9 +97,9 @@ public class CozyCompanions
             // Some client setup code
             MAIN_LOGGER.info("HELLO FROM CLIENT SETUP");
             MAIN_LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-
             EntityRenderers.register(ModEntityTypes.Amaro.get(), AmaroRenderer::new);
             EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);
+
         }
     }
 }

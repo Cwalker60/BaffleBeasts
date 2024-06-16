@@ -20,6 +20,7 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> JELLYBAT_IDLE = createSoundEvent("jellybat/jellybat_idle1");
     public static final RegistryObject<SoundEvent> JELLYBAT_HURT = createSoundEvent("jellybat/jellybat_hurt1");
     public static final RegistryObject<SoundEvent> JELLYBAT_DEATH = createSoundEvent("jellybat/jellybat_death");
+    public static final RegistryObject<SoundEvent> JELLYBAT_SUPERSIZE = createSoundEvent("jellybat/jellybat_growth_effect");
 
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {

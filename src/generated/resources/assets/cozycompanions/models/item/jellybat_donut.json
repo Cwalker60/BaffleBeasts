@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "cozycompanions:item/jellybat_donut"
+    "layer0": "cozycompanions:item/jellybat_donut_layer"
   }
 }

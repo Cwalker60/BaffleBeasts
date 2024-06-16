@@ -34,5 +34,9 @@ public class SoundGenerator extends SoundDefinitionsProvider {
         this.add(CustomSoundEvents.JELLYBAT_DEATH, definition()
                 .subtitle("sound.cozycompanions.jellybat_death1")
                 .with(sound(SoundRegistry.JELLYBAT_DEATH.getId(), SoundDefinition.SoundType.SOUND)));
+
+        this.add(CustomSoundEvents.JELLYBAT_SUPERSIZE, definition()
+                .subtitle("sound.cozycompanions.jellybat_growth_effect")
+                .with(sound(SoundRegistry.JELLYBAT_SUPERSIZE.getId(), SoundDefinition.SoundType.SOUND)));
     }
 }
