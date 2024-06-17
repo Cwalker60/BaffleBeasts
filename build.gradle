@@ -51,7 +51,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', 'cozycompanions'
+            property 'forge.enabledGameTestNamespaces', 'bafflebeasts'
 
             mods {
                 cozycompanions {
@@ -67,7 +67,7 @@ minecraft {
 
             property 'forge.logging.console.level', 'debug'
 
-            property 'forge.enabledGameTestNamespaces', 'cozycompanions'
+            property 'forge.enabledGameTestNamespaces', 'bafflebeasts'
 
             mods {
                 cozycompanions {
@@ -86,7 +86,7 @@ minecraft {
 
             property 'forge.logging.console.level', 'debug'
 
-            property 'forge.enabledGameTestNamespaces', 'cozycompanions'
+            property 'forge.enabledGameTestNamespaces', 'bafflebeasts'
 
             mods {
                 cozycompanions {
@@ -103,7 +103,7 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
 
             // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', 'cozycompanions', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            args '--mod', 'bafflebeasts', '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
 
             mods {
                 cozycompanions {
@@ -163,7 +163,7 @@ dependencies {
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mixins.cozycompanions.refmap.json'
+    add sourceSets.main, 'mixins.bafflebeasts.refmap.json'
     config 'mixins.cozycompanions.json'
 
     debug.verbose = true
@@ -174,12 +174,12 @@ mixin {
 jar {
     manifest {
         attributes([
-                "Specification-Title"     : "cozycompanions",
-                "Specification-Vendor"    : "cozycompanionssareus",
+                "Specification-Title"     : "bafflebeasts",
+                "Specification-Vendor"    : "bafflebeastssareus",
                 "Specification-Version"   : "1", // We are version 1 of ourselves
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : project.jar.archiveVersion,
-                "Implementation-Vendor"   : "cozycompanionssareus",
+                "Implementation-Vendor"   : "bafflebeastssareus",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
