@@ -1,6 +1,7 @@
 package com.Taco.BaffleBeasts.entity.goal;
 
 import com.Taco.BaffleBeasts.entity.custom.AmaroEntity;
+import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
@@ -14,9 +15,9 @@ import net.minecraft.world.level.pathfinder.BlockPathTypes;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import java.util.EnumSet;
 
-public class AmaroFollowOwnerGoal extends Goal {
+public class FlyEntityFollowOwnerGoal extends Goal {
 
-        private final AmaroEntity tamable;
+        private final RideableFlightEntity tamable;
         private LivingEntity owner;
         private final LevelReader level;
         private final double speedModifier;
@@ -27,7 +28,7 @@ public class AmaroFollowOwnerGoal extends Goal {
         private float oldWaterCost;
         private final boolean canFly;
 
-        public AmaroFollowOwnerGoal(AmaroEntity entity, double pSpeedModifier, float pStartDistance, float pStopDistance, boolean pCanFly) {
+        public FlyEntityFollowOwnerGoal(RideableFlightEntity entity, double pSpeedModifier, float pStartDistance, float pStopDistance, boolean pCanFly) {
             this.tamable = entity;
             this.level = entity.level;
             this.speedModifier = pSpeedModifier;
@@ -47,16 +48,6 @@ public class AmaroFollowOwnerGoal extends Goal {
          */
         public boolean canUse() {
             LivingEntity livingentity = this.tamable.getOwner();
-            boolean riderFlyingCheck = false;
-            if (this.tamable.getOwner() != null) {
-                if (livingentity.getVehicle() != null) {
-                    if (livingentity.getVehicle() instanceof AmaroEntity amaro) {
-                        if (amaro.isFlying()) {
-                            riderFlyingCheck = true;
-                        }
-                    }
-                }
-            }
 
             if (livingentity == null) {
                 return false;
@@ -65,8 +56,6 @@ public class AmaroFollowOwnerGoal extends Goal {
             } else if (this.tamable.isOrderedToSit()) {
                 return false;
             } else if (this.tamable.distanceToSqr(livingentity) < (double)(this.startDistance * this.startDistance)) {
-                return false;
-            } else if (riderFlyingCheck == true){
                 return false;
             } else {
                 this.owner = livingentity;

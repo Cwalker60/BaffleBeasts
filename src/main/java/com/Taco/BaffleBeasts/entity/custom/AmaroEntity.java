@@ -1,9 +1,9 @@
 package com.Taco.BaffleBeasts.entity.custom;
 
 import com.Taco.BaffleBeasts.entity.ModEntityTypes;
-import com.Taco.BaffleBeasts.entity.goal.AmaroFollowOwnerGoal;
+import com.Taco.BaffleBeasts.entity.goal.FlyEntityFollowOwnerGoal;
 import com.Taco.BaffleBeasts.entity.goal.IdleAnimationGoal;
-import com.Taco.BaffleBeasts.entity.goal.AmaroLookAtPlayer;
+import com.Taco.BaffleBeasts.entity.goal.FlyEntityLookAtPlayer;
 import com.Taco.BaffleBeasts.sound.SoundRegistry;
 import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
@@ -120,9 +120,9 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
         this.goalSelector.addGoal(2, new FloatGoal(this));
         this.goalSelector.addGoal(3, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(4, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
-        this.goalSelector.addGoal(5, new AmaroFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
+        this.goalSelector.addGoal(5, new FlyEntityFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
         this.goalSelector.addGoal(6, new PanicGoal(this, 1.250));
-        this.goalSelector.addGoal(7, new AmaroLookAtPlayer(this, Player.class, 12F));
+        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 12F));
         this.goalSelector.addGoal(8, new IdleAnimationGoal(this, 5));
         this.goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 1.00));
         this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));

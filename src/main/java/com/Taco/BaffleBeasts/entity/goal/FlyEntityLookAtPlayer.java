@@ -1,22 +1,23 @@
 package com.Taco.BaffleBeasts.entity.goal;
 
 import com.Taco.BaffleBeasts.entity.custom.AmaroEntity;
+import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 
 
-public class AmaroLookAtPlayer extends LookAtPlayerGoal {
-    private final AmaroEntity entity;
+public class FlyEntityLookAtPlayer extends LookAtPlayerGoal {
+    private final RideableFlightEntity entity;
 
-    public AmaroLookAtPlayer(Mob pMob, Class<? extends LivingEntity> pLookAtType, float pLookDistance) {
+    public FlyEntityLookAtPlayer(Mob pMob, Class<? extends LivingEntity> pLookAtType, float pLookDistance) {
         super(pMob, pLookAtType, pLookDistance);
-        this.entity = (AmaroEntity)pMob;
+        this.entity = (RideableFlightEntity)pMob;
     }
 
-    public AmaroLookAtPlayer(Mob pMob, Class<? extends LivingEntity> pLookAtType, float pLookDistance, float pProbability) {
+    public FlyEntityLookAtPlayer(Mob pMob, Class<? extends LivingEntity> pLookAtType, float pLookDistance, float pProbability) {
         super(pMob, pLookAtType, pLookDistance, pProbability);
-        this.entity = (AmaroEntity)pMob;
+        this.entity = (RideableFlightEntity)pMob;
     }
     /**
      Add to the canUse method to allow this look goal to only work when the amaro is not sleeping.

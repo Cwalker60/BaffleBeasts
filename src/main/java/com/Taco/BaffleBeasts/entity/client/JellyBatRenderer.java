@@ -61,6 +61,11 @@ public class JellyBatRenderer extends GeoEntityRenderer<JellyBatEntity> {
             poseStack.scale(1.0f,1.0f,1.0f);
         }
 
+        if (entity.isBaby()) {
+            poseStack.scale(0.4f, 0.4f, 0.4f);
+            model.getBone("head").get().setScale(1.6f, 1.6f, 1.6f);
+        }
+
         if (entity.isElytraFlying()) {
             float f1 = (float)entity.getFallFlyingTicks() + partialTick;
             float f2 = Mth.clamp(f1 * f1 / 100.0F, 0.0F, 1.0F);

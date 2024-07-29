@@ -10,6 +10,8 @@ public class BaffleConfigValues {
     // Amaro Values
     public static final ArrayList<String> AMARO_BIOME_SPAWN_LIST =
             validateBiomes(new ArrayList<String>(BaffleServerConfig.AMARO_SPAWN_BIOMES.get()), "AMARO");
+    public static final ArrayList<String> JELLYBAT_BIOME_SPAWN_LIST =
+            validateBiomes(new ArrayList<String>(BaffleServerConfig.JELLYBAT_SPAWN_BIOMES.get()), "JELLYBAT");
 
     /**
      *  validateList will take in a list of biomes from the CozyCompaniosnConfig.java class and return the list

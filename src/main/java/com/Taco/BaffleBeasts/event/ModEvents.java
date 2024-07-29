@@ -6,6 +6,7 @@ import com.Taco.BaffleBeasts.entity.custom.AmaroEntity;
 import com.Taco.BaffleBeasts.entity.custom.JellyBatEntity;
 import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
@@ -23,12 +24,6 @@ public class ModEvents {
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntityTypes.Amaro.get(), AmaroEntity.setAttributes());
         event.put(ModEntityTypes.JellyBat.get(), JellyBatEntity.setAttributes());
-    }
-
-    @SubscribeEvent
-    public static void entitySpawnRestriction(SpawnPlacementRegisterEvent event) {
-        event.register(ModEntityTypes.Amaro.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-                Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
     }
 
     @Mod.EventBusSubscriber(modid = BaffleBeasts.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -52,6 +47,15 @@ public class ModEvents {
             }
 
         }
+
+        @SubscribeEvent
+        public static void entitySpawnRestriction(SpawnPlacementRegisterEvent event) {
+            event.register(ModEntityTypes.Amaro.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+                    Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+            event.register(ModEntityTypes.JellyBat.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
+                    JellyBatEntity::jellyBatSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+        }
+
     }
 
 

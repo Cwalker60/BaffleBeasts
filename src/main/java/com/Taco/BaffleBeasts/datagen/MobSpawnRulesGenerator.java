@@ -28,8 +28,15 @@ public class MobSpawnRulesGenerator  {
 
     public static void onGatherData(GatherDataEvent event) {
 
+        // TODO Make MobSpawnRulesGenerator create a entity_spawns.json that uses this format
+        //   "type": "bafflebeasts:add_spawns",
+        //   "use_configs": true
+
         MobSpawnSettings.SpawnerData amaroSpawnData = new MobSpawnSettings.SpawnerData(
                 ModEntityTypes.Amaro.get(), 50, 1, 2);
+
+        MobSpawnSettings.SpawnerData jellyBatSpawnData = new MobSpawnSettings.SpawnerData(
+                ModEntityTypes.JellyBat.get(), 50, 1, 2);
 
         DataGenerator generator = event.getGenerator();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
@@ -41,20 +48,30 @@ public class MobSpawnRulesGenerator  {
 
         // Resource Locations
         ResourceLocation amaroSpawnLocation = new ResourceLocation("bafflebeasts", "amaro_spawns");
+        ResourceLocation jellyBatSpawnLocation = new ResourceLocation("bafflebeasts", "jellybat_spawns");
 
         //Biome Modifier Spawn Data
         ForgeBiomeModifiers.AddSpawnsBiomeModifier amaroSpawnsBiomeModifier = ForgeBiomeModifiers.
                 AddSpawnsBiomeModifier.singleSpawn(TAIGA_TAG, amaroSpawnData);
 
+        ForgeBiomeModifiers.AddSpawnsBiomeModifier jellyBatSpawnsBiomeModifier = ForgeBiomeModifiers.
+                AddSpawnsBiomeModifier.singleSpawn(TAIGA_TAG, jellyBatSpawnData);
+
         // Create a map for the JsonCodecProvider
         Map<ResourceLocation, BiomeModifier> modifierMap = Map.of(amaroSpawnLocation, amaroSpawnsBiomeModifier);
+        Map<ResourceLocation, BiomeModifier> modifierMap2 = Map.of(jellyBatSpawnLocation, jellyBatSpawnsBiomeModifier);
 
         // Create the provider
         JsonCodecProvider provider = JsonCodecProvider.forDatapackRegistry(
                 generator, existingFileHelper, BaffleBeasts.MODID, registryOps,
                 ForgeRegistries.Keys.BIOME_MODIFIERS, modifierMap
         );
+        JsonCodecProvider provider2 = JsonCodecProvider.forDatapackRegistry(
+                generator, existingFileHelper, BaffleBeasts.MODID, registryOps,
+                ForgeRegistries.Keys.BIOME_MODIFIERS, modifierMap2
+        );
 
-        generator.addProvider(event.includeServer(), provider);
+//        generator.addProvider(event.includeServer(), provider);
+//        generator.addProvider(event.includeServer(), provider2);
     }
 }

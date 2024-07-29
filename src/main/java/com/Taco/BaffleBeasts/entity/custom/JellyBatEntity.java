@@ -1,9 +1,8 @@
 package com.Taco.BaffleBeasts.entity.custom;
 
 import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.entity.goal.IdleAnimationGoal;
-import com.Taco.BaffleBeasts.entity.goal.JellyBatRoamGoal;
-import com.Taco.BaffleBeasts.entity.goal.JellyBatUpsideDownGoal;
+import com.Taco.BaffleBeasts.entity.ModEntityTypes;
+import com.Taco.BaffleBeasts.entity.goal.*;
 import com.Taco.BaffleBeasts.item.JellyDonutItem;
 import com.Taco.BaffleBeasts.item.ModItems;
 import com.Taco.BaffleBeasts.sound.CustomSoundEvents;
@@ -20,6 +19,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -28,24 +29,28 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
-import net.minecraft.world.entity.ai.goal.FloatGoal;
-import net.minecraft.world.entity.ai.goal.PanicGoal;
+import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.IForgeShearable;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -70,6 +75,8 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     private static final int MAX_TICKS_BEFORE_ROAM = 600;
     private static final int MAX_TICKS_UPSIDEDOWN_COOLDOWN = 600;
     private static final int FUR_REGROWTH = 2400;
+
+    private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.GLOW_BERRIES, Items.APPLE, Items.MELON_SLICE);
 
     protected static final AnimationBuilder JELLYBAT_WALK = new AnimationBuilder().addAnimation("animation.jellybat.walk", ILoopType.EDefaultLoopTypes.LOOP);
     protected static final AnimationBuilder JELLYBAT_NUETRAL = new AnimationBuilder().addAnimation("animation.jellybat.neutral", ILoopType.EDefaultLoopTypes.LOOP);
@@ -107,6 +114,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
         this.moveControl = new FlyingMoveControl(this, 10, false);
         this.setTame(false);
         this.setNoGravity(true);
+        this.setDonutColor(0xFFFFFF);
         furRegrowthCooldown = 0;
         ticksRoamCooldown = 0;
         ticksUpsideDownCooldown = 0;
@@ -153,14 +161,30 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
+    public static boolean jellyBatSpawnRules(EntityType<? extends Entity> bat, LevelAccessor pLevel, MobSpawnType pSpawnType, BlockPos pPos, RandomSource pRandom) {
+        return (pLevel.getBlockState(pPos.below()).is(BlockTags.ANIMALS_SPAWNABLE_ON) || pLevel.getBlockState(pPos.below()).is(BlockTags.BASE_STONE_OVERWORLD) ||
+                pLevel.getBlockState(pPos.below()).is(BlockTags.AXOLOTLS_SPAWNABLE_ON));
+    }
+
+    @Override
+    public boolean checkSpawnRules(LevelAccessor pLevel, MobSpawnType pSpawnReason) {
+        return true;
+    }
+
+
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new PanicGoal(this, 1.1));
-        this.goalSelector.addGoal(3, new IdleAnimationGoal(this, 2));
-        this.goalSelector.addGoal(4, new JellyBatRoamGoal(this, 1.0d));
-        this.goalSelector.addGoal(5, new JellyBatUpsideDownGoal(this));
+        this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
+        this.goalSelector.addGoal(2, new FloatGoal(this));
+        this.goalSelector.addGoal(3, new PanicGoal(this, 1.1));
+        this.goalSelector.addGoal(4, new BreedGoal(this, 1.0));
+        this.goalSelector.addGoal(5, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
+        this.goalSelector.addGoal(6, new FlyEntityFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
+        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 12F));
+        this.goalSelector.addGoal(8, new IdleAnimationGoal(this, 2));
+        this.goalSelector.addGoal(9, new JellyBatRoamGoal(this, 1.0d));
+        this.goalSelector.addGoal(10, new JellyBatUpsideDownGoal(this));
     }
 
     @Override
@@ -287,7 +311,30 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     @Nullable
     @Override
     public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
-        return null;
+        JellyBatEntity baby = ModEntityTypes.JellyBat.get().create(pLevel);
+        return baby;
+    }
+
+    @Override
+    public boolean canMate(Animal pOtherAnimal) {
+        if (pOtherAnimal == this) {
+            return false;
+        } else if (!(pOtherAnimal instanceof JellyBatEntity)) {
+            return false;
+        } else {
+            JellyBatEntity otherBat = (JellyBatEntity)pOtherAnimal;
+            if (otherBat.isInSittingPose()) {
+                return false;
+            } else {
+                return this.isInLove() && otherBat.isInLove();
+            }
+        }
+    }
+
+    @Override
+    public boolean isFood(ItemStack pStack) {
+        Item item = pStack.getItem();
+        return (item == Items.GLOW_BERRIES);
     }
 
     private <E extends IAnimatable>PlayState movementPredicate(AnimationEvent<E> event) {
@@ -409,6 +456,26 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
         ItemStack is = pPlayer.getItemInHand(pHand);
 
+        // Breeding Interactions
+        int age = this.getAge();
+        if (is.is(Items.GLOW_BERRIES)) {
+            if (!this.level.isClientSide && age == 0 && this.canFallInLove()) {
+                this.usePlayerItem(pPlayer, pHand, is);
+                this.setInLove(pPlayer);
+                return InteractionResult.SUCCESS;
+            }
+            // Baby Growth Interaction
+            if (this.isBaby()) {
+                this.usePlayerItem(pPlayer, pHand, is);
+                this.ageUp(getSpeedUpSecondsWhenFeeding(-age), true);
+                return InteractionResult.sidedSuccess(this.level.isClientSide);
+            }
+
+            if (this.level.isClientSide) {
+                return InteractionResult.CONSUME;
+            }
+        }
+
         // Potion Check
         if (is.getItem() instanceof PotionItem) {
             Potion potion = PotionUtils.getPotion(is);
@@ -427,7 +494,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
         }
 
         // Super Size Check
-        if (is.getItem().equals(ModItems.SUPER_SHAKE.get())) {
+        if (is.getItem().equals(ModItems.SUPER_SHAKE.get()) && !this.isBaby()) {
             this.setSuperSize(true);
             this.usePlayerItem(pPlayer, pHand, is);
             this.tame(pPlayer);
@@ -443,8 +510,6 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
                 double d4 = this.getRandomY() + 0.5D;
                 double d5 = this.getRandomZ(1.0D);
                 this.level.addParticle(particleoptions, d3, d4, d5, d0, d1, d2);
-                BaffleBeasts.MAIN_LOGGER.debug("Speed of Particle is " + d0 + "," + d1 + "," + d2);
-                BaffleBeasts.MAIN_LOGGER.debug("Random Position of Particle is " + d3 + "," + d4 + "," + d5);
             }
         }
 
@@ -469,8 +534,34 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             return InteractionResult.sidedSuccess(level.isClientSide());
         }
 
+        // Sit check
+        InteractionResult emptyhand = super.mobInteract(pPlayer, pHand);
+        if (pPlayer.isShiftKeyDown() && !emptyhand.consumesAction()) {
+            this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
+            this.navigation.stop();
+            this.flying = false;
+            return InteractionResult.sidedSuccess(level.isClientSide());
+        }
+
+        // Heal check
+        if (isHealItem(is.getItem()) &&!pPlayer.isShiftKeyDown()) {
+            is.shrink(1);
+            this.heal(4.0f);
+            this.spawnTamingParticles(true);
+            return InteractionResult.sidedSuccess(level.isClientSide());
+        }
+
+
+
 
         return super.mobInteract(pPlayer, pHand);
+    }
+
+    private boolean isHealItem(Item item) {
+        if (item == Items.MELON_SLICE || item == Items.APPLE || item == Items.MELON_SLICE) {
+            return true;
+        }
+        return false;
     }
 
     private void setRidingPlayer(Player pPlayer) {

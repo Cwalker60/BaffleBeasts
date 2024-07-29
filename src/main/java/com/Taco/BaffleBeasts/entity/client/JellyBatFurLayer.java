@@ -45,6 +45,11 @@ public class JellyBatFurLayer extends GeoLayerRenderer<JellyBatEntity> {
             ps.scale(1.0f,1.0f,1.0f);
         }
 
+        if (entity.isBaby()) {
+            ps.scale(2.6f, 2.6f, 2.6f);
+        }
+
+
         this.getRenderer().render(model,entity, partialTicks,
         renderType,ps, bufferIn, bufferIn.getBuffer(renderType), packedLightIn,
                 OverlayTexture.NO_OVERLAY,r,g,b,1f);
