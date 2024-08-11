@@ -30,7 +30,7 @@ public class BaffleServerConfig {
                 .define("Amaro_Spawn_Amount", 2);
 
         AMARO_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how often Amaros can spawn.")
-                .define("Amaro_Spawn_Weight", 50);
+                .define("Amaro_Spawn_Weight", 25);
 
         builder.push("Spawn Biomes");
         AMARO_SPAWN_BIOMES = BUILDER.comment("These values are the biomes that the Amaro will spawn in. They are seperated by ,'s." +
