@@ -122,6 +122,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         ticksUpsideDownCooldown = 0;
         upsideDownDelay = false;
         roamDelay = false;
+        this.getDimensions(this.getPose());
+        this.refreshDimensions();
     }
 
     @Override
@@ -213,7 +215,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         return false;
 
     }
-    //Entity Data Getters/Setters -----------------------------------------------
     public String getDonutEffect() {
         return this.entityData.get(DONUT_EFFECT);
     }
@@ -246,7 +247,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.entityData.set(SUPER_SIZE, b);
         if (b == true) {
             this.setPos(this.getPosition(0.0f).add(0.0d, 1.0d, 0.0d));
-            //this.setBoundingBox(this.getBoundingBox().inflate(2.0,2.0,2.0));
+            this.setBoundingBox(this.getBoundingBox().inflate(2.0,2.0,2.0));
             this.refreshDimensions();
         }
     }
@@ -258,7 +259,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     public void setUpsideDown(boolean b) {
         entityData.set(HANGING_ON_CEILING, b);
     }
-    //----------------------------------------------------------------------------
 
     @Override
     public EntityDimensions getDimensions(Pose pPose) {
@@ -463,6 +463,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         if (is.is(Items.GLOW_BERRIES)) {
             if (!this.level().isClientSide && age == 0 && this.canFallInLove()) {
                 this.usePlayerItem(pPlayer, pHand, is);
+                this.tame(pPlayer);
                 this.setInLove(pPlayer);
                 return InteractionResult.SUCCESS;
             }
