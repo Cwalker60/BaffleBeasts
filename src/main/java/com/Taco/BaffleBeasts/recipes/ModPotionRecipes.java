@@ -1,4 +1,4 @@
-package com.Taco.BaffleBeasts.recipes;
+package com.taco.bafflebeasts.recipes;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
@@ -46,4 +46,5 @@ public class ModPotionRecipes implements IBrewingRecipe {
 
         return itemStack;
     }
+
 }

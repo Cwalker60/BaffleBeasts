@@ -1,17 +1,18 @@
-package com.Taco.BaffleBeasts.datagen;
+package com.taco.bafflebeasts.datagen;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.sound.CustomSoundEvents;
-import com.Taco.BaffleBeasts.sound.SoundRegistry;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.sound.CustomSoundEvents;
+import com.taco.bafflebeasts.sound.SoundRegistry;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.SoundDefinition;
 import net.minecraftforge.common.data.SoundDefinitionsProvider;
 
 public class SoundGenerator extends SoundDefinitionsProvider {
 
-    public SoundGenerator(final DataGenerator generator, final String modId, final ExistingFileHelper helper) {
-        super(generator, modId, helper);
+    public SoundGenerator(final PackOutput po, final String modId, final ExistingFileHelper helper) {
+        super(po, modId, helper);
     }
 
     @Override

@@ -1,4 +1,4 @@
-package com.Taco.BaffleBeasts.util;
+package com.taco.bafflebeasts.util;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
@@ -15,5 +15,4 @@ public class KeyBindings {
 
     public static final KeyMapping GLIDE_KEY = new KeyMapping(KEY_GLIDE, KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_X, KEY_CATEGORY_COZYCOMPANIONS);
-
 }

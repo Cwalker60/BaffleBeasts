@@ -1,8 +1,8 @@
-package com.Taco.BaffleBeasts.flight;
+package com.taco.bafflebeasts.flight;
 
 import net.minecraft.nbt.CompoundTag;
 
-public class AmaroFlight {
+public class FlightPower {
     // Flightpower is the amount of times the amaro can use the jump key to boost their height, or to accelerate with
     // the Amaro glide.
 
@@ -32,7 +32,7 @@ public class AmaroFlight {
         this.flightPower = Math.max(flightPower - power, MIN_FLIGHTPOWER);
     }
 
-    public void copyFrom(AmaroFlight source) {
+    public void copyFrom(FlightPower source) {
         this.flightPower = source.flightPower;
     }
 

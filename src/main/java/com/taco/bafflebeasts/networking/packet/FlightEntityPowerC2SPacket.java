@@ -1,26 +1,26 @@
-package com.Taco.BaffleBeasts.networking.packet;
+package com.taco.bafflebeasts.networking.packet;
 
-import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class AmaroFlightPowerC2SPacket {
+public class FlightEntityPowerC2SPacket {
     public int flightPower;
     public int id;
-    public AmaroFlightPowerC2SPacket() {
+    public FlightEntityPowerC2SPacket() {
 
     }
 
-    public AmaroFlightPowerC2SPacket(int power, int i) {
+    public FlightEntityPowerC2SPacket(int power, int i) {
         this.flightPower = power;
         this.id = i;
     }
 
 
-    public AmaroFlightPowerC2SPacket(FriendlyByteBuf buf) {
+    public FlightEntityPowerC2SPacket(FriendlyByteBuf buf) {
         this.flightPower = buf.readInt();
         this.id = buf.readInt();
     }

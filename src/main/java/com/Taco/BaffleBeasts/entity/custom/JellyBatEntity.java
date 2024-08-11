@@ -1,12 +1,13 @@
-package com.Taco.BaffleBeasts.entity.custom;
+package com.taco.bafflebeasts.entity.custom;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.entity.ModEntityTypes;
-import com.Taco.BaffleBeasts.entity.goal.*;
-import com.Taco.BaffleBeasts.item.JellyDonutItem;
-import com.Taco.BaffleBeasts.item.ModItems;
-import com.Taco.BaffleBeasts.sound.CustomSoundEvents;
-import com.Taco.BaffleBeasts.sound.SoundRegistry;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.entity.ModEntityTypes;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.goal.*;
+import com.taco.bafflebeasts.item.JellyDonutItem;
+import com.taco.bafflebeasts.item.ModItems;
+import com.taco.bafflebeasts.sound.CustomSoundEvents;
+import com.taco.bafflebeasts.sound.SoundRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -54,23 +55,24 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.AnimatableManager;
+import software.bernie.geckolib.core.animation.AnimationController;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.animation.RawAnimation;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class JellyBatEntity extends RideableFlightEntity implements IAnimatable, FlyingAnimal, IForgeShearable {
+public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, FlyingAnimal, IForgeShearable {
 
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
 
     private static final int MAX_TICKS_BEFORE_ROAM = 600;
     private static final int MAX_TICKS_UPSIDEDOWN_COOLDOWN = 600;
@@ -78,15 +80,15 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
 
     private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.GLOW_BERRIES, Items.APPLE, Items.MELON_SLICE);
 
-    protected static final AnimationBuilder JELLYBAT_WALK = new AnimationBuilder().addAnimation("animation.jellybat.walk", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder JELLYBAT_NUETRAL = new AnimationBuilder().addAnimation("animation.jellybat.neutral", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder JELLYBAT_FLY = new AnimationBuilder().addAnimation("animation.jellybat.fly", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder JELLYBAT_BLINK = new AnimationBuilder().addAnimation("animation.jellybat.blink", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder JELLYBAT_GOTO_SLEEP = new AnimationBuilder().addAnimation("animation.jellybat.ground_gotosleep", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder JELLYBAT_GROUND_SLEEP = new AnimationBuilder().addAnimation("animation.jellybat.ground_sleep", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder JELLYBAT_GROUND_IDLE1 = new AnimationBuilder().addAnimation("animation.jellybat.ground_idle1", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder JELLYBAT_GROUND_IDLE2 = new AnimationBuilder().addAnimation("animation.jellybat.ground_idle2", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder JELLYBAT_UPSIDEDOWN = new AnimationBuilder().addAnimation("animation.jellybat.upsidedown", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final RawAnimation JELLYBAT_WALK = RawAnimation.begin().thenLoop("animation.jellybat.walk");
+    protected static final RawAnimation JELLYBAT_NUETRAL = RawAnimation.begin().thenLoop("animation.jellybat.neutral");
+    protected static final RawAnimation JELLYBAT_FLY = RawAnimation.begin().thenLoop("animation.jellybat.fly");
+    protected static final RawAnimation JELLYBAT_BLINK = RawAnimation.begin().thenLoop("animation.jellybat.blink");
+    protected static final RawAnimation JELLYBAT_GOTO_SLEEP = RawAnimation.begin().thenLoop("animation.jellybat.ground_gotosleep");
+    protected static final RawAnimation JELLYBAT_GROUND_SLEEP = RawAnimation.begin().thenLoop("animation.jellybat.ground_sleep");
+    protected static final RawAnimation JELLYBAT_GROUND_IDLE1 = RawAnimation.begin().thenPlay("animation.jellybat.ground_idle1");
+    protected static final RawAnimation JELLYBAT_GROUND_IDLE2 = RawAnimation.begin().thenPlay("animation.jellybat.ground_idle2");
+    protected static final RawAnimation JELLYBAT_UPSIDEDOWN = RawAnimation.begin().thenPlay("animation.jellybat.upsidedown");
 
     private static final EntityDataAccessor<Boolean> HANGING_ON_CEILING = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HAS_JELLY_FUR = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
@@ -195,12 +197,12 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     }
     //This swaps the navigation mode so that the bat can walk when landing.
     public void setNavigationModeToFlying(boolean b) {
-       this.navigation.stop();
-       if (b == true) {
-           this.navigation = flyingNavigation;
-       } else {
-           this.navigation = groundNavigation;
-       }
+        this.navigation.stop();
+        if (b == true) {
+            this.navigation = flyingNavigation;
+        } else {
+            this.navigation = groundNavigation;
+        }
     }
 
     public boolean getFlyingNavigationState() {
@@ -337,11 +339,11 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
         return (item == Items.GLOW_BERRIES);
     }
 
-    private <E extends IAnimatable>PlayState movementPredicate(AnimationEvent<E> event) {
-        if (event.isMoving() && this.isOnGround()) {
+    private <E extends GeoAnimatable> PlayState movementPredicate(AnimationState<E> event) {
+        if (event.isMoving() && this.onGround()) {
             event.getController().setAnimation(JELLYBAT_WALK);
             return PlayState.CONTINUE;
-        } else if (event.isMoving() && !this.isOnGround()) {
+        } else if (event.isMoving() && !this.onGround()) {
             event.getController().setAnimation(JELLYBAT_FLY);
             return PlayState.CONTINUE;
         } else {
@@ -355,14 +357,14 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
         }
     }
 
-    private <E extends IAnimatable>PlayState blinkPredicate(AnimationEvent<E> event) {
+    private <E extends GeoAnimatable>PlayState blinkPredicate(AnimationState<E> event) {
         event.getController().setAnimation(JELLYBAT_BLINK);
 
         return PlayState.CONTINUE;
     }
 
-    private <E extends IAnimatable>PlayState idlePredicate(AnimationEvent<E> event) {
-        if (!this.isInSittingPose() && !event.isMoving() && this.isOnGround()) {
+    private <E extends GeoAnimatable>PlayState idlePredicate(AnimationState<E> event) {
+        if (!this.isInSittingPose() && !event.isMoving() && this.onGround()) {
             switch (getIdlePose()) {
                 case 1 : event.getController().setAnimation(JELLYBAT_GROUND_IDLE1);
                     return PlayState.CONTINUE;
@@ -377,19 +379,19 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     }
 
     @Override
-    public void registerControllers(AnimationData data) {
-        AnimationController movementController = new AnimationController(this, "movement", 15, this::movementPredicate);
-        AnimationController blinkController = new AnimationController(this, "blink", 15, this::blinkPredicate);
-        AnimationController idleController = new AnimationController(this, "idle", 15, this::idlePredicate);
+    public void registerControllers(AnimatableManager.ControllerRegistrar controller) {
+        AnimationController<JellyBatEntity> movementController = new AnimationController(this, "movement", 15, this::movementPredicate);
+        AnimationController<JellyBatEntity> blinkController = new AnimationController(this, "blink", 15, this::blinkPredicate);
+        AnimationController<JellyBatEntity> idleController = new AnimationController(this, "idle", 15, this::idlePredicate);
 
-        data.addAnimationController(movementController);
-        data.addAnimationController(blinkController);
-        data.addAnimationController(idleController);
+        controller.add(movementController);
+        controller.add(blinkController);
+        controller.add(idleController);
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.animationCache;
     }
 
     public static AttributeSupplier setAttributes() {
@@ -459,7 +461,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
         // Breeding Interactions
         int age = this.getAge();
         if (is.is(Items.GLOW_BERRIES)) {
-            if (!this.level.isClientSide && age == 0 && this.canFallInLove()) {
+            if (!this.level().isClientSide && age == 0 && this.canFallInLove()) {
                 this.usePlayerItem(pPlayer, pHand, is);
                 this.setInLove(pPlayer);
                 return InteractionResult.SUCCESS;
@@ -468,10 +470,10 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             if (this.isBaby()) {
                 this.usePlayerItem(pPlayer, pHand, is);
                 this.ageUp(getSpeedUpSecondsWhenFeeding(-age), true);
-                return InteractionResult.sidedSuccess(this.level.isClientSide);
+                return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
 
-            if (this.level.isClientSide) {
+            if (this.level().isClientSide) {
                 return InteractionResult.CONSUME;
             }
         }
@@ -489,7 +491,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             this.setDonutColor(potion.getEffects().get(0).getEffect().getColor());
 
             this.usePlayerItem(pPlayer, pHand, is);
-            this.level.playSound((Player)null, this, SoundEvents.BOTTLE_FILL, this.getSoundSource(), 0.5F, 1.0F);
+            this.level().playSound((Player)null, this, SoundEvents.BOTTLE_FILL, this.getSoundSource(), 0.5F, 1.0F);
             return InteractionResult.SUCCESS;
         }
 
@@ -498,7 +500,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             this.setSuperSize(true);
             this.usePlayerItem(pPlayer, pHand, is);
             this.tame(pPlayer);
-            this.getLevel().playSound((Player)null, this, CustomSoundEvents.JELLYBAT_SUPERSIZE, this.getSoundSource(), 0.5F, 1.0F);
+            this.level().playSound((Player)null, this, CustomSoundEvents.JELLYBAT_SUPERSIZE, this.getSoundSource(), 0.5F, 1.0F);
 
             ParticleOptions particleoptions = ParticleTypes.EXPLOSION;
 
@@ -509,7 +511,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
                 double d3 = this.getRandomX(1.0D);
                 double d4 = this.getRandomY() + 0.5D;
                 double d5 = this.getRandomZ(1.0D);
-                this.level.addParticle(particleoptions, d3, d4, d5, d0, d1, d2);
+                this.level().addParticle(particleoptions, d3, d4, d5, d0, d1, d2);
             }
         }
 
@@ -519,19 +521,19 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             is.shrink(1); // remove saddle from players inventory.
             equipSaddle(getSoundSource());
             setSaddle(true);
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.sidedSuccess(level().isClientSide());
         }
 
         // Ride Check
         if (isSaddled() && this.isTame() && !pPlayer.isShiftKeyDown()) {
-            if (!level.isClientSide) {
+            if (!level().isClientSide) {
                 setRidingPlayer(pPlayer);
                 this.setOrderedToSit(false);
                 this.setEntityWakeUpState(true);
                 navigation.stop();
                 setTarget(null);
             }
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.sidedSuccess(level().isClientSide());
         }
 
         // Sit check
@@ -540,7 +542,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
             this.navigation.stop();
             this.flying = false;
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.sidedSuccess(level().isClientSide());
         }
 
         // Heal check
@@ -548,7 +550,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
             is.shrink(1);
             this.heal(4.0f);
             this.spawnTamingParticles(true);
-            return InteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.sidedSuccess(level().isClientSide());
         }
 
 
@@ -571,8 +573,8 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     }
 
     @Override
-    public void positionRider(Entity passenger) {
-        super.positionRider(passenger);
+    public void positionRider(Entity passenger, Entity.MoveFunction pCallback) {
+        super.positionRider(passenger, pCallback);
 
         Entity rider = getControllingPassenger();
         if (rider != null) {
@@ -589,12 +591,12 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     }
 
     @Override
-    public Entity getControllingPassenger() {
+    public LivingEntity getControllingPassenger() {
         List<Entity> list = getPassengers();
         if (list.isEmpty()) {
             return null;
         } else {
-            return list.get(0);
+            return (LivingEntity)list.get(0);
         }
     }
 
@@ -612,7 +614,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     public void aiStep() {
         super.aiStep();
         Vec3 vec = this.getDeltaMovement();
-        if (!this.isOnGround() && vec.y < 0.0D && !this.isElytraFlying()) {
+        if (!this.onGround() && vec.y < 0.0D && !this.isElytraFlying()) {
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
             this.flying = true;
         }
@@ -664,7 +666,7 @@ public class JellyBatEntity extends RideableFlightEntity implements IAnimatable,
     public void equipSaddle(@Nullable SoundSource pSource) {
         entityData.set(HAS_SADDLE, true);
         if (pSource != null) {
-            this.level.playSound((Player)null, this, SoundEvents.HORSE_SADDLE, pSource, 0.5F, 1.0F);
+            this.level().playSound((Player)null, this, SoundEvents.HORSE_SADDLE, pSource, 0.5F, 1.0F);
         }
     }
 

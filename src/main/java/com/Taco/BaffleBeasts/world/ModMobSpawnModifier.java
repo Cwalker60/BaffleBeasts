@@ -1,15 +1,17 @@
-package com.Taco.BaffleBeasts.world;
+package com.taco.bafflebeasts.world;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.config.BaffleServerConfig;
-import com.Taco.BaffleBeasts.config.BaffleConfigValues;
-import com.Taco.BaffleBeasts.entity.ModEntityTypes;
-import com.Taco.BaffleBeasts.entity.custom.AmaroEntity;
 import com.mojang.serialization.Codec;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.config.BaffleConfigValues;
+import com.taco.bafflebeasts.config.BaffleServerConfig;
+import com.taco.bafflebeasts.config.EntityConfigData;
+import com.taco.bafflebeasts.entity.ModEntityTypes;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -19,7 +21,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
-
 public record ModMobSpawnModifier(boolean config) implements BiomeModifier {
     @Override
     public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
@@ -28,57 +29,40 @@ public record ModMobSpawnModifier(boolean config) implements BiomeModifier {
             // Check through the biome resource keys to see if the resource location matches with
             // BaffleBeasts Config
             biome.unwrapKey().ifPresent(biomeResourceKey -> {
-                ResourceLocation biomeID = biomeResourceKey.location();
-                ArrayList<String> biomeList = BaffleConfigValues.AMARO_BIOME_SPAWN_LIST;
-                biomeList = removeDuplicates(biome, biomeID, biomeList);
 
                 // Amaro
                 // if the tag is in the config list, add the amaro to that biome with that tag.
-                for (String s : biomeList) {
-                    TagKey<Biome> tag = TagKey.create(ForgeRegistries.BIOMES.getRegistryKey(), new ResourceLocation(s));
-
-                    if (biome.containsTag(tag)) {
-                        builder.getMobSpawnSettings().addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntityTypes.Amaro.get(),
-                                50, BaffleServerConfig.AMARO_SPAWN_AMOUNT_MIN.get(), BaffleServerConfig.AMARO_SPAWN_AMOUNT_MAX.get()));
-
-                    }
-                }
-
-                if (biomeList.contains(biomeID.toString())) {
-                    builder.getMobSpawnSettings().addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(ModEntityTypes.Amaro.get(),
-                            50, BaffleServerConfig.AMARO_SPAWN_AMOUNT_MIN.get(), BaffleServerConfig.AMARO_SPAWN_AMOUNT_MAX.get()));
-                }
-
-                // JellyBat
-                biomeList = BaffleConfigValues.JELLYBAT_BIOME_SPAWN_LIST;
-                biomeList = removeDuplicates(biome, biomeID, biomeList);
-                for (String s : biomeList) {
-                    TagKey<Biome> tag = TagKey.create(ForgeRegistries.BIOMES.getRegistryKey(), new ResourceLocation(s));
-
-                    if (biome.containsTag(tag)) {
-                        builder.getMobSpawnSettings().addSpawn(MobCategory.AMBIENT, new MobSpawnSettings.SpawnerData(ModEntityTypes.JellyBat.get(),
-                                50, BaffleServerConfig.JELLYBAT_SPAWN_AMOUNT_MIN.get(), BaffleServerConfig.JELLYBAT_SPAWN_AMOUNT_MAX.get()));
-
-                    }
-                }
-
-                if (biomeList.contains(biomeID.toString())) {
-                    builder.getMobSpawnSettings().addSpawn(MobCategory.AMBIENT, new MobSpawnSettings.SpawnerData(ModEntityTypes.JellyBat.get(),
-                            50, BaffleServerConfig.JELLYBAT_SPAWN_AMOUNT_MIN.get(), BaffleServerConfig.JELLYBAT_SPAWN_AMOUNT_MAX.get()));
-                    BaffleBeasts.MAIN_LOGGER.debug("Spawning Jellybat in biome " + biomeID.getPath());
-                }
-
+                addEntitySpawn(BaffleConfigValues.AMARO_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.CREATURE);
+                addEntitySpawn(BaffleConfigValues.JELLYBAT_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.AMBIENT);
             });
 
         }
 
-        // TEMPLATE PHASE
-
-//        if (phase == Phase.ADD) {
-//            builder.getMobSpawnSettings().addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(
-//                    ModEntityTypes.Amaro.get(), 50, BaffleServerConfig.AMARO_SPAWN_AMOUNT.get(), BaffleServerConfig.AMARO_SPAWN_AMOUNT.get()));
-//        }
     }
+
+    public void addEntitySpawn(EntityConfigData configData, ResourceKey<Biome> biomeResourceKey, Holder<Biome> biome,
+                               ModifiableBiomeInfo.BiomeInfo.Builder builder, MobCategory category) {
+
+        ResourceLocation biomeID = biomeResourceKey.location();
+        ArrayList<String> biomeList = configData.getSpawnBiomes();
+        biomeList = removeDuplicates(biome, biomeID, biomeList);
+
+        // if the tag is in the config list, add the amaro to that biome with that tag.
+        for (String s : biomeList) {
+            TagKey<Biome> tag = TagKey.create(ForgeRegistries.BIOMES.getRegistryKey(), new ResourceLocation(s));
+
+            if (biome.containsTag(tag)) {
+                builder.getMobSpawnSettings().addSpawn(category, new MobSpawnSettings.SpawnerData(configData.getMobType(),
+                        configData.getSpawnWeight(), configData.getMinSpawn(), configData.getMaxSpawn()));
+
+            }
+        }
+        if (biomeList.contains(biomeID.toString())) {
+            builder.getMobSpawnSettings().addSpawn(category, new MobSpawnSettings.SpawnerData(configData.getMobType(),
+                    configData.getSpawnWeight(), configData.getMinSpawn(), configData.getMaxSpawn()));
+        }
+    }
+
     @Override
     public Codec<? extends BiomeModifier> codec() {
         return BiomeModifierRegistry.MOD_MOB_SPAWN_CODEX.get();
@@ -121,4 +105,3 @@ public record ModMobSpawnModifier(boolean config) implements BiomeModifier {
     }
 
 }
-

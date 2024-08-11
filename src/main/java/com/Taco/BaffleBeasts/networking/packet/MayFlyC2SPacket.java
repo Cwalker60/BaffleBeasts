@@ -1,7 +1,7 @@
-package com.Taco.BaffleBeasts.networking.packet;
+package com.taco.bafflebeasts.networking.packet;
 
-import com.Taco.BaffleBeasts.entity.custom.AmaroEntity;
 import com.mojang.logging.LogUtils;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,11 +35,11 @@ public class MayFlyC2SPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            ServerLevel level = context.getSender().getLevel();
+            ServerLevel level = context.getSender().serverLevel();
 
             if (player != null) {
                 if (player.getVehicle() != null) {
-                    if (player.getVehicle() instanceof AmaroEntity a) {
+                    if (player.getVehicle() instanceof RideableFlightEntity a) {
                         a.setNoGravity(canFly);
                         LOGGER.debug("amaro gravity is : " + a.isNoGravity());
                     }
@@ -51,5 +51,5 @@ public class MayFlyC2SPacket {
         });
         return true;
     }
-}
 
+}

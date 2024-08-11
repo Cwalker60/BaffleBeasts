@@ -1,11 +1,12 @@
-package com.Taco.BaffleBeasts.entity.custom;
+package com.taco.bafflebeasts.entity.custom;
 
-import com.Taco.BaffleBeasts.entity.ModEntityTypes;
-import com.Taco.BaffleBeasts.entity.goal.FlyEntityFollowOwnerGoal;
-import com.Taco.BaffleBeasts.entity.goal.IdleAnimationGoal;
-import com.Taco.BaffleBeasts.entity.goal.FlyEntityLookAtPlayer;
-import com.Taco.BaffleBeasts.sound.SoundRegistry;
 import com.mojang.logging.LogUtils;
+import com.taco.bafflebeasts.entity.ModEntityTypes;
+import com.taco.bafflebeasts.entity.goal.FlyEntityFollowOwnerGoal;
+import com.taco.bafflebeasts.entity.goal.FlyEntityLookAtPlayer;
+import com.taco.bafflebeasts.entity.goal.IdleAnimationGoal;
+import com.taco.bafflebeasts.sound.SoundRegistry;
+import com.taco.bafflebeasts.util.ElytraGlideCalculation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -36,42 +37,42 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
-import software.bernie.geckolib3.core.IAnimatable;
-import software.bernie.geckolib3.core.PlayState;
-import software.bernie.geckolib3.core.builder.AnimationBuilder;
-import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
-import software.bernie.geckolib3.core.event.SoundKeyframeEvent;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.manager.AnimationData;
-import software.bernie.geckolib3.core.manager.AnimationFactory;
-import software.bernie.geckolib3.util.GeckoLibUtil;
+import software.bernie.geckolib.animatable.GeoEntity;
+import software.bernie.geckolib.core.animatable.GeoAnimatable;
+import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.core.animation.*;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.core.keyframe.event.SoundKeyframeEvent;
+import software.bernie.geckolib.core.object.PlayState;
+import software.bernie.geckolib.util.GeckoLibUtil;
 
 import java.util.List;
 
-public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Saddleable, PlayerRideable, PlayerRideableJumping {
+public class AmaroEntity extends RideableFlightEntity implements GeoEntity, PlayerRideable, PlayerRideableJumping {
 
-    private final AnimationFactory factory = GeckoLibUtil.createFactory(this);
+    private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
     private static final EntityDataAccessor<Integer> AMARO_VARIANT = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
 
     private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.MELON_SLICE, Items.GLISTERING_MELON_SLICE);
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    protected static final AnimationBuilder AMARO_FLY = new AnimationBuilder().addAnimation("animation.amaro.fly", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder AMARO_RUN = new AnimationBuilder().addAnimation("animation.amaro.run", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder AMARO_SIT = new AnimationBuilder().addAnimation("animation.amaro.sit", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder AMARO_NEUTRAL = new AnimationBuilder().addAnimation("animation.amaro.neutral", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder AMARO_IDLE1 = new AnimationBuilder().addAnimation("animation.amaro.idle1", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder AMARO_IDLE2 = new AnimationBuilder().addAnimation("animation.amaro.idle2", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder AMARO_IDLE3 = new AnimationBuilder().addAnimation("animation.amaro.idle3", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder AMARO_IDLE4 = new AnimationBuilder().addAnimation("animation.amaro.idle4", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder AMARO_IDLE5 = new AnimationBuilder().addAnimation("animation.amaro.idle5", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder AMARO_SLEEP = new AnimationBuilder().addAnimation("animation.amaro.sleep", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder AMARO_GOTOSLEEP = new AnimationBuilder().addAnimation("animation.amaro.gotosleep", ILoopType.EDefaultLoopTypes.PLAY_ONCE);
-    protected static final AnimationBuilder AMARO_WAKEUP = new AnimationBuilder().addAnimation("animation.amaro.wakeup");
-    protected static final AnimationBuilder AMARO_BLINK = new AnimationBuilder().addAnimation("animation.amaro.blink", ILoopType.EDefaultLoopTypes.LOOP);
-    protected static final AnimationBuilder AMARO_NONE = new AnimationBuilder().addAnimation("animation.amaro.blink", ILoopType.EDefaultLoopTypes.LOOP);
+    protected static final RawAnimation AMARO_SPRINT = RawAnimation.begin().thenLoop("animation.amaro.sprint");
+    protected static final RawAnimation AMARO_FLY = RawAnimation.begin().thenLoop("animation.amaro.fly");
+    protected static final RawAnimation AMARO_RUN = RawAnimation.begin().thenLoop("animation.amaro.run");
+    protected static final RawAnimation AMARO_SIT = RawAnimation.begin().thenLoop("animation.amaro.sit");
+    protected static final RawAnimation AMARO_NEUTRAL = RawAnimation.begin().thenLoop("animation.amaro.neutral");
+    protected static final RawAnimation AMARO_IDLE1 = RawAnimation.begin().thenPlay("animation.amaro.idle1");
+    protected static final RawAnimation AMARO_IDLE2 = RawAnimation.begin().thenPlay("animation.amaro.idle2");
+    protected static final RawAnimation AMARO_IDLE3 = RawAnimation.begin().thenPlay("animation.amaro.idle3");
+    protected static final RawAnimation AMARO_IDLE4 = RawAnimation.begin().thenPlay("animation.amaro.idle4");
+    protected static final RawAnimation AMARO_IDLE5 = RawAnimation.begin().thenPlay("animation.amaro.idle5");
+    protected static final RawAnimation AMARO_SLEEP = RawAnimation.begin().thenPlay("animation.amaro.sleep");
+    protected static final RawAnimation AMARO_GOTOSLEEP = RawAnimation.begin().thenPlay("animation.amaro.gotosleep");
+    protected static final RawAnimation AMARO_WAKEUP = RawAnimation.begin().thenPlay("animation.amaro.wakeup");
+    protected static final RawAnimation AMARO_BLINK = RawAnimation.begin().thenLoop("animation.amaro.blink");
+    protected static final RawAnimation AMARO_GLIDE = RawAnimation.begin().thenLoop("animation.amaro.glide");
+    protected static final RawAnimation AMARO_FLIGHT_DASH = RawAnimation.begin().thenPlay("animation.amaro.fly_dash");
 
     public int animationbuffer = 5;
 
@@ -164,16 +165,27 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
     }
 
     // this plays the walking, neutral, flying, sit, and sleep animations
-    private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
+    private <E extends GeoAnimatable> PlayState predicate(AnimationState<E> event) {
         //If the amaro is moving
-        if (event.isMoving() && this.isOnGround()) {
+        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger()) {
             event.getController().setAnimation(AMARO_RUN);
             return PlayState.CONTINUE;
-        } else if (!this.isOnGround() && !this.isElytraFlying()) { // Set the amaro to fly
+        // If the Amaro is moving with a rider
+        } else if (event.isMoving() && this.onGround() && this.hasControllingPassenger()) {
+            event.getController().setAnimation(AMARO_SPRINT);
+            return PlayState.CONTINUE;
+        // Fly Animation
+        } else if (!this.onGround() && !this.isElytraFlying()) { // Set the amaro to fly
             event.getController().setAnimation(AMARO_FLY);
             return PlayState.CONTINUE;
-        } else if (!this.isOnGround() && this.isElytraFlying()) {
-            event.getController().setAnimation(AMARO_NONE);
+        // Fly Dash Animation
+        } else if (!this.onGround() && this.isElytraFlying() && ElytraGlideCalculation.isFlightBoosting(this)) {
+            event.getController().stop();
+            event.getController().setAnimation(AMARO_FLIGHT_DASH);
+            return PlayState.CONTINUE;
+        // Neutral Fly Animation
+        } else if (!this.onGround() && this.isElytraFlying()) {
+            event.getController().setAnimation(AMARO_GLIDE);
             return PlayState.CONTINUE;
         }
         // If the amaro is not moving
@@ -188,19 +200,19 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
                 return PlayState.CONTINUE;
             }
 
-            if (this.isOnGround() && !this.isInSittingPose()) {
+            if (this.onGround() && !this.isInSittingPose()) {
                 event.getController().setAnimation(AMARO_NEUTRAL);
                 return PlayState.CONTINUE;
             }
         }
-        return PlayState.STOP;
+        return PlayState.CONTINUE;
     }
 
-    private <E extends IAnimatable> PlayState idlePredicate(AnimationEvent<E> event) {
+    private <E extends GeoAnimatable> PlayState idlePredicate(AnimationState<E> event) {
         int idlePose = this.getIdlePose();
 
         // Idle Animations
-        if (!event.isMoving() && this.isOnGround() && !this.isInSittingPose()) {
+        if (!event.isMoving() && this.onGround() && !this.isInSittingPose()) {
             switch (idlePose) {
                 case 1: event.getController().setAnimation(AMARO_IDLE1);
                     return PlayState.CONTINUE;
@@ -216,7 +228,7 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
         }
 
         if (!event.isMoving() && this.getEntityWakeUpState() && this.isInSittingPose()) {
-            event.getController().clearAnimationCache();
+            event.getController().forceAnimationReset();
             event.getController().setAnimation(AMARO_WAKEUP);
             return PlayState.CONTINUE;
         }
@@ -224,7 +236,7 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
         return PlayState.CONTINUE;
     }
 
-    private <E extends IAnimatable> PlayState blinkPredicate(AnimationEvent<E> event) {
+    private <E extends GeoAnimatable> PlayState blinkPredicate(AnimationState<E> event) {
         if (!this.isAsleep()) {
             event.getController().setAnimation(AMARO_BLINK);
             return PlayState.CONTINUE;
@@ -232,26 +244,27 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
         return PlayState.STOP;
     }
 
-    private <ENTITY extends IAnimatable> void soundListener(SoundKeyframeEvent<ENTITY> event) {
-        this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 3.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
+    private <ENTITY extends GeoAnimatable> void soundListener(SoundKeyframeEvent<ENTITY> event) {
+        this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 3.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
     }
 
     @Override
-    public void registerControllers(AnimationData data) {
-        AnimationController walkController = new AnimationController(this, "walk", 15, this::predicate);
-        walkController.registerSoundListener(this::soundListener);
-        data.addAnimationController(walkController);
+    public void registerControllers(AnimatableManager.ControllerRegistrar controller) {
+        AnimationController<AmaroEntity> walkController = new AnimationController(this, "walk", 15, this::predicate);
+        walkController.setSoundKeyframeHandler(this::soundListener);
+        controller.add(walkController);
 
-        data.addAnimationController(new AnimationController(this, "idle",
+
+        controller.add(new AnimationController(this, "idle",
                 15, this::idlePredicate));
-        data.addAnimationController(new AnimationController(this, "blink",
+        controller.add(new AnimationController(this, "blink",
                 0, this::blinkPredicate));
 
     }
 
     @Override
-    public AnimationFactory getFactory() {
-        return this.factory;
+    public AnimatableInstanceCache getAnimatableInstanceCache() {
+        return this.animationCache;
     }
 
     protected void playStepSound(BlockPos pos, BlockState blockIn) {
@@ -321,10 +334,10 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-        if (this.level.isClientSide) {
-           if (this.isTame() ) {
-               return InteractionResult.SUCCESS;
-           }
+        if (this.level().isClientSide) {
+            if (this.isTame() ) {
+                return InteractionResult.SUCCESS;
+            }
 
         } else {
             // tamed interactions
@@ -332,7 +345,7 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
                 // Breeding Interactions
                 int age = this.getAge();
                 if (stack.is(Items.MELON_SLICE)) {
-                    if (!this.level.isClientSide && age == 0 && this.canFallInLove()) {
+                    if (!this.level().isClientSide && age == 0 && this.canFallInLove()) {
                         this.usePlayerItem(player, hand, stack);
                         this.setInLove(player);
                         return InteractionResult.SUCCESS;
@@ -341,10 +354,10 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
                     if (this.isBaby()) {
                         this.usePlayerItem(player, hand, stack);
                         this.ageUp(getSpeedUpSecondsWhenFeeding(-age), true);
-                        return InteractionResult.sidedSuccess(this.level.isClientSide);
+                        return InteractionResult.sidedSuccess(this.level().isClientSide);
                     }
 
-                    if (this.level.isClientSide) {
+                    if (this.level().isClientSide) {
                         return InteractionResult.CONSUME;
                     }
                 }
@@ -355,26 +368,26 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
                     stack.shrink(1); // remove saddle from players inventory.
                     equipSaddle(getSoundSource());
                     setSaddle(true);
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.sidedSuccess(level().isClientSide());
                 }
 
                 // Check to see if you can ride the Amaro
                 if (isSaddled() && this.isTame() && !player.isShiftKeyDown() && !isHealItem(stack.getItem())) {
-                    if (!level.isClientSide) {
+                    if (!level().isClientSide) {
                         setRidingPlayer(player);
                         this.setOrderedToSit(false);
                         this.setEntityWakeUpState(true);
                         navigation.stop();
                         setTarget(null);
                     }
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.sidedSuccess(level().isClientSide());
                 }
                 // Heal check
                 if (isHealItem(stack.getItem()) &&!player.isShiftKeyDown()) {
                     stack.shrink(1);
                     this.heal(4.0f);
                     this.spawnTamingParticles(true);
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.sidedSuccess(level().isClientSide());
                 }
 
                 // Sit check
@@ -383,22 +396,22 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
                     this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
                     this.navigation.stop();
                     this.flying = false;
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.sidedSuccess(level().isClientSide());
                 }
-            // Untamed interactions
-            // Tame check
+                // Untamed interactions
+                // Tame check
             } else if (stack.is(Items.GLISTERING_MELON_SLICE) && !this.isTame()) {
-                    stack.shrink(1);
-                    // Have a 1-3 chance of taming the amaro
-                    if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) {
-                        this.tame(player);
-                        this.navigation.stop();
-                        this.level.broadcastEntityEvent(this, (byte)7);
-                    } else {
-                        this.level.broadcastEntityEvent(this, (byte)6);
-                    }
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                stack.shrink(1);
+                // Have a 1-3 chance of taming the amaro
+                if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) {
+                    this.tame(player);
+                    this.navigation.stop();
+                    this.level().broadcastEntityEvent(this, (byte)7);
+                } else {
+                    this.level().broadcastEntityEvent(this, (byte)6);
                 }
+                return InteractionResult.sidedSuccess(level().isClientSide());
+            }
         }
         return super.mobInteract(player,hand);
     }
@@ -428,17 +441,17 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
     public void equipSaddle(@Nullable SoundSource pSource) {
         entityData.set(HAS_SADDLE, true);
         if (pSource != null) {
-            this.level.playSound((Player)null, this, SoundEvents.HORSE_SADDLE, pSource, 0.5F, 1.0F);
+            this.level().playSound((Player)null, this, SoundEvents.HORSE_SADDLE, pSource, 0.5F, 1.0F);
         }
     }
 
     @Override
-    public Entity getControllingPassenger() {
+    public LivingEntity getControllingPassenger() {
         List<Entity> list = getPassengers();
         if (list.isEmpty()) {
             return null;
         } else {
-            return list.get(0);
+            return (LivingEntity)list.get(0);
         }
     }
 
@@ -462,8 +475,8 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
     }
 
     @Override
-    public void positionRider(Entity passenger) {
-        super.positionRider(passenger);
+    public void positionRider(Entity passenger, Entity.MoveFunction pCallback) {
+        super.positionRider(passenger, pCallback);
 
         Entity rider = getControllingPassenger();
         if (rider != null) {
@@ -498,7 +511,7 @@ public class AmaroEntity extends RideableFlightEntity implements IAnimatable, Sa
     public void aiStep() {
         super.aiStep();
         Vec3 vec = this.getDeltaMovement();
-        if (!this.onGround && vec.y < 0.0D && !this.isElytraFlying()) {
+        if (!this.onGround() && vec.y < 0.0D && !this.isElytraFlying()) {
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
             this.flying = true;
         }

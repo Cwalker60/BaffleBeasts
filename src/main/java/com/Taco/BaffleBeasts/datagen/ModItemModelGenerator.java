@@ -1,8 +1,9 @@
-package com.Taco.BaffleBeasts.datagen;
+package com.taco.bafflebeasts.datagen;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.item.ModItems;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.item.ModItems;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
@@ -11,8 +12,8 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 public class ModItemModelGenerator extends ItemModelProvider {
 
-    public ModItemModelGenerator(DataGenerator generator, ExistingFileHelper fileHelper)  {
-        super(generator, BaffleBeasts.MODID, fileHelper);
+    public ModItemModelGenerator(PackOutput po, ExistingFileHelper fileHelper)  {
+        super(po, BaffleBeasts.MODID, fileHelper);
     }
 
     public  void registerModels() {

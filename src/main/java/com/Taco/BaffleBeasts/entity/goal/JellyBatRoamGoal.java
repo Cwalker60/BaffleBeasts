@@ -1,8 +1,8 @@
-package com.Taco.BaffleBeasts.entity.goal;
+package com.taco.bafflebeasts.entity.goal;
 
-import com.Taco.BaffleBeasts.entity.custom.JellyBatEntity;
-
+import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.util.HoverRandomPos;
 import net.minecraft.world.phys.Vec3;
@@ -47,9 +47,9 @@ public class JellyBatRoamGoal extends RandomStrollGoal {
             this.entity.setNavigationModeToFlying(true);
             Vec3 vec = this.entity.getViewVector(0.0f);
             Vec3 vecPath = HoverRandomPos.getPos(this.entity, 8, 7, vec.x, vec.z,((float)Math.PI / 10F), 3, 1);
-
             if (vecPath != null) {
-                BlockPos pathBlock = new BlockPos(vecPath);
+                Vec3i block = new Vec3i((int)vecPath.x, (int)vecPath.y, (int)vecPath.z);
+                BlockPos pathBlock = new BlockPos(block);
                 this.entity.getNavigation().moveTo(this.entity.getNavigation().createPath(pathBlock, 1),1.0d );
             }
         }

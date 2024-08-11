@@ -1,30 +1,30 @@
-package com.Taco.BaffleBeasts.networking.packet;
+package com.taco.bafflebeasts.networking.packet;
 
-import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class AmaroDescendC2SPacket {
-    public int amaroId;
+public class FlightEntityDescendC2SPacket {
+    public int entityId;
 
-    public AmaroDescendC2SPacket() {
+    public FlightEntityDescendC2SPacket() {
 
     }
 
-    public AmaroDescendC2SPacket(int id) {
-        this.amaroId = id;
+    public FlightEntityDescendC2SPacket(int id) {
+        this.entityId = id;
     }
 
 
-    public AmaroDescendC2SPacket(FriendlyByteBuf buf) {
-        this.amaroId = buf.readInt();
+    public FlightEntityDescendC2SPacket(FriendlyByteBuf buf) {
+        this.entityId = buf.readInt();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
-        buf.writeInt(amaroId);
+        buf.writeInt(entityId);
     }
 
     public void encode() {

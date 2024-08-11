@@ -1,23 +1,29 @@
-package com.Taco.BaffleBeasts.entity.client;
+package com.taco.bafflebeasts.entity.client;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.entity.custom.AmaroEntity;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.entity.custom.AmaroEntity;
 import net.minecraft.resources.ResourceLocation;
-import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
-import software.bernie.geckolib3.core.processor.IBone;
-import software.bernie.geckolib3.model.AnimatedGeoModel;
-import software.bernie.geckolib3.model.provider.data.EntityModelData;
+import software.bernie.geckolib.constant.DataTickets;
+import software.bernie.geckolib.core.animatable.model.CoreGeoBone;
+import software.bernie.geckolib.core.animation.AnimationState;
+import software.bernie.geckolib.model.GeoModel;
+import software.bernie.geckolib.model.data.EntityModelData;
 
 import javax.annotation.Nullable;
 
-public class AmaroModel extends AnimatedGeoModel<AmaroEntity> {
+public class AmaroModel extends GeoModel<AmaroEntity> {
+
     @Override
-    public void setCustomAnimations(AmaroEntity entity, int uniqueID, @Nullable AnimationEvent customPredicate) {
+    public void setCustomAnimations(AmaroEntity entity, long uniqueID, @Nullable AnimationState<AmaroEntity> customPredicate) {
         super.setCustomAnimations(entity, uniqueID, customPredicate);
-        IBone head = this.getAnimationProcessor().getBone("head");
-        EntityModelData extraData = (EntityModelData) customPredicate.getExtraDataOfType(EntityModelData.class).get(0);
-        head.setRotationX(extraData.headPitch * 0.017453292F);
-        head.setRotationY(extraData.netHeadYaw * 0.017453292F);
+        CoreGeoBone head = this.getAnimationProcessor().getBone("head");
+        EntityModelData as;
+        if (customPredicate.getData(DataTickets.ENTITY_MODEL_DATA) != null) {
+            as = customPredicate.getData(DataTickets.ENTITY_MODEL_DATA);
+            head.setRotX(as.headPitch() * 0.017453292F);
+            head.setRotY(as.netHeadYaw() * 0.017453292F);
+        }
+
     }
 
     @Override
@@ -34,5 +40,4 @@ public class AmaroModel extends AnimatedGeoModel<AmaroEntity> {
     public ResourceLocation getAnimationResource(AmaroEntity animatable) {
         return new ResourceLocation(BaffleBeasts.MODID, "animations/amaro.animation.json");
     }
-
 }

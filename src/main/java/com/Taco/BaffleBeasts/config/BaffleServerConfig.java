@@ -1,4 +1,4 @@
-package com.Taco.BaffleBeasts.config;
+package com.taco.bafflebeasts.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -37,7 +37,7 @@ public class BaffleServerConfig {
                 "Biomes that do not exist will log an error message, an example being: BaffleServerConfig error in validating biomes for...")
                 .comment("Tags will work and be checked as well")
                 .comment("An example biome config would be: Amaro_Spawn_Biomes = minecraft:taiga, minecraft:plains, byg:cika_woods, #is_taiga")
-                .defineList("Amaro_Spawn_Biomes",  createDefaultSpawnBiomes("AMARO"), entry -> true);
+                .defineListAllowEmpty("Amaro_Spawn_Biomes",  createDefaultSpawnBiomes("AMARO"), entry -> true);
         builder.pop();
         builder.pop();
 
@@ -53,7 +53,7 @@ public class BaffleServerConfig {
                 .define("JellyBat_Spawn_Weight", 50);
 
         builder.push("Spawn Biomes");
-        JELLYBAT_SPAWN_BIOMES = BUILDER.defineList("JellyBat_Spawn_Biomes",  createDefaultSpawnBiomes("JELLYBAT"), entry -> true);
+        JELLYBAT_SPAWN_BIOMES = BUILDER.defineListAllowEmpty("JellyBat_Spawn_Biomes",  createDefaultSpawnBiomes("JELLYBAT"), entry -> true);
         builder.pop();
         builder.pop();
 
@@ -74,5 +74,4 @@ public class BaffleServerConfig {
 
         return defaultList;
     }
-
 }

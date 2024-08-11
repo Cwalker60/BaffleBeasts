@@ -1,10 +1,10 @@
-package com.Taco.BaffleBeasts.entity.custom;
+package com.taco.bafflebeasts.entity.custom;
 
-import com.Taco.BaffleBeasts.entity.client.AmaroFlightHud;
-import com.Taco.BaffleBeasts.flight.AmaroFlightProvider;
-import com.Taco.BaffleBeasts.networking.ModPackets;
-import com.Taco.BaffleBeasts.networking.packet.AmaroFlightDashC2SPacket;
-import com.Taco.BaffleBeasts.util.ElytraGlideCalculation;
+import com.taco.bafflebeasts.entity.client.FlightPowerHud;
+import com.taco.bafflebeasts.flight.FlightPowerProvider;
+import com.taco.bafflebeasts.networking.ModPackets;
+import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
+import com.taco.bafflebeasts.util.ElytraGlideCalculation;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -44,7 +44,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     }
 
     public void setFlightStats() {
-        this.getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
+        this.getCapability(FlightPowerProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
             amaroFlight.setFlightPower(flightPower);
         });
     }
@@ -119,9 +119,9 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
             }
 
             // Launch off the ground with more power
-            if (this.isJumping && this.isOnGround() && !this.isElytraFlying()) {
+            if (this.isJumping && this.onGround() && !this.isElytraFlying()) {
                 this.setDeltaMovement(jvec.x, 1.8, jvec.z);
-                this.level.playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
+                this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
                 this.isJumping = false;
             } // Launch in the air with less power
             if (this.flying && this.isJumping && !this.isElytraFlying()) {
@@ -130,7 +130,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
             }
             // Launch the amaro forward in the air with elytra gliding, similar to a minecraft rocket.
             if (this.flying && this.isJumping && this.isElytraFlying()) {
-                ModPackets.sendToServer(new AmaroFlightDashC2SPacket());
+                ModPackets.sendToServer(new FlightEntityDashC2SPacket());
                 this.isJumping = false;
             }
 
@@ -158,7 +158,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
                 return;
             }
 
-            if (isOnGround()) {
+            if (onGround()) {
                 this.flying = false;
                 this.isJumping = false;
                 this.descend = false;
@@ -177,9 +177,9 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     public void tick() {
         super.tick();
 
-        getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
+        getCapability(FlightPowerProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
             if (amaroFlight.getFlightPower() < amaroFlight.getMaXFlightPower()) {
-                if (this.isOnGround()) {
+                if (this.onGround()) {
                     this.flightRechargeBuffer -= 5;
                 } else {
                     this.flightRechargeBuffer--;
@@ -194,10 +194,10 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
             }
 
             if (this.flightGUIFlicker == true) {
-                AmaroFlightHud.updateFlightPowerGUI();
-                if (AmaroFlightHud.getFlightAnimationDrawstate() > 16) {
+                FlightPowerHud.updateFlightPowerGUI();
+                if (FlightPowerHud.getFlightAnimationDrawstate() > 16) {
                     this.flightGUIFlicker = false;
-                    AmaroFlightHud.FLIGHT_ANIMATION_DRAWSTATE = -1;
+                    FlightPowerHud.FLIGHT_ANIMATION_DRAWSTATE = -1;
                 }
             }
 
@@ -206,7 +206,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
 
     @Override
     public void onPlayerJump(int pJumpPower) {
-        this.getCapability(AmaroFlightProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
+        this.getCapability(FlightPowerProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
             if (this.isSaddled() && amaroFlight.getFlightPower() > 0) {
                 this.flying = true;
                 this.isJumping = true;

@@ -1,0 +1,52 @@
+{
+  "amaro/amaro_hurt": {
+    "sounds": [
+      {
+        "name": "bafflebeasts:amaro/amaro_hurt",
+        "volume": 2.0
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.amaro_hurt"
+  },
+  "amaro/amaro_idle": {
+    "sounds": [
+      "bafflebeasts:amaro/amaro_idle"
+    ],
+    "subtitle": "sound.bafflebeasts.amaro_idle"
+  },
+  "jellybat/jellybat_death": {
+    "sounds": [
+      "bafflebeasts:jellybat/jellybat_death"
+    ],
+    "subtitle": "sound.bafflebeasts.jellybat_death1"
+  },
+  "jellybat/jellybat_growth_effect": {
+    "sounds": [
+      "bafflebeasts:jellybat/jellybat_growth_effect"
+    ],
+    "subtitle": "sound.bafflebeasts.jellybat_growth_effect"
+  },
+  "jellybat/jellybat_hurt1": {
+    "sounds": [
+      "bafflebeasts:jellybat/jellybat_hurt1"
+    ],
+    "subtitle": "sound.bafflebeasts.jellybat_hurt1"
+  },
+  "jellybat/jellybat_idle1": {
+    "sounds": [
+      {
+        "name": "bafflebeasts:jellybat/jellybat_idle1",
+        "volume": 0.8
+      },
+      {
+        "name": "bafflebeasts:jellybat/jellybat_idle2",
+        "volume": 0.8
+      },
+      {
+        "name": "bafflebeasts:jellybat/jellybat_idle3",
+        "volume": 0.8
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.jellybat_idle"
+  }
+}

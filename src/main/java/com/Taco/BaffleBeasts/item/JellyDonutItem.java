@@ -1,7 +1,6 @@
-package com.Taco.BaffleBeasts.item;
+package com.taco.bafflebeasts.item;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import net.minecraft.client.color.item.ItemColor;
+import com.taco.bafflebeasts.BaffleBeasts;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,7 +12,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 
-public class JellyDonutItem extends Item  {
+public class JellyDonutItem extends Item {
     private static final String NBT_EFFECTS = "Potion";
     private static final String DONUT_COLOR = "DonutColor";
 

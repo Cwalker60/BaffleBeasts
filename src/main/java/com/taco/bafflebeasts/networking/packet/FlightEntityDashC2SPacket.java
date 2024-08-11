@@ -1,7 +1,7 @@
-package com.Taco.BaffleBeasts.networking.packet;
+package com.taco.bafflebeasts.networking.packet;
 
-import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
-import com.Taco.BaffleBeasts.util.ElytraGlideCalculation;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.util.ElytraGlideCalculation;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -11,19 +11,19 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class AmaroFlightDashC2SPacket {
+public class FlightEntityDashC2SPacket {
     public int amaroId;
 
-    public AmaroFlightDashC2SPacket() {
+    public FlightEntityDashC2SPacket() {
 
     }
 
-    public AmaroFlightDashC2SPacket(int id) {
+    public FlightEntityDashC2SPacket(int id) {
         this.amaroId = id;
     }
 
 
-    public AmaroFlightDashC2SPacket(FriendlyByteBuf buf) {
+    public FlightEntityDashC2SPacket(FriendlyByteBuf buf) {
         this.amaroId = buf.readInt();
     }
 
@@ -39,7 +39,7 @@ public class AmaroFlightDashC2SPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            ServerLevel level = context.getSender().getLevel();
+            ServerLevel level = context.getSender().serverLevel();
 
             if (player != null) {
                 if (player.getVehicle() instanceof RideableFlightEntity flightEntity) {
@@ -60,4 +60,5 @@ public class AmaroFlightDashC2SPacket {
         });
         return true;
     }
+
 }

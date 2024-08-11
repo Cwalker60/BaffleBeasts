@@ -1,5 +1,6 @@
-package com.Taco.BaffleBeasts.util;
+package com.taco.bafflebeasts.util;
 
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
@@ -22,7 +23,7 @@ public class ElytraGlideCalculation {
      *
      */
 
-    public static void calculateGlide(LivingEntity entity, Vec3 lookVec) {
+    public static void calculateGlide(RideableFlightEntity entity, Vec3 lookVec) {
         Vec3 vec3 = entity.getDeltaMovement();
         double d0 = 0.08D;
         AttributeInstance gravity = entity.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
@@ -57,18 +58,7 @@ public class ElytraGlideCalculation {
         entity.setDeltaMovement(vec3.multiply((double)0.99F, (double)0.98F, (double)0.99F));
         // If the entity is riding a rocket for the speed boost, do not apply the multiplier.
 
-        // see if the amaro is dashing by finding the nearest firework rocket
-        AABB box = entity.getBoundingBox().inflate(1.5);
-        List<Entity> nearby = Minecraft.getInstance().level.getEntities(entity, box);//entity.getLevel().getEntities(entity, box);
-        boolean dashflag = false;
-        // iterate through the entities to see if there's a firework rocket.
-        for (Entity listEntity : nearby) {
-            if (listEntity != null) {
-                if (listEntity instanceof FireworkRocketEntity rocket) {
-                    dashflag = true;
-                }
-            }
-        }
+       boolean dashflag = isFlightBoosting(entity);
 
         if (dashflag == true) {
             entity.move(MoverType.SELF, entity.getDeltaMovement().multiply(1.20,1.0,1.20));
@@ -100,5 +90,21 @@ public class ElytraGlideCalculation {
 
 
         return amaroFirework;
+    }
+
+    public static boolean isFlightBoosting(RideableFlightEntity entity) {
+        // see if the amaro is dashing by finding the nearest firework rocket
+        AABB box = entity.getBoundingBox().inflate(1.5);
+        List<Entity> nearby = Minecraft.getInstance().level.getEntities(entity, box);//entity.getLevel().getEntities(entity, box);
+        // iterate through the entities to see if there's a firework rocket.
+        for (Entity listEntity : nearby) {
+            if (listEntity != null) {
+                if (listEntity instanceof FireworkRocketEntity rocket) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

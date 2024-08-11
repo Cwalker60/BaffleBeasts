@@ -1,6 +1,6 @@
-package com.Taco.BaffleBeasts.entity.goal;
+package com.taco.bafflebeasts.entity.goal;
 
-import com.Taco.BaffleBeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 public class IdleAnimationGoal extends Goal {
@@ -33,7 +33,4 @@ public class IdleAnimationGoal extends Goal {
         this.entity.setIdleTimer(400);
 
     }
-
-
-
 }

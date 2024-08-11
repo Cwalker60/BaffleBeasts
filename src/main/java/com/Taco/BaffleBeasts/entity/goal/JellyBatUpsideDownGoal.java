@@ -1,13 +1,10 @@
-package com.Taco.BaffleBeasts.entity.goal;
+package com.taco.bafflebeasts.entity.goal;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.entity.custom.JellyBatEntity;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 
-/**
- * JellyBatUpsideDownGoal is an ai goal that attempts to search for a nearby ceiling block to go upsidedown.
- */
 public class JellyBatUpsideDownGoal extends Goal {
 
     private final JellyBatEntity entity;
@@ -46,10 +43,10 @@ public class JellyBatUpsideDownGoal extends Goal {
         BlockPos targetCeiling = null;
 
         Iterable<BlockPos> ceilingBlocks = BlockPos.betweenClosed(this.entity.getBlockX(), this.entity.getBlockY(), this.entity.getBlockZ(),
-                  this.entity.getBlockX(), this.entity.getBlockY() + 8, this.entity.getBlockZ());
+                this.entity.getBlockX(), this.entity.getBlockY() + 8, this.entity.getBlockZ());
         for (BlockPos blocks: ceilingBlocks) {
             // If a solid block, break the loop and set this to be the block position we want.
-            if (this.entity.getLevel().getBlockState(blocks).isRedstoneConductor(this.entity.getLevel(), blocks)) {
+            if (this.entity.level().getBlockState(blocks).isRedstoneConductor(this.entity.level(), blocks)) {
                 targetCeiling = blocks;
                 break;
             }

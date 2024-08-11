@@ -1,8 +1,8 @@
-package com.Taco.BaffleBeasts.world;
+package com.taco.bafflebeasts.world;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.taco.bafflebeasts.BaffleBeasts;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;

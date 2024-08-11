@@ -1,7 +1,10 @@
-package com.Taco.BaffleBeasts.networking;
+package com.taco.bafflebeasts.networking;
 
-import com.Taco.BaffleBeasts.BaffleBeasts;
-import com.Taco.BaffleBeasts.networking.packet.*;
+import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
+import com.taco.bafflebeasts.networking.packet.FlightEntityDescendC2SPacket;
+import com.taco.bafflebeasts.networking.packet.FlightEntityPowerC2SPacket;
+import com.taco.bafflebeasts.networking.packet.MayFlyC2SPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -26,29 +29,29 @@ public class ModPackets {
                 .simpleChannel();
 
         INSTANCE = net;
-        net.messageBuilder(AmaroDescendC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(AmaroDescendC2SPacket::new)
-                .encoder(AmaroDescendC2SPacket::toBytes)
-                .consumerMainThread(AmaroDescendC2SPacket::handle)
+        net.messageBuilder(FlightEntityDescendC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(FlightEntityDescendC2SPacket::new)
+                .encoder(FlightEntityDescendC2SPacket::toBytes)
+                .consumerMainThread(FlightEntityDescendC2SPacket::handle)
                 .add();
 
-        net.messageBuilder(AmaroFlightPowerC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(AmaroFlightPowerC2SPacket::new)
-                .encoder(AmaroFlightPowerC2SPacket::toBytes)
-                .consumerMainThread((AmaroFlightPowerC2SPacket::handle))
+        net.messageBuilder(FlightEntityPowerC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(FlightEntityPowerC2SPacket::new)
+                .encoder(FlightEntityPowerC2SPacket::toBytes)
+                .consumerMainThread((FlightEntityPowerC2SPacket::handle))
                 .add();
 
-        net.messageBuilder(AmaroFlightDashC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(AmaroFlightDashC2SPacket::new)
-                .encoder(AmaroFlightDashC2SPacket::toBytes)
-                .consumerMainThread((AmaroFlightDashC2SPacket::handle))
+        net.messageBuilder(FlightEntityDashC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(FlightEntityDashC2SPacket::new)
+                .encoder(FlightEntityDashC2SPacket::toBytes)
+                .consumerMainThread((FlightEntityDashC2SPacket::handle))
                 .add();
 
-        net.messageBuilder(AmaroGUISyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(AmaroGUISyncS2CPacket::new)
-                .encoder(AmaroGUISyncS2CPacket::toBytes)
-                .consumerMainThread((AmaroGUISyncS2CPacket::handle))
-                .add();
+//        net.messageBuilder(AmaroGUISyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+//                .decoder(AmaroGUISyncS2CPacket::new)
+//                .encoder(AmaroGUISyncS2CPacket::toBytes)
+//                .consumerMainThread((AmaroGUISyncS2CPacket::handle))
+//                .add();
 
         // MayFlyC2SPacket
         net.messageBuilder(MayFlyC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)

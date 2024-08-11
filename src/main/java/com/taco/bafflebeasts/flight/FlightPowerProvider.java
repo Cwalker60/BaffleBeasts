@@ -1,4 +1,4 @@
-package com.Taco.BaffleBeasts.flight;
+package com.taco.bafflebeasts.flight;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -11,15 +11,15 @@ import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class AmaroFlightProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
-    public static Capability<AmaroFlight> AMARO_FLIGHT_POWER = CapabilityManager.get(new CapabilityToken<AmaroFlight>() { });
+public class FlightPowerProvider implements ICapabilityProvider, INBTSerializable<CompoundTag> {
+    public static Capability<FlightPower> AMARO_FLIGHT_POWER = CapabilityManager.get(new CapabilityToken<FlightPower>() { });
 
-    private AmaroFlight flightPower = null;
-    private final LazyOptional<AmaroFlight> optional = LazyOptional.of(this::createAmaroFlight);
+    private FlightPower flightPower = null;
+    private final LazyOptional<FlightPower> optional = LazyOptional.of(this::createFlightPower);
 
-    private AmaroFlight createAmaroFlight() {
+    private FlightPower createFlightPower() {
         if(this.flightPower == null) {
-            this.flightPower = new AmaroFlight();
+            this.flightPower = new FlightPower();
         }
 
         return this.flightPower;
@@ -37,13 +37,13 @@ public class AmaroFlightProvider implements ICapabilityProvider, INBTSerializabl
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag nbt = new CompoundTag();
-        createAmaroFlight().saveNBTData(nbt);
+        createFlightPower().saveNBTData(nbt);
 
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        createAmaroFlight().loadNBTData(nbt);
+        createFlightPower().loadNBTData(nbt);
     }
 }

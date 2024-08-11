@@ -1,4 +1,4 @@
-package com.Taco.BaffleBeasts.config;
+package com.taco.bafflebeasts.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
