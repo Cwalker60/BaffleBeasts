@@ -5,6 +5,7 @@ import net.minecraft.sounds.SoundEvent;
 public class CustomSoundEvents {
     public static final SoundEvent AMARO_IDLE = SoundRegistry.AMARO_IDLE.get();
     public static final SoundEvent AMARO_HURT = SoundRegistry.AMARO_HURT.get();
+    public static final SoundEvent AMARO_DEATH = SoundRegistry.AMARO_DEATH.get();
 
     public static final SoundEvent JELLYBAT_IDLE = SoundRegistry.JELLYBAT_IDLE.get();
     public static final SoundEvent JELLYBAT_HURT = SoundRegistry.JELLYBAT_HURT.get();

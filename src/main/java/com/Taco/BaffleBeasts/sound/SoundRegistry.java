@@ -13,8 +13,9 @@ public class SoundRegistry {
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, BaffleBeasts.MODID);
 
     // Amaro sound effects
-    public static final RegistryObject<SoundEvent> AMARO_IDLE = createSoundEvent("amaro/amaro_idle");
-    public static final RegistryObject<SoundEvent> AMARO_HURT = createSoundEvent("amaro/amaro_hurt");
+    public static final RegistryObject<SoundEvent> AMARO_IDLE = createSoundEvent("amaro/amaro_idle1");
+    public static final RegistryObject<SoundEvent> AMARO_HURT = createSoundEvent("amaro/amaro_hurt1");
+    public static final RegistryObject<SoundEvent> AMARO_DEATH = createSoundEvent("amaro/amaro_death1");
     // Jellybat Sound effects
     public static final RegistryObject<SoundEvent> JELLYBAT_IDLE = createSoundEvent("jellybat/jellybat_idle1");
     public static final RegistryObject<SoundEvent> JELLYBAT_HURT = createSoundEvent("jellybat/jellybat_hurt1");

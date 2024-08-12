@@ -280,7 +280,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     }
 
     protected SoundEvent getDeathSound() {
-        return SoundEvents.CAT_DEATH;
+        return SoundRegistry.AMARO_DEATH.get();
     }
 
     protected float getSoundVolume() {

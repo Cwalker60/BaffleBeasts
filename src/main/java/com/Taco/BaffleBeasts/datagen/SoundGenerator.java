@@ -19,10 +19,16 @@ public class SoundGenerator extends SoundDefinitionsProvider {
     public void registerSounds() {
         this.add(CustomSoundEvents.AMARO_IDLE, definition()
                 .subtitle("sound.bafflebeasts.amaro_idle")
-                .with(sound(SoundRegistry.AMARO_IDLE.getId(), SoundDefinition.SoundType.SOUND)));
+                .with(sound(SoundRegistry.AMARO_IDLE.getId(), SoundDefinition.SoundType.SOUND))
+                .with(sound(BaffleBeasts.MODID + ":amaro/amaro_idle2", SoundDefinition.SoundType.SOUND))
+                .with(sound(BaffleBeasts.MODID + ":amaro/amaro_idle3", SoundDefinition.SoundType.SOUND))
+                .with(sound(BaffleBeasts.MODID + ":amaro/amaro_idle4", SoundDefinition.SoundType.SOUND)));
         this.add(CustomSoundEvents.AMARO_HURT, definition()
                 .subtitle("sound.bafflebeasts.amaro_hurt")
-                .with(sound(SoundRegistry.AMARO_HURT.getId(), SoundDefinition.SoundType.SOUND).volume(2.0f)));
+                .with(sound(SoundRegistry.AMARO_HURT.getId(), SoundDefinition.SoundType.SOUND).volume(1.0f)));
+        this.add(CustomSoundEvents.AMARO_DEATH, definition()
+                .subtitle("sound.bafflebeasts.amaro_death")
+                .with(sound(SoundRegistry.AMARO_DEATH.getId(), SoundDefinition.SoundType.SOUND).volume(1.0f)));
 
         this.add(CustomSoundEvents.JELLYBAT_IDLE, definition()
                 .subtitle("sound.bafflebeasts.jellybat_idle")

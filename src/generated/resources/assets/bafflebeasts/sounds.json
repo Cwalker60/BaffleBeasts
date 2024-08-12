@@ -1,16 +1,22 @@
 {
-  "amaro/amaro_hurt": {
+  "amaro/amaro_death1": {
     "sounds": [
-      {
-        "name": "bafflebeasts:amaro/amaro_hurt",
-        "volume": 2.0
-      }
+      "bafflebeasts:amaro/amaro_death1"
+    ],
+    "subtitle": "sound.bafflebeasts.amaro_death"
+  },
+  "amaro/amaro_hurt1": {
+    "sounds": [
+      "bafflebeasts:amaro/amaro_hurt1"
     ],
     "subtitle": "sound.bafflebeasts.amaro_hurt"
   },
-  "amaro/amaro_idle": {
+  "amaro/amaro_idle1": {
     "sounds": [
-      "bafflebeasts:amaro/amaro_idle"
+      "bafflebeasts:amaro/amaro_idle1",
+      "bafflebeasts:amaro/amaro_idle2",
+      "bafflebeasts:amaro/amaro_idle3",
+      "bafflebeasts:amaro/amaro_idle4"
     ],
     "subtitle": "sound.bafflebeasts.amaro_idle"
   },
