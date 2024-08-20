@@ -138,7 +138,7 @@
 				{
 					"name": "saddle",
 					"parent": "chest",
-					"pivot": [0, 12, -1],
+					"pivot": [0, 0, -5],
 					"cubes": [
 						{"origin": [-5, 8, -4], "size": [10, 4, 10], "inflate": 0.1, "uv": [0, 74]}
 					]

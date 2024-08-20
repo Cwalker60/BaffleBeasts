@@ -2,7 +2,6 @@ package com.taco.bafflebeasts.entity.custom;
 
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
-import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.item.JellyDonutItem;
 import com.taco.bafflebeasts.item.ModItems;
@@ -47,11 +46,9 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.IForgeShearable;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -456,20 +453,20 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
 
     @Override
     public InteractionResult mobInteract(Player pPlayer, InteractionHand pHand) {
-        ItemStack is = pPlayer.getItemInHand(pHand);
+        ItemStack itemStack = pPlayer.getItemInHand(pHand);
 
         // Breeding Interactions
         int age = this.getAge();
-        if (is.is(Items.GLOW_BERRIES)) {
+        if (itemStack.is(Items.GLOW_BERRIES)) {
             if (!this.level().isClientSide && age == 0 && this.canFallInLove()) {
-                this.usePlayerItem(pPlayer, pHand, is);
+                this.usePlayerItem(pPlayer, pHand, itemStack);
                 this.tame(pPlayer);
                 this.setInLove(pPlayer);
                 return InteractionResult.SUCCESS;
             }
             // Baby Growth Interaction
             if (this.isBaby()) {
-                this.usePlayerItem(pPlayer, pHand, is);
+                this.usePlayerItem(pPlayer, pHand, itemStack);
                 this.ageUp(getSpeedUpSecondsWhenFeeding(-age), true);
                 return InteractionResult.sidedSuccess(this.level().isClientSide);
             }
@@ -480,8 +477,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
         // Potion Check
-        if (is.getItem() instanceof PotionItem) {
-            Potion potion = PotionUtils.getPotion(is);
+        if (itemStack.getItem() instanceof PotionItem) {
+            Potion potion = PotionUtils.getPotion(itemStack);
             String potionName = "";
 
             if (ForgeRegistries.POTIONS.containsValue(potion)) {
@@ -491,15 +488,15 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             this.setDonutEffect(potionName);
             this.setDonutColor(potion.getEffects().get(0).getEffect().getColor());
 
-            this.usePlayerItem(pPlayer, pHand, is);
+            this.usePlayerItem(pPlayer, pHand, itemStack);
             this.level().playSound((Player)null, this, SoundEvents.BOTTLE_FILL, this.getSoundSource(), 0.5F, 1.0F);
             return InteractionResult.SUCCESS;
         }
 
         // Super Size Check
-        if (is.getItem().equals(ModItems.SUPER_SHAKE.get()) && !this.isBaby()) {
+        if (itemStack.getItem().equals(ModItems.SUPER_SHAKE.get()) && !this.isBaby()) {
             this.setSuperSize(true);
-            this.usePlayerItem(pPlayer, pHand, is);
+            this.usePlayerItem(pPlayer, pHand, itemStack);
             this.tame(pPlayer);
             this.level().playSound((Player)null, this, CustomSoundEvents.JELLYBAT_SUPERSIZE, this.getSoundSource(), 0.5F, 1.0F);
 
@@ -517,16 +514,16 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
         // Saddle Equip check
-        boolean saddlecheck = !this.isSaddled() && this.isSaddleable() && is.is(Items.SADDLE) && !this.isBaby();
+        boolean saddlecheck = !this.isSaddled() && this.isSaddleable() && itemStack.is(Items.SADDLE) && !this.isBaby();
         if (saddlecheck) {
-            is.shrink(1); // remove saddle from players inventory.
+            itemStack.shrink(1); // remove saddle from players inventory.
             equipSaddle(getSoundSource());
             setSaddle(true);
             return InteractionResult.sidedSuccess(level().isClientSide());
         }
 
         // Ride Check
-        if (isSaddled() && this.isTame() && !pPlayer.isShiftKeyDown()) {
+        if (isSaddled() && this.isTame() && !pPlayer.isShiftKeyDown() && !itemStack.is(Items.SHEARS)) {
             if (!level().isClientSide) {
                 setRidingPlayer(pPlayer);
                 this.setOrderedToSit(false);
@@ -547,8 +544,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
         // Heal check
-        if (isHealItem(is.getItem()) &&!pPlayer.isShiftKeyDown()) {
-            is.shrink(1);
+        if (isHealItem(itemStack.getItem()) &&!pPlayer.isShiftKeyDown()) {
+            itemStack.shrink(1);
             this.heal(4.0f);
             this.spawnTamingParticles(true);
             return InteractionResult.sidedSuccess(level().isClientSide());

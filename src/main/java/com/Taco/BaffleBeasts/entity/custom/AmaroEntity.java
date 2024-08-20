@@ -490,12 +490,6 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
             }
         }
 
-//        if (getFirstPassenger() instanceof LivingEntity) {
-//            LivingEntity r = ((LivingEntity) rider);
-//            r.xRotO = r.getXRot();
-//            r.yRotO = r.getYRot();
-//            rider.setYBodyRot(yBodyRot);
-//        }
     }
     @Override
     public boolean causeFallDamage(float pFallDistance, float pMultiplier, DamageSource pSource) {

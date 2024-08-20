@@ -6,6 +6,7 @@ import com.taco.bafflebeasts.config.BaffleConfigValues;
 import com.taco.bafflebeasts.config.BaffleServerConfig;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.client.AmaroRenderer;
+import com.taco.bafflebeasts.entity.client.DozeDrakeRenderer;
 import com.taco.bafflebeasts.entity.client.JellyBatRenderer;
 import com.taco.bafflebeasts.item.ModItems;
 import com.taco.bafflebeasts.networking.ModPackets;
@@ -105,6 +106,7 @@ public class BaffleBeasts
 
             EntityRenderers.register(ModEntityTypes.Amaro.get(), AmaroRenderer::new);
             EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);
+            EntityRenderers.register(ModEntityTypes.DozeDrake.get(), DozeDrakeRenderer::new);
         }
     }
 }

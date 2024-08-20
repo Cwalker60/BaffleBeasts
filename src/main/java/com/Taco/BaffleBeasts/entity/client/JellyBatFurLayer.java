@@ -2,6 +2,7 @@ package com.taco.bafflebeasts.entity.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.custom.AmaroEntity;
 import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
@@ -9,6 +10,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec3;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
@@ -31,6 +33,7 @@ public class JellyBatFurLayer extends GeoRenderLayer<JellyBatEntity> {
 
         ps.scale(1.0f, 1.0f, 1.0f);
         ps.translate(0.0d, 0.0d, 0.0d);
+
         // Get the color of the current donut that the Jellybat has, and apply it to the render() call at the bottom.
         float r = 0; float g = 0; float b = 0;
 
@@ -55,6 +58,8 @@ public class JellyBatFurLayer extends GeoRenderLayer<JellyBatEntity> {
                 rt, bufferSource.getBuffer(rt), partialTick, packedLight, OverlayTexture.NO_OVERLAY,
                 r,g,b,1.0f);
 
+
     }
+
 
 }

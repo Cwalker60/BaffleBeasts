@@ -3,6 +3,7 @@ package com.taco.bafflebeasts.event;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.custom.AmaroEntity;
+import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import com.taco.bafflebeasts.item.ModItems;
@@ -26,6 +27,7 @@ public class ModEvents {
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntityTypes.Amaro.get(), AmaroEntity.setAttributes());
         event.put(ModEntityTypes.JellyBat.get(), JellyBatEntity.setAttributes());
+        event.put(ModEntityTypes.DozeDrake.get(), DozeDrakeEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -33,6 +35,7 @@ public class ModEvents {
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(ModItems.AMARO_SPAWN_EGG);
             event.accept(ModItems.JELLYBAT_SPAWN_EGG);
+            event.accept(ModItems.DOZEDRAKE_SPAWN_EGG);
         }
 
         if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {

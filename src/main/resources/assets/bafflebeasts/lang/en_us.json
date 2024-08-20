@@ -1,9 +1,11 @@
 {
   "entity.bafflebeasts.jellybat" : "Jelly Bat",
   "entity.bafflebeasts.amaro": "Amaro",
+  "entity.bafflebeasts.dozedrake": "Doze Drake",
 
   "item.bafflebeasts.amaro_spawn_egg": "Amaro Spawn Egg",
   "item.bafflebeasts.jellybat_spawn_egg": "Jelly Bat Spawn Egg",
+  "item.bafflebeasts.dozedrake_spawn_egg": "Doze Drake Spawn Egg",
   "item.bafflebeasts.jellybat_donut": "Jelly Donut",
   "item.bafflebeasts.super_shake": "Super Shake",
 

@@ -2,6 +2,7 @@ package com.taco.bafflebeasts.entity;
 
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.custom.AmaroEntity;
+import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -27,6 +28,12 @@ public class ModEntityTypes {
                     () -> EntityType.Builder.of(JellyBatEntity::new, MobCategory.AMBIENT)
                             .sized(0.8f, 0.8f)
                             .build(new ResourceLocation(BaffleBeasts.MODID, "jellybat").toString()));
+
+    public static final RegistryObject<EntityType<DozeDrakeEntity>> DozeDrake =
+            ENTITY_TYPES.register("dozedrake",
+                    () -> EntityType.Builder.of(DozeDrakeEntity::new, MobCategory.CREATURE)
+                            .sized(2.0f, 4.0f)
+                            .build(new ResourceLocation(BaffleBeasts.MODID, "dozedrake").toString()));
 
     public static void register(IEventBus eventBus) {ENTITY_TYPES.register(eventBus);}
 }

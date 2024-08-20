@@ -18,12 +18,15 @@ import java.util.ArrayList;
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, BaffleBeasts.MODID);
+
     public static final RegistryObject<Item> AMARO_SPAWN_EGG = ITEMS.register("amaro_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntityTypes.Amaro,0x948e8d, 0x3b3635,
                     new Item.Properties().stacksTo(64)));
-
     public static final RegistryObject<Item> JELLYBAT_SPAWN_EGG = ITEMS.register("jellybat_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntityTypes.JellyBat, 0xe07a56, 0xe07a56,
+                    new Item.Properties()));
+    public static final RegistryObject<Item> DOZEDRAKE_SPAWN_EGG = ITEMS.register("dozedrake_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntityTypes.DozeDrake, 0xfcba03, 0xda5f19,
                     new Item.Properties()));
 
     public static final RegistryObject<JellyDonutItem> JELLYBAT_DONUT = ITEMS.register("jellybat_donut",
