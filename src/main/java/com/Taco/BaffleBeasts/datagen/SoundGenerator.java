@@ -17,6 +17,7 @@ public class SoundGenerator extends SoundDefinitionsProvider {
 
     @Override
     public void registerSounds() {
+        // Amaro Sound Generation
         this.add(CustomSoundEvents.AMARO_IDLE, definition()
                 .subtitle("sound.bafflebeasts.amaro_idle")
                 .with(sound(SoundRegistry.AMARO_IDLE.getId(), SoundDefinition.SoundType.SOUND))
@@ -30,6 +31,7 @@ public class SoundGenerator extends SoundDefinitionsProvider {
                 .subtitle("sound.bafflebeasts.amaro_death")
                 .with(sound(SoundRegistry.AMARO_DEATH.getId(), SoundDefinition.SoundType.SOUND).volume(1.0f)));
 
+        // JellyBat Sound Generation
         this.add(CustomSoundEvents.JELLYBAT_IDLE, definition()
                 .subtitle("sound.bafflebeasts.jellybat_idle")
                 .with(sound(SoundRegistry.JELLYBAT_IDLE.getId(), SoundDefinition.SoundType.SOUND).volume(0.8f),
@@ -41,9 +43,31 @@ public class SoundGenerator extends SoundDefinitionsProvider {
         this.add(CustomSoundEvents.JELLYBAT_DEATH, definition()
                 .subtitle("sound.bafflebeasts.jellybat_death1")
                 .with(sound(SoundRegistry.JELLYBAT_DEATH.getId(), SoundDefinition.SoundType.SOUND)));
-
         this.add(CustomSoundEvents.JELLYBAT_SUPERSIZE, definition()
                 .subtitle("sound.bafflebeasts.jellybat_growth_effect")
                 .with(sound(SoundRegistry.JELLYBAT_SUPERSIZE.getId(), SoundDefinition.SoundType.SOUND)));
+
+        //DozeDrake Sound Generation
+        this.add(CustomSoundEvents.DOZEDRAKE_IDLE, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_idle")
+                .with(sound(SoundRegistry.DOZEDRAKE_IDLE.getId(), SoundDefinition.SoundType.SOUND))
+                .with(sound(BaffleBeasts.MODID + ":dozedrake/dozedrake_idle2", SoundDefinition.SoundType.SOUND))
+                .with(sound(BaffleBeasts.MODID + ":dozedrake/dozedrake_idle3", SoundDefinition.SoundType.SOUND)));
+        this.add(CustomSoundEvents.DOZEDRAKE_HURT, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_hurt1")
+                .with(sound(SoundRegistry.DOZEDRAKE_HURT.getId(), SoundDefinition.SoundType.SOUND)));
+        this.add(CustomSoundEvents.DOZEDRAKE_DEATH, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_death")
+                .with(sound(SoundRegistry.DOZEDRAKE_DEATH.getId(), SoundDefinition.SoundType.SOUND)));
+        this.add(CustomSoundEvents.DOZEDRAKE_SNOOZE, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_snooze")
+                .with(sound(SoundRegistry.DOZEDRAKE_SNOOZE.getId(), SoundDefinition.SoundType.SOUND)));
+        this.add(CustomSoundEvents.DOZEDRAKE_HONK_MIMIMI, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_honk_mimimi")
+                .with(sound(SoundRegistry.DOZEDRAKE_HONK_MIMI.getId(), SoundDefinition.SoundType.SOUND)));
+
+
+
+
     }
 }

@@ -20,6 +20,38 @@
     ],
     "subtitle": "sound.bafflebeasts.amaro_idle"
   },
+  "dozedrake/dozedrake_death": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_death"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_death"
+  },
+  "dozedrake/dozedrake_honk_mimimi": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_honk_mimimi"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_honk_mimimi"
+  },
+  "dozedrake/dozedrake_hurt": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_hurt"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_hurt1"
+  },
+  "dozedrake/dozedrake_idle1": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_idle1",
+      "bafflebeasts:dozedrake/dozedrake_idle2",
+      "bafflebeasts:dozedrake/dozedrake_idle3"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_idle"
+  },
+  "dozedrake/dozedrake_snore": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_snore"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_snooze"
+  },
   "jellybat/jellybat_death": {
     "sounds": [
       "bafflebeasts:jellybat/jellybat_death"

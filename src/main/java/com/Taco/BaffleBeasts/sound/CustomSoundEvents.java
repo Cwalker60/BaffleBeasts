@@ -11,4 +11,11 @@ public class CustomSoundEvents {
     public static final SoundEvent JELLYBAT_HURT = SoundRegistry.JELLYBAT_HURT.get();
     public static final SoundEvent JELLYBAT_DEATH = SoundRegistry.JELLYBAT_DEATH.get();
     public static final SoundEvent JELLYBAT_SUPERSIZE = SoundRegistry.JELLYBAT_SUPERSIZE.get();
+
+    public static final SoundEvent DOZEDRAKE_IDLE = SoundRegistry.DOZEDRAKE_IDLE.get();
+    public static final SoundEvent DOZEDRAKE_HURT = SoundRegistry.DOZEDRAKE_HURT.get();
+    public static final SoundEvent DOZEDRAKE_DEATH = SoundRegistry.DOZEDRAKE_DEATH.get();
+    public static final SoundEvent DOZEDRAKE_SNOOZE = SoundRegistry.DOZEDRAKE_SNOOZE.get();
+    public static final SoundEvent DOZEDRAKE_HONK_MIMIMI = SoundRegistry.DOZEDRAKE_HONK_MIMI.get();
+
 }

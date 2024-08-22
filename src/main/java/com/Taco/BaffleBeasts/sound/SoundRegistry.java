@@ -21,6 +21,12 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> JELLYBAT_HURT = createSoundEvent("jellybat/jellybat_hurt1");
     public static final RegistryObject<SoundEvent> JELLYBAT_DEATH = createSoundEvent("jellybat/jellybat_death");
     public static final RegistryObject<SoundEvent> JELLYBAT_SUPERSIZE = createSoundEvent("jellybat/jellybat_growth_effect");
+    // DozeDrake Sound effects
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_IDLE = createSoundEvent("dozedrake/dozedrake_idle1");
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_HURT = createSoundEvent("dozedrake/dozedrake_hurt");
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_DEATH = createSoundEvent("dozedrake/dozedrake_death");
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_SNOOZE = createSoundEvent("dozedrake/dozedrake_snore");
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_HONK_MIMI = createSoundEvent("dozedrake/dozedrake_honk_mimimi");
 
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {
