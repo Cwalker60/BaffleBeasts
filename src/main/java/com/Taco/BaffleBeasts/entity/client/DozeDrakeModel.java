@@ -19,9 +19,11 @@ public class DozeDrakeModel extends GeoModel<DozeDrakeEntity> {
         CoreGeoBone head = this.getAnimationProcessor().getBone("head");
         EntityModelData as;
         if (customPredicate.getData(DataTickets.ENTITY_MODEL_DATA) != null) {
-            as = customPredicate.getData(DataTickets.ENTITY_MODEL_DATA);
-            head.setRotX(as.headPitch() * 0.017453292F);
-            head.setRotY(as.netHeadYaw() * 0.017453292F);
+            if (!entity.isAsleep()) {
+                as = customPredicate.getData(DataTickets.ENTITY_MODEL_DATA);
+                head.setRotX(as.headPitch() * 0.017453292F);
+                head.setRotY(as.netHeadYaw() * 0.017453292F);
+            }
         }
 
     }
