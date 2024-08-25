@@ -13,10 +13,10 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.entity.EntityMountEvent;
-import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
+import net.minecraftforge.event.entity.*;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -74,6 +74,7 @@ public class ModEvents {
             event.register(ModEntityTypes.JellyBat.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                     JellyBatEntity::jellyBatSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
         }
+
 
     }
 

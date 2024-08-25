@@ -119,8 +119,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         ticksUpsideDownCooldown = 0;
         upsideDownDelay = false;
         roamDelay = false;
-        this.getDimensions(this.getPose());
-        this.refreshDimensions();
     }
 
     @Override
@@ -241,12 +239,19 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     }
 
     public void setSuperSize(boolean b) {
+        BaffleBeasts.MAIN_LOGGER.debug("Setting supersize to : " + b);
+        BaffleBeasts.MAIN_LOGGER.debug("Current Pose : " + this.getPose());
+        BaffleBeasts.MAIN_LOGGER.debug("Current bounding box size : " + this.getBoundingBox().getSize());
+
         this.entityData.set(SUPER_SIZE, b);
         if (b == true) {
             this.setPos(this.getPosition(0.0f).add(0.0d, 1.0d, 0.0d));
             this.setBoundingBox(this.getBoundingBox().inflate(2.0,2.0,2.0));
             this.refreshDimensions();
         }
+        BaffleBeasts.MAIN_LOGGER.debug("After Resize");
+        BaffleBeasts.MAIN_LOGGER.debug("Current Pose : " + this.getPose());
+        BaffleBeasts.MAIN_LOGGER.debug("Current bounding box size : " + this.getBoundingBox().getSize());
     }
 
     public boolean isUpsideDown() {
@@ -392,6 +397,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     }
 
     public static AttributeSupplier setAttributes() {
+
         return Animal.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 8)
                 .add(Attributes.ATTACK_DAMAGE, 1.0f)
@@ -415,7 +421,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     @Override
     public void tick() {
         super.tick();
-
+        this.refreshDimensions();
         // Idle timer
         if (getIdleTimer() > 0) {
             setIdleTimer(getIdleTimer() - 1);
@@ -494,7 +500,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
         // Super Size Check
-        if (itemStack.getItem().equals(ModItems.SUPER_SHAKE.get()) && !this.isBaby()) {
+        if (itemStack.getItem().equals(ModItems.SUPER_SHAKE.get()) && !this.isBaby() && !this.getSuperSize()) {
             this.setSuperSize(true);
             this.usePlayerItem(pPlayer, pHand, itemStack);
             this.tame(pPlayer);

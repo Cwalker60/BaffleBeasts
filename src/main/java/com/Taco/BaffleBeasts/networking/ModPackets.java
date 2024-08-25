@@ -1,10 +1,7 @@
 package com.taco.bafflebeasts.networking;
 
 import com.taco.bafflebeasts.BaffleBeasts;
-import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
-import com.taco.bafflebeasts.networking.packet.FlightEntityDescendC2SPacket;
-import com.taco.bafflebeasts.networking.packet.FlightEntityPowerC2SPacket;
-import com.taco.bafflebeasts.networking.packet.MayFlyC2SPacket;
+import com.taco.bafflebeasts.networking.packet.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -52,6 +49,7 @@ public class ModPackets {
 //                .encoder(AmaroGUISyncS2CPacket::toBytes)
 //                .consumerMainThread((AmaroGUISyncS2CPacket::handle))
 //                .add();
+
 
         // MayFlyC2SPacket
         net.messageBuilder(MayFlyC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)

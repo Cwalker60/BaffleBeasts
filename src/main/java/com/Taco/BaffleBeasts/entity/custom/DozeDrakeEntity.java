@@ -2,8 +2,7 @@ package com.taco.bafflebeasts.entity.custom;
 
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
-import com.taco.bafflebeasts.entity.goal.FlyEntityLookAtPlayer;
-import com.taco.bafflebeasts.entity.goal.IdleAnimationGoal;
+import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
 import net.minecraft.nbt.CompoundTag;
@@ -52,6 +51,8 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
 
     private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(15, 25);
+    private int sleepTickCooldown = 0;
+
     private int remainingPersistentAngerTime;
     private UUID persistentAngerTarget;
 
@@ -72,11 +73,13 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     protected static final RawAnimation DOZEDRAKE_IDLE5 = RawAnimation.begin().thenPlay("animation.doze_drake.idle5");
 
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> CAN_AI_SLEEP = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
 
     public int animationbuffer = 5;
 
     public DozeDrakeEntity(EntityType<? extends RideableFlightEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, 7, 150);
+        sleepTickCooldown = 0;
     }
 
     public static AttributeSupplier setAttributes() {
@@ -91,6 +94,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     public void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(HAS_SADDLE, false);
+        this.entityData.define(CAN_AI_SLEEP, true);
     }
 
     @Override
@@ -116,9 +120,10 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         this.goalSelector.addGoal(4, new FloatGoal(this));
         this.goalSelector.addGoal(5, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(6, new IdleAnimationGoal(this, 5));
-        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 12F));
-        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 1.00));
+        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 6F));
+        this.goalSelector.addGoal(8, new FlyEntityRandomLookAtGoal(this));
+        this.goalSelector.addGoal(9, new DozeDrakeRandomStrollGoal(this, 1.00));
+        this.goalSelector.addGoal(10, new DozeDrakeSleepGoal(this));
         this.targetSelector.addGoal(1,new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
     }
@@ -181,14 +186,15 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 event.getController().setAnimation(DOZEDRAKE_SIT);
                 return PlayState.CONTINUE;
             }
-            if (this.isInSittingPose() && this.isAsleep()) {
-                event.getController().stop();
-                event.getController().setAnimation(DOZEDRAKE_SLEEP);
+
+            if (this.onGround() && !this.isInSittingPose() && !this.isAsleep()) {
+                event.getController().setAnimation(DOZEDRAKE_NEUTRAL);
                 return PlayState.CONTINUE;
             }
 
-            if (this.onGround() && !this.isInSittingPose()) {
-                event.getController().setAnimation(DOZEDRAKE_NEUTRAL);
+            if (this.isAsleep()) {
+                event.getController().stop();
+                event.getController().setAnimation(DOZEDRAKE_SLEEP);
                 return PlayState.CONTINUE;
             }
         }
@@ -264,11 +270,15 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     @Override
     public void setIdlePose(int pose) {
         super.setIdlePose(pose);
-        if (pose <= 3) {
-            this.setGoToSleepState(true);
-        } else {
-            this.setEntityWakeUpState(true);
+        if (this.isTame()) {
+            if (pose <= 3) {
+                this.setSleep(true);
+            } else {
+
+                this.setSleep(false);
+            }
         }
+
     }
 
     protected SoundEvent getAmbientSound() {
@@ -303,20 +313,37 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             setIdleTimer(getIdleTimer() - 1);
         }
 
-        if (this.getGoToSleepState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setSleep(true);
-                this.setGoToSleepState(false);
-                this.animationbuffer = 5;
-            }
+        // if dozedrake is actively targeting someone, wake it up
+        if (this.targetSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof HurtByTargetGoal))) {
+            this.setSleep(false);
+            this.sleepTickCooldown = 0;
         }
-        if (this.getEntityWakeUpState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setEntityWakeUpState(false);
+
+//        if (this.getGoToSleepState()) {
+//            this.animationbuffer -= 1;
+//            if (this.animationbuffer < 0) {
+//                this.setSleep(true);
+//                this.setGoToSleepState(false);
+//                this.animationbuffer = 5;
+//            }
+//        }
+//
+//        if (this.getEntityWakeUpState()) {
+//            this.animationbuffer -= 1;
+//            if (this.animationbuffer < 0) {
+//                this.setEntityWakeUpState(false);
+//                this.setSleep(false);
+//                this.animationbuffer = 5;
+//            }
+//        }
+
+
+        // If a wild Dozedrake is asleep, start ticking the cooldown before it can sleep again.
+        if (this.isAsleep() && !this.isTame()) {
+            this.sleepTickCooldown++;
+            if (sleepTickCooldown > 300) {
+                sleepTickCooldown = 0;
                 this.setSleep(false);
-                this.animationbuffer = 5;
             }
         }
     }
@@ -324,6 +351,13 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
+
+        // DEBUG LINE
+        if (itemStack.is(Items.MELON_SLICE)) {
+            this.setIdlePose(2);
+            this.setSleep(true);
+            return InteractionResult.sidedSuccess(level().isClientSide());
+        }
 
         if (this.isTame()) {
             //  Attempt to Saddle the Dragon
@@ -345,10 +379,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 return InteractionResult.sidedSuccess(level().isClientSide());
             }
 
-            if (itemStack.is(Items.MELON_SLICE)) {
-                this.setIdlePose(2);
-                return InteractionResult.sidedSuccess(level().isClientSide());
-            }
 
             InteractionResult emptyhand = super.mobInteract(player, hand);
             if (!emptyhand.consumesAction() && player.isShiftKeyDown()) {
@@ -371,6 +401,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) {
                     this.tame(player);
                     this.navigation.stop();
+                    this.setSleep(false); this.sleepTickCooldown = 0; // Reset Sleep State
                     this.level().broadcastEntityEvent(this, (byte)7);
                 } else {
                     this.level().broadcastEntityEvent(this, (byte)6);
@@ -435,6 +466,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
             this.flying = true;
         }
+
     }
 
     @Override
@@ -482,7 +514,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     @Override
     public void startPersistentAngerTimer() {
-        this.setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(this.random));
+        BaffleBeasts.MAIN_LOGGER.debug("dozedrake wants to attack!");
     }
 
     public boolean canAttackType(EntityType<?> pType) {
@@ -497,7 +529,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         float f = this.getAttackDamage();
         boolean flag = super.doHurtTarget(pEntity);
 
-        this.playSound(SoundEvents.IRON_GOLEM_ATTACK, 1.0F, 1.0F);
         return flag;
     }
 
