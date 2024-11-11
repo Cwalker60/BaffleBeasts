@@ -17,5 +17,7 @@ public class CustomSoundEvents {
     public static final SoundEvent DOZEDRAKE_DEATH = SoundRegistry.DOZEDRAKE_DEATH.get();
     public static final SoundEvent DOZEDRAKE_SNOOZE = SoundRegistry.DOZEDRAKE_SNOOZE.get();
     public static final SoundEvent DOZEDRAKE_HONK_MIMIMI = SoundRegistry.DOZEDRAKE_HONK_MIMI.get();
+    public static final SoundEvent DOZEDRAKE_BUBBLE_SHOOT = SoundRegistry.DOZEDRAKE_BUBBLE_SHOOT.get();
+    public static final SoundEvent DOZEDRAKE_BUBBLE_EXPLODE = SoundRegistry.DOZEDRAKE_BUBBLE_EXPLODE.get();
 
 }

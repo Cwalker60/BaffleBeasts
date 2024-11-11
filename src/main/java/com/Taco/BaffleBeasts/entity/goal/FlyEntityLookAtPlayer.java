@@ -22,7 +22,7 @@ public class FlyEntityLookAtPlayer extends LookAtPlayerGoal {
      This stops the random looking when the amaro is sleeping.
      */
     public boolean canUse() {
-        if (!this.entity.isAsleep()) {
+        if (!this.entity.isAsleep() || !this.entity.hasControllingPassenger()) {
             super.canUse();
         }
         return this.lookAt != null;

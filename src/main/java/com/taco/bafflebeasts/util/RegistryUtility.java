@@ -10,7 +10,9 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
+
 public class RegistryUtility {
+
 
     @Nullable
     public static RegistryAccess getRegistryAccess() {

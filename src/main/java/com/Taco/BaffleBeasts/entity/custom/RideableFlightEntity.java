@@ -1,21 +1,32 @@
 package com.taco.bafflebeasts.entity.custom;
 
+import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
+import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
+import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncS2C;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public abstract class RideableFlightEntity extends TamableAnimal implements Saddleable, PlayerRideable, PlayerRideableJumping {
 
@@ -34,6 +45,9 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     protected static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
     protected static final EntityDataAccessor<Integer> IDLE_POSE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.INT);
     protected static final EntityDataAccessor<Integer> IDLE_TIMER = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.INT);
+
+    public boolean isMoving;
+    public boolean hasMoved;
 
     public RideableFlightEntity(EntityType<? extends TamableAnimal> pEntityType, Level pLevel, int flightP, int flightRecharge) {
         super(pEntityType, pLevel);
@@ -80,46 +94,74 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
         this.setEntityWakeUpState(tag.getBoolean("EntityWakeUpState"));
     }
 
+    // isMoving() will send a datapacket to ensure that the moving animation is synched via client/server.
+    // isMoving will try to only send this data packet by checking if lastMoving is true/false to ensure a packet is only sent when the mob stops,
+    // or starts moving. There probably is a better solution but this is what I have come up with.
+    protected void isMovingCheck() {
+        Vec2 groundmovement = new Vec2((float)this.getDeltaMovement().x, (float)this.getDeltaMovement().z);
+        groundmovement = groundmovement.normalized();
+
+        boolean moving = (Mth.abs(groundmovement.x) > 0 || Mth.abs(groundmovement.y) > 0);
+        if (!this.isElytraFlying()) {
+
+
+            if (this.level().isClientSide) {
+                if (moving == true && hasMoved == false) {
+                    this.isMoving = true; hasMoved = true;
+                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(true, this.getId()));
+
+                } else if (moving == false && hasMoved == true) {
+                    this.isMoving = false; hasMoved = false;
+                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(false, this.getId()));
+                }
+            }
+        }
+
+    }
+
+
     @Override
     public void travel(Vec3 vec3) {
-        LivingEntity rider = (LivingEntity) this.getControllingPassenger();
-        if (rider != null && this.isVehicle()) {
+        super.travel(vec3);
+    }
 
-            this.setYRot(rider.getYRot()); // set the y rotation to the riders rotation
-            this.yRotO = this.getYRot();
 
-            AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
-            double gravityValue = gravity.getValue();
 
-            this.setXRot(rider.getXRot()); // set the x rotation to the riders rotation
-            this.setRot(this.getYRot(), this.getXRot());
+    @Override
+    public void tickRidden(Player pPlayer, Vec3 travelVec) {
+        super.tickRidden(pPlayer, travelVec);
+        // Set the mob to look at where the player is and rotate the body too.
+        Vec2 riderLookVec = new Vec2(pPlayer.getXRot(), pPlayer.getYRot());
+        this.setRot(riderLookVec.y, riderLookVec.x);
+        this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
 
-            this.yBodyRot = this.getYRot();
-            this.yHeadRot = this.yBodyRot;
+        if (this.isElytraFlying()) {
+            //this.setNoGravity(true);
+        }
 
-            double strafex = rider.xxa * 0.5f;
-            double yascend = rider.yya;
-            double forwardz = rider.zza;
+        AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
+        double gravityValue = gravity.getValue();
+        BaffleBeasts.MAIN_LOGGER.debug("gravity value is : " + gravityValue);
+        if (this.isNoGravity() && !this.isElytraFlying()) {
+            this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue / 4.0D, 0.0D));
+        }
 
+
+        double strafex = pPlayer.xxa * 0.5f;
+        double yascend = pPlayer.yya;
+        double forwardz = pPlayer.zza;
+
+        // make backward movement twice as slow.
+        if (forwardz <= 0.0f) {
+            forwardz *= 0.5f;
+        }
+
+        if (this.isControlledByLocalInstance()) {
             Vec3 jvec = this.getDeltaMovement();
-            // Add gravity to no gravity. This allows minecraft servers to not kick the player for floating the vehicle.
-            // Alternative solution may be to inject code into ServerGamePacketListener to add a check to flying vehicles.
-            if (this.isNoGravity()) {
-                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue / 4.0D, 0.0D));
-            }
-
-            // make backward movement twice as slow.
-            if (forwardz <= 0.0f) {
-                forwardz *= 0.5f;
-            }
-            // While flying, move towards where the rider is facing.
-            if (flying && !isElytraFlying()) {
-                this.moveRelative(0.1F,new Vec3(strafex, yascend, forwardz));
-                //LOGGER.debug("deltamovement is " + jvec.x + "," + jvec.y + "," + jvec.z);
-            }
 
             // Launch off the ground with more power
             if (this.isJumping && this.onGround() && !this.isElytraFlying()) {
+                //this.executeRidersJump(travelVec, 1.8f);
                 this.setDeltaMovement(jvec.x, 1.8, jvec.z);
                 this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
                 this.isJumping = false;
@@ -133,50 +175,63 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
                 ModPackets.sendToServer(new FlightEntityDashC2SPacket());
                 this.isJumping = false;
             }
-
             // Descend the amaro if the Descend key is called
             if (this.flying && this.descend && !this.isElytraFlying()) {
                 this.moveRelative(0.1F, new Vec3(strafex, -20, forwardz));
             }
+        }
 
-            // When the rider is controlling, set the movement vector
+        // If on ground, set all fly states to false;
+        if (onGround()) {
+            this.flying = false;
+            this.isJumping = false;
+            this.descend = false;
+            this.setElytraFlying(false);
+        }
+
+        if (this.level().isClientSide) {
             if (this.isControlledByLocalInstance()) {
-                this.setSpeed((float) (this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.1)); // set the speed and multiply it by 20%
-                // While gliding, use the look vector to elytra glide.
-                if (this.isElytraFlying()) {
-                    Vec3 look = this.getLookAngle();
-                    ElytraGlideCalculation.calculateGlide(this, look);
-                } else {
-                    super.travel(new Vec3(strafex, yascend, forwardz));
-                }
-
+                this.isMovingCheck();
             }
-
-            // If there is no player movement, don't move the mob
-            else if (rider instanceof Player) {
-                this.setDeltaMovement(Vec3.ZERO);
-                return;
-            }
-
-            if (onGround()) {
-                this.flying = false;
-                this.isJumping = false;
-                this.descend = false;
-                this.setNoGravity(false);
-                this.setElytraFlying(false);
-            }
-
-        } else {
-            super.travel(vec3);
         }
 
     }
 
+    @Override
+    protected Vec3 getRiddenInput(Player pPlayer, Vec3 travelVec) {
+        double strafex = pPlayer.xxa * 0.5f;
+        double yascend = pPlayer.yya;
+        double forwardz = pPlayer.zza;
+
+        // make backward movement twice as slow.
+        if (forwardz <= 0.0f) {
+            forwardz *= 0.5f;
+        }
+
+        // While flying, move towards where the rider is facing.
+        if (flying && !isElytraFlying()) {
+            this.moveRelative(0.1F,new Vec3(strafex, yascend, forwardz));
+            //LOGGER.debug("deltamovement is " + jvec.x + "," + jvec.y + "," + jvec.z);
+        }
+
+
+        return new Vec3(strafex, yascend, forwardz);
+    }
+    @Override
+    protected float getRiddenSpeed(Player pPlayer) {
+        if (this.isControlledByLocalInstance()) {
+            return (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 1.1f;
+        }
+        return (float)this.getAttributeValue(Attributes.MOVEMENT_SPEED);
+    }
+
+    protected void executeRidersJump(Vec3 travelVec, float jumpBonusHeight) {
+
+    }
 
     @Override
     public void tick() {
         super.tick();
-
         getCapability(FlightPowerProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
             if (amaroFlight.getFlightPower() < amaroFlight.getMaXFlightPower()) {
                 if (this.onGround()) {

@@ -20,6 +20,18 @@
     ],
     "subtitle": "sound.bafflebeasts.amaro_idle"
   },
+  "dozedrake/dozedrake_bubble_explode": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_bubble_explode"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_bubble_explode"
+  },
+  "dozedrake/dozedrake_bubble_shoot": {
+    "sounds": [
+      "bafflebeasts:dozedrake/dozedrake_bubble_shoot"
+    ],
+    "subtitle": "sound.bafflebeasts.dozedrake_bubble_shoot"
+  },
   "dozedrake/dozedrake_death": {
     "sounds": [
       "bafflebeasts:dozedrake/dozedrake_death"

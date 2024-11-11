@@ -2,10 +2,10 @@ package com.taco.bafflebeasts;
 
 import com.mojang.logging.LogUtils;
 import com.taco.bafflebeasts.config.BaffleClientConfig;
-import com.taco.bafflebeasts.config.BaffleConfigValues;
 import com.taco.bafflebeasts.config.BaffleServerConfig;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.client.AmaroRenderer;
+import com.taco.bafflebeasts.entity.client.BubbleProjectileRenderer;
 import com.taco.bafflebeasts.entity.client.DozeDrakeRenderer;
 import com.taco.bafflebeasts.entity.client.JellyBatRenderer;
 import com.taco.bafflebeasts.item.ModItems;
@@ -17,7 +17,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
@@ -30,11 +29,9 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.slf4j.Logger;
 import software.bernie.geckolib.GeckoLib;
 
-import javax.swing.text.html.parser.Entity;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(BaffleBeasts.MODID)
@@ -107,6 +104,8 @@ public class BaffleBeasts
             EntityRenderers.register(ModEntityTypes.Amaro.get(), AmaroRenderer::new);
             EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);
             EntityRenderers.register(ModEntityTypes.DozeDrake.get(), DozeDrakeRenderer::new);
+
+            EntityRenderers.register(ModEntityTypes.BubbleProjectile.get(), BubbleProjectileRenderer::new);
         }
     }
 }

@@ -1,8 +1,11 @@
 package com.taco.bafflebeasts.networking;
 
 import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import com.taco.bafflebeasts.networking.packet.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
@@ -51,6 +54,19 @@ public class ModPackets {
 //                .add();
 
 
+        net.messageBuilder(FlightEntityMovementSyncS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(FlightEntityMovementSyncS2C::new)
+                .encoder(FlightEntityMovementSyncS2C::toBytes)
+                .consumerMainThread(FlightEntityMovementSyncS2C::handle)
+                .add();
+
+        net.messageBuilder(FlightEntityMovementSyncC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(FlightEntityMovementSyncC2S::new)
+                .encoder(FlightEntityMovementSyncC2S::toBytes)
+                .consumerMainThread(FlightEntityMovementSyncC2S::handle)
+                .add();
+
+
         // MayFlyC2SPacket
         net.messageBuilder(MayFlyC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
                 .decoder(MayFlyC2SPacket::new)
@@ -66,4 +82,13 @@ public class ModPackets {
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
+
+    public static <MSG> void sendToNearbyPlayersByEntity(MSG message, PacketDistributor.TargetPoint targetPoint) {
+        INSTANCE.send(PacketDistributor.NEAR.with(() -> targetPoint), message);
+    }
+
+    public static <MSG> void sendToAllPlayers(MSG message) {
+        INSTANCE.send(PacketDistributor.ALL.noArg(), message);
+    }
+
 }

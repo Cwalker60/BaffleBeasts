@@ -171,7 +171,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
             event.getController().setAnimation(AMARO_RUN);
             return PlayState.CONTINUE;
         // If the Amaro is moving with a rider
-        } else if (event.isMoving() && this.onGround() && this.hasControllingPassenger()) {
+        } else if (this.isMoving && this.onGround() && this.hasControllingPassenger()) {
             event.getController().setAnimation(AMARO_SPRINT);
             return PlayState.CONTINUE;
         // Fly Animation
@@ -250,7 +250,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
 
     @Override
     public void registerControllers(AnimatableManager.ControllerRegistrar controller) {
-        AnimationController<AmaroEntity> walkController = new AnimationController(this, "walk", 15, this::predicate);
+        AnimationController<AmaroEntity> walkController = new AnimationController(this, "walk", 0, this::predicate);
         walkController.setSoundKeyframeHandler(this::soundListener);
         controller.add(walkController);
 

@@ -3,7 +3,6 @@ package com.taco.bafflebeasts.datagen;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.sound.CustomSoundEvents;
 import com.taco.bafflebeasts.sound.SoundRegistry;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.SoundDefinition;
@@ -65,6 +64,12 @@ public class SoundGenerator extends SoundDefinitionsProvider {
         this.add(CustomSoundEvents.DOZEDRAKE_HONK_MIMIMI, definition()
                 .subtitle("sound.bafflebeasts.dozedrake_honk_mimimi")
                 .with(sound(SoundRegistry.DOZEDRAKE_HONK_MIMI.getId(), SoundDefinition.SoundType.SOUND)));
+        this.add(CustomSoundEvents.DOZEDRAKE_BUBBLE_SHOOT, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_bubble_shoot")
+                .with(sound(SoundRegistry.DOZEDRAKE_BUBBLE_SHOOT.getId(), SoundDefinition.SoundType.SOUND)));
+        this.add(CustomSoundEvents.DOZEDRAKE_BUBBLE_EXPLODE, definition()
+                .subtitle("sound.bafflebeasts.dozedrake_bubble_explode")
+                .with(sound(SoundRegistry.DOZEDRAKE_BUBBLE_EXPLODE.getId(), SoundDefinition.SoundType.SOUND)));
 
 
 

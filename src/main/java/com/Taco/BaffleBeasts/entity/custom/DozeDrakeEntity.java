@@ -6,7 +6,6 @@ import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -14,8 +13,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.TimeUtil;
-import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -50,10 +47,11 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     private final AnimatableInstanceCache animationCache = GeckoLibUtil.createInstanceCache(this);
 
-    private static final UniformInt PERSISTENT_ANGER_TIME = TimeUtil.rangeOfSeconds(15, 25);
     private int sleepTickCooldown = 0;
+    private int bubbleBlastCooldown = 0;
 
     private int remainingPersistentAngerTime;
+
     private UUID persistentAngerTarget;
 
     protected static final RawAnimation DOZEDRAKE_NEUTRAL = RawAnimation.begin().thenLoop("animation.doze_drake.neutral");
@@ -64,6 +62,8 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     protected static final RawAnimation DOZEDRAKE_FLY_DASH = RawAnimation.begin().thenPlay("animation.doze_drake.fly_dash");
     protected static final RawAnimation DOZEDRAKE_SIT = RawAnimation.begin().thenPlayAndHold("animation.doze_drake.sitdown");
     protected static final RawAnimation DOZEDRAKE_SLEEP = RawAnimation.begin().thenPlay("animation.doze_drake.gotosleep").thenPlay("animation.doze_drake.sleep");
+    protected static final RawAnimation DOZEDRAKE_WAKEUP = RawAnimation.begin().thenPlay("animation.doze_drake.wakeup");
+    protected static final RawAnimation DOZEDRAKE_BUBBLE_BLAST = RawAnimation.begin().thenPlay("animation.doze_drake.bubble_charge");
     protected static final RawAnimation DOZEDRAKE_BLINK = RawAnimation.begin().thenLoop("animation.doze_drake.blink");
     protected static final RawAnimation DOZEDRAKE_ATTACK = RawAnimation.begin().thenPlay("animation.doze_drake.attack");
     protected static final RawAnimation DOZEDRAKE_IDLE1 = RawAnimation.begin().thenPlay("animation.doze_drake.idle1");
@@ -74,11 +74,12 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> CAN_AI_SLEEP = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> BUBBLE_CHARGE = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
 
     public int animationbuffer = 5;
 
     public DozeDrakeEntity(EntityType<? extends RideableFlightEntity> pEntityType, Level pLevel) {
-        super(pEntityType, pLevel, 7, 150);
+        super(pEntityType, pLevel, 6, 150);
         sleepTickCooldown = 0;
     }
 
@@ -87,7 +88,8 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 .add(Attributes.MAX_HEALTH, 30)
                 .add(Attributes.ATTACK_DAMAGE, 5.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
-                .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
+                .add(Attributes.MOVEMENT_SPEED, 0.2f)
+                .add(Attributes.FOLLOW_RANGE, 48.0f).build();
     }
 
     @Override
@@ -95,19 +97,21 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         super.defineSynchedData();
         this.entityData.define(HAS_SADDLE, false);
         this.entityData.define(CAN_AI_SLEEP, true);
+        this.entityData.define(BUBBLE_CHARGE, true);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("DozeDrakeHasSaddle", this.isSaddled());
+        tag.putBoolean("BubbleCharge", this.isBubbleBlasting());
     }
-
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.setSaddle(tag.getBoolean("DozeDrakeHasSaddle"));
+        this.setBubbleBlast(tag.getBoolean("BubbleCharge"));
     }
 
 
@@ -116,14 +120,16 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         super.registerGoals();
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
         this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 2.2D, true));
-        this.goalSelector.addGoal(3, new MoveTowardsTargetGoal(this, 2.2D, 32.0F));
-        this.goalSelector.addGoal(4, new FloatGoal(this));
-        this.goalSelector.addGoal(5, new BreedGoal(this, 1.0));
-        this.goalSelector.addGoal(6, new IdleAnimationGoal(this, 5));
-        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 6F));
-        this.goalSelector.addGoal(8, new FlyEntityRandomLookAtGoal(this));
-        this.goalSelector.addGoal(9, new DozeDrakeRandomStrollGoal(this, 1.00));
-        this.goalSelector.addGoal(10, new DozeDrakeSleepGoal(this));
+        this.goalSelector.addGoal(3, new DozeDrakeBubbleAttackGoal(this));
+        this.goalSelector.addGoal(4, new MoveTowardsTargetGoal(this, 2.2D, 32.0F));
+        this.goalSelector.addGoal(5, new FloatGoal(this));
+        this.goalSelector.addGoal(6, new BreedGoal(this, 1.0));
+        this.goalSelector.addGoal(7, new IdleAnimationGoal(this, 5));
+        this.goalSelector.addGoal(8, new FlyEntityLookAtPlayer(this, Player.class, 6F));
+        this.goalSelector.addGoal(9, new FlyEntityRandomLookAtGoal(this));
+        this.goalSelector.addGoal(10, new DozeDrakeRandomStrollGoal(this, 1.00));
+        this.goalSelector.addGoal(11, new DozeDrakeSleepGoal(this));
+
         this.targetSelector.addGoal(1,new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
     }
@@ -157,44 +163,50 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     }
 
     private <E extends GeoAnimatable> PlayState movementPredicate(AnimationState<E> event) {
-        //If the amaro is moving
-        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger()) {
+
+        // If the amaro is moving
+        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger() && !this.isAsleep()) {
             event.getController().setAnimation(DOZEDRAKE_WALK);
             return PlayState.CONTINUE;
-            // If the Amaro is moving with a rider
-        } else if (event.isMoving() && this.onGround() && this.hasControllingPassenger()) {
+        // If the Amaro is moving with a rider
+        } else if (this.isMoving && this.onGround() && this.hasControllingPassenger()) {
             event.getController().setAnimation(DOZEDRAKE_RUN);
             return PlayState.CONTINUE;
-            // Fly Animation
+        // Fly Animation
         } else if (!this.onGround() && !this.isElytraFlying()) { // Set the amaro to fly
             event.getController().setAnimation(DOZEDRAKE_FLY);
             return PlayState.CONTINUE;
-            // Fly Dash Animation
+        // Fly Dash Animation
         } else if (!this.onGround() && this.isElytraFlying() && ElytraGlideCalculation.isFlightBoosting(this)) {
             event.getController().stop();
             event.getController().setAnimation(DOZEDRAKE_FLY_DASH);
             return PlayState.CONTINUE;
-            // Neutral Fly Animation
+        // Neutral Fly Animation
         } else if (!this.onGround() && this.isElytraFlying()) {
             event.getController().setAnimation(DOZEDRAKE_GLIDE);
             return PlayState.CONTINUE;
         }
         // If the amaro is not moving
         else {
+
+            if (this.getEntityWakeUpState()) {
+                event.getController().setAnimation(DOZEDRAKE_WAKEUP);
+                return PlayState.CONTINUE;
+            }
             //
-            if (this.isInSittingPose() && !this.isAsleep()) {
+            if (this.isInSittingPose() && !this.isAsleep() && !this.getEntityWakeUpState()) {
                 event.getController().setAnimation(DOZEDRAKE_SIT);
                 return PlayState.CONTINUE;
             }
 
-            if (this.onGround() && !this.isInSittingPose() && !this.isAsleep()) {
-                event.getController().setAnimation(DOZEDRAKE_NEUTRAL);
+            if (this.isAsleep() && (this.isInSittingPose() || !this.isTame())) {
+                event.getController().stop();
+                event.getController().setAnimation(DOZEDRAKE_SLEEP);
                 return PlayState.CONTINUE;
             }
 
-            if (this.isAsleep()) {
-                event.getController().stop();
-                event.getController().setAnimation(DOZEDRAKE_SLEEP);
+            if (this.onGround() && !this.isInSittingPose()) {
+                event.getController().setAnimation(DOZEDRAKE_NEUTRAL);
                 return PlayState.CONTINUE;
             }
         }
@@ -221,9 +233,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             }
         }
 
-        if (!event.isMoving() && this.getEntityWakeUpState() && this.isInSittingPose()) {
-
-        }
 
         return PlayState.CONTINUE;
     }
@@ -235,7 +244,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         }
 
         //event.getController().forceAnimationReset();
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     private <E extends GeoAnimatable> PlayState blinkPredicate(AnimationState<E> event) {
@@ -259,7 +268,8 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         controllers.add(movementController);
         controllers.add(new AnimationController(this, "idle", 15, this::idlePredicate));
         controllers.add(new AnimationController(this, "blink", 0, this::blinkPredicate));
-        controllers.add(new AnimationController(this, "attack", 0, this::attackPredicate));
+        controllers.add(new AnimationController(this, "attack", 0, this::attackPredicate).
+                triggerableAnim("bubble_blast", DOZEDRAKE_BUBBLE_BLAST));
     }
 
     @Override
@@ -274,8 +284,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             if (pose <= 3) {
                 this.setSleep(true);
             } else {
-
-                this.setSleep(false);
+                this.setEntityWakeUpState(true);
             }
         }
 
@@ -292,6 +301,16 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         }
 
         return SoundRegistry.DOZEDRAKE_IDLE.get();
+
+
+    }
+
+    public boolean isBubbleBlasting() {
+        return this.entityData.get(BUBBLE_CHARGE);
+    }
+
+    public void setBubbleBlast(boolean b) {
+        this.entityData.set(BUBBLE_CHARGE, b);
     }
 
     protected SoundEvent getHurtSound(DamageSource damageSourceIn) {
@@ -313,37 +332,42 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             setIdleTimer(getIdleTimer() - 1);
         }
 
+        if (this.hasControllingPassenger()) {
+            BaffleBeasts.MAIN_LOGGER.debug("gravity is currently " + this.isNoGravity());
+        }
+
         // if dozedrake is actively targeting someone, wake it up
         if (this.targetSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof HurtByTargetGoal))) {
-            this.setSleep(false);
+            this.setEntityWakeUpState(true);
             this.sleepTickCooldown = 0;
         }
 
-//        if (this.getGoToSleepState()) {
-//            this.animationbuffer -= 1;
-//            if (this.animationbuffer < 0) {
-//                this.setSleep(true);
-//                this.setGoToSleepState(false);
-//                this.animationbuffer = 5;
-//            }
-//        }
-//
-//        if (this.getEntityWakeUpState()) {
-//            this.animationbuffer -= 1;
-//            if (this.animationbuffer < 0) {
-//                this.setEntityWakeUpState(false);
-//                this.setSleep(false);
-//                this.animationbuffer = 5;
-//            }
-//        }
-
+        if (this.getEntityWakeUpState()) {
+            this.animationbuffer -= 1;
+            BaffleBeasts.MAIN_LOGGER.debug("waking up!");
+            if (this.animationbuffer < 0) {
+                this.setEntityWakeUpState(false);
+                this.setSleep(false);
+                this.animationbuffer = 5;
+            }
+        }
 
         // If a wild Dozedrake is asleep, start ticking the cooldown before it can sleep again.
         if (this.isAsleep() && !this.isTame()) {
             this.sleepTickCooldown++;
             if (sleepTickCooldown > 300) {
                 sleepTickCooldown = 0;
-                this.setSleep(false);
+                this.setEntityWakeUpState(true);
+            }
+        }
+
+        // Check the cooldown for the bubble blast move. Once the cooldown timer is reached, set
+        // the BubbleBlast ability to be ready.
+        if (!this.isBubbleBlasting()) {
+            this.bubbleBlastCooldown++;
+            if (bubbleBlastCooldown > 100) {
+                bubbleBlastCooldown = 0;
+                this.setBubbleBlast(true);
             }
         }
     }
@@ -385,11 +409,11 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
                 this.navigation.stop();
                 this.flying = false;
-                if (this.isInSittingPose()) {
-                    player.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting"), false);
-                } else {
-                    player.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting"), false);
-                }
+//                if (this.isInSittingPose()) {
+//                    player.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting"), false);
+//                } else {
+//                    player.displayClientMessage(Component.literal(this.getName().getString() + " is now not sitting"), false);
+//                }
                 return InteractionResult.SUCCESS;
             }
 
@@ -401,7 +425,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) {
                     this.tame(player);
                     this.navigation.stop();
-                    this.setSleep(false); this.sleepTickCooldown = 0; // Reset Sleep State
+                    this.setSleep(false); this.sleepTickCooldown = 0; this.setEntityWakeUpState(true); // Reset Sleep State
                     this.level().broadcastEntityEvent(this, (byte)7);
                 } else {
                     this.level().broadcastEntityEvent(this, (byte)6);
@@ -414,32 +438,78 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         return super.mobInteract(player, hand);
     }
 
+    @Override
+    protected boolean canAddPassenger(Entity pPassenger) {
+        return this.getPassengers().size() < getMaxPassengers();
+    }
+
     private void setRidingPlayer(Player player) {
-        player.setYRot(getYRot());
-        player.setXRot(getXRot());
-        player.startRiding(this);
+        if (!this.level().isClientSide()) {
+            List<Entity> passengers = this.getPassengers();
+            if (passengers.size() < this.getMaxPassengers()) {
+                player.setYRot(getYRot());
+                player.setXRot(getXRot());
+                player.startRiding(this);
+            }
+        }
+    }
+
+    public int getMaxPassengers() {
+        return 4;
     }
 
     @Override
     public void positionRider(Entity passenger, Entity.MoveFunction pCallback) {
         super.positionRider(passenger, pCallback);
 
-        Entity rider = getControllingPassenger();
+        Entity rider = this.getControllingPassenger();
+        int index = this.getPassengers().indexOf(passenger) + 1;
+
+        // Controlling Rider Position
         if (rider != null) {
+            // 1 slot of the mount
+            double xPass = this.getX();
+            double yPass = this.getY() + (this.getBbHeight() - 2);
+            double zPass = this.getZ();
 
-            passenger.setPos(this.getX(), this.getY() + (this.getBbHeight() - 1.75),
-                    this.getZ());
-
-            if (rider instanceof LivingEntity) {
-                ((LivingEntity) rider).yBodyRot = this.yBodyRot;
+            switch (index) {
+            // Top left passenger
+                case 1 :
+                    xPass = xPass + 0.8 * Math.cos(Math.toRadians(this.getYRot() + 50));
+                    zPass = zPass + 0.8 * Math.sin(Math.toRadians(this.getYRot() + 50)); break;
+            // Top right passenger
+                case 2 :
+                    xPass = xPass - 0.8 * Math.cos(Math.toRadians(this.getYRot() - 50));
+                    zPass = zPass - 0.8 * Math.sin(Math.toRadians(this.getYRot() - 50)); break;
+            // Bottom left passenger
+                case 3 :
+                    xPass = xPass + 0.8 * Math.cos(Math.toRadians(this.getYRot() - 50));
+                    zPass = zPass + 0.8 * Math.sin(Math.toRadians(this.getYRot() - 50)); break;
+            // Bottom right passenger
+                case 4 :
+                    xPass = xPass - 0.8 * Math.cos(Math.toRadians(this.getYRot() + 50));
+                    zPass = zPass - 0.8 * Math.sin(Math.toRadians(this.getYRot() + 50)); break;
             }
+
+            passenger.setPos(xPass, yPass, zPass);
+
+
+//            if (rider instanceof LivingEntity) {
+//                ((LivingEntity) rider).yBodyRot = this.yBodyRot;
+//            }
+            if (passenger instanceof LivingEntity) {
+                ((LivingEntity) passenger).yBodyRot = this.yBodyRot;
+            }
+
         }
+
+
 
     }
 
     @Override
     public LivingEntity getControllingPassenger() {
-        List<Entity> list = getPassengers();
+        List<Entity> list = this.getPassengers();
         if (list.isEmpty()) {
             return null;
         } else {

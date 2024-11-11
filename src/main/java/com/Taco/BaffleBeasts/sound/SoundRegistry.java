@@ -27,6 +27,8 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> DOZEDRAKE_DEATH = createSoundEvent("dozedrake/dozedrake_death");
     public static final RegistryObject<SoundEvent> DOZEDRAKE_SNOOZE = createSoundEvent("dozedrake/dozedrake_snore");
     public static final RegistryObject<SoundEvent> DOZEDRAKE_HONK_MIMI = createSoundEvent("dozedrake/dozedrake_honk_mimimi");
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_BUBBLE_SHOOT = createSoundEvent("dozedrake/dozedrake_bubble_shoot");
+    public static final RegistryObject<SoundEvent> DOZEDRAKE_BUBBLE_EXPLODE = createSoundEvent("dozedrake/dozedrake_bubble_explode");
 
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {
