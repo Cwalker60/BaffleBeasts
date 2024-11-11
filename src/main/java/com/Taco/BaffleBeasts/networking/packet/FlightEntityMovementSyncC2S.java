@@ -15,24 +15,28 @@ import java.util.function.Supplier;
 public class FlightEntityMovementSyncC2S {
     protected boolean movement;
     protected int mobId;
+    protected boolean isElytraGliding;
 
     public FlightEntityMovementSyncC2S() {
 
     }
 
-    public FlightEntityMovementSyncC2S(boolean move, int id) {
+    public FlightEntityMovementSyncC2S(boolean move, int id, boolean gliding) {
         this.movement = move;
         this.mobId = id;
+        this.isElytraGliding = gliding;
     }
 
     public FlightEntityMovementSyncC2S(FriendlyByteBuf buf) {
         movement = buf.readBoolean();
         mobId = buf.readInt();
+        isElytraGliding = buf.readBoolean();
     }
 
     public void toBytes(FriendlyByteBuf buf) {
         buf.writeBoolean(movement);
         buf.writeInt(mobId);
+        buf.writeBoolean(isElytraGliding);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
@@ -43,15 +47,20 @@ public class FlightEntityMovementSyncC2S {
             RideableFlightEntity rideableFlightEntity = (RideableFlightEntity) serverLevel.getEntity(this.mobId);
 
             if (!serverLevel.isClientSide()) {
+                // Set the serverside entity to match what the client sent.
                 rideableFlightEntity.hasMoved = this.movement;
                 rideableFlightEntity.isMoving = this.movement;
+                rideableFlightEntity.setElytraFlying(false);
+
+                // Send the packet to nearby clients
                 PacketDistributor.TargetPoint  areaForSync = new PacketDistributor.TargetPoint(context.getSender(), rideableFlightEntity.getX(),
                         rideableFlightEntity.getY(), rideableFlightEntity.getZ(), 50,serverLevel.dimension());
                 //BaffleBeasts.MAIN_LOGGER.debug("Sending targetpoint of sync packed too " + areaForSync.toString());
                 BaffleBeasts.MAIN_LOGGER.debug("dozedrake id passed from packet is  " + this.mobId);
                 BaffleBeasts.MAIN_LOGGER.debug("dozedrake id found on server is " + rideableFlightEntity.getId());
-                //ModPackets.sendToNearbyPlayersByEntity(new FlightEntityMovementSyncS2C(this.movement,this.mobId), areaForSync);
-                ModPackets.sendToAllPlayers(new FlightEntityMovementSyncS2C(this.movement,this.mobId));
+                BaffleBeasts.MAIN_LOGGER.debug("dozedrake id found on server is " + rideableFlightEntity.getId());
+                //ModPackets.sendToAllPlayers(new FlightEntityMovementSyncS2C(this.movement,this.mobId, this.isElytraGliding));
+                ModPackets.sendToNearbyPlayersByEntity(new FlightEntityMovementSyncS2C(this.movement,this.mobId, this.isElytraGliding), areaForSync);
             }
 
 

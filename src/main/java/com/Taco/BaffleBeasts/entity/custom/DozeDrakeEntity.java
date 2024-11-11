@@ -332,10 +332,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             setIdleTimer(getIdleTimer() - 1);
         }
 
-        if (this.hasControllingPassenger()) {
-            BaffleBeasts.MAIN_LOGGER.debug("gravity is currently " + this.isNoGravity());
-        }
-
         // if dozedrake is actively targeting someone, wake it up
         if (this.targetSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof HurtByTargetGoal))) {
             this.setEntityWakeUpState(true);
@@ -505,16 +501,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
 
 
-    }
-
-    @Override
-    public LivingEntity getControllingPassenger() {
-        List<Entity> list = this.getPassengers();
-        if (list.isEmpty()) {
-            return null;
-        } else {
-            return (LivingEntity)list.get(0);
-        }
     }
 
     @Override

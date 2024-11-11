@@ -11,6 +11,7 @@ import com.taco.bafflebeasts.item.JellyDonutItem;
 import com.taco.bafflebeasts.item.ModItems;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDescendC2SPacket;
+import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
 import com.taco.bafflebeasts.util.KeyBindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +37,9 @@ public class ClientEvents {
             if (Minecraft.getInstance().player != null) {
                 if (Minecraft.getInstance().player.getVehicle() instanceof RideableFlightEntity) {
                     flightEntity = (RideableFlightEntity) Minecraft.getInstance().player.getVehicle();
+                    if (!flightEntity.hasControllingPassenger()) {
+                        flightEntity = null;
+                    }
                 }
             }
 
@@ -48,7 +52,16 @@ public class ClientEvents {
                 }
 
                 if (KeyBindings.GLIDE_KEY.consumeClick() && flightEntity.isFlying()) {
-                    flightEntity.setElytraFlying(!flightEntity.isElytraFlying());
+                        flightEntity.setElytraFlying(!flightEntity.isElytraFlying());
+                        ModPackets.sendToServer(new FlightEntityMovementSyncC2S(flightEntity.isMoving,
+                                flightEntity.getId(), flightEntity.isElytraFlying()));
+//                    if (flightEntity.isElytraFlying()) {
+//                        flightEntity.setElytraFlying(false);
+//                    } else {
+//                        flightEntity.setElytraFlying(true);
+//
+//                    }
+
                 }
             }
         }

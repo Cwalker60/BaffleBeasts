@@ -28,6 +28,8 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
+import java.util.List;
+
 public abstract class RideableFlightEntity extends TamableAnimal implements Saddleable, PlayerRideable, PlayerRideableJumping {
 
     public boolean flying = false;
@@ -97,22 +99,21 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     // isMoving() will send a datapacket to ensure that the moving animation is synched via client/server.
     // isMoving will try to only send this data packet by checking if lastMoving is true/false to ensure a packet is only sent when the mob stops,
     // or starts moving. There probably is a better solution but this is what I have come up with.
-    protected void isMovingCheck() {
+    public void isMovingCheck() {
         Vec2 groundmovement = new Vec2((float)this.getDeltaMovement().x, (float)this.getDeltaMovement().z);
         groundmovement = groundmovement.normalized();
 
         boolean moving = (Mth.abs(groundmovement.x) > 0 || Mth.abs(groundmovement.y) > 0);
         if (!this.isElytraFlying()) {
 
-
             if (this.level().isClientSide) {
                 if (moving == true && hasMoved == false) {
                     this.isMoving = true; hasMoved = true;
-                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(true, this.getId()));
+                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(true, this.getId(), this.getSharedFlag(7)));
 
                 } else if (moving == false && hasMoved == true) {
                     this.isMoving = false; hasMoved = false;
-                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(false, this.getId()));
+                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(false, this.getId(), this.getSharedFlag(7)));
                 }
             }
         }
@@ -135,14 +136,11 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
         this.setRot(riderLookVec.y, riderLookVec.x);
         this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
 
-        if (this.isElytraFlying()) {
-            //this.setNoGravity(true);
-        }
-
         AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
         double gravityValue = gravity.getValue();
-        BaffleBeasts.MAIN_LOGGER.debug("gravity value is : " + gravityValue);
-        if (this.isNoGravity() && !this.isElytraFlying()) {
+
+
+        if (this.isNoGravity()) {
             this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue / 4.0D, 0.0D));
         }
 
@@ -158,7 +156,6 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
 
         if (this.isControlledByLocalInstance()) {
             Vec3 jvec = this.getDeltaMovement();
-
             // Launch off the ground with more power
             if (this.isJumping && this.onGround() && !this.isElytraFlying()) {
                 //this.executeRidersJump(travelVec, 1.8f);
@@ -179,6 +176,11 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
             if (this.flying && this.descend && !this.isElytraFlying()) {
                 this.moveRelative(0.1F, new Vec3(strafex, -20, forwardz));
             }
+
+            if (this.isElytraFlying()) {
+                //ElytraGlideCalculation.calculateGlide(this, this.getLookAngle());
+            }
+
         }
 
         // If on ground, set all fly states to false;
@@ -187,11 +189,14 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
             this.isJumping = false;
             this.descend = false;
             this.setElytraFlying(false);
+
         }
 
         if (this.level().isClientSide) {
             if (this.isControlledByLocalInstance()) {
-                this.isMovingCheck();
+                if (!this.isFlying()) {
+                    this.isMovingCheck();
+                }
             }
         }
 
@@ -269,6 +274,16 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
                 amaroFlight.subFlightPower(1);
             }
         });
+    }
+
+    @Override
+    public LivingEntity getControllingPassenger() {
+        List<Entity> list = this.getPassengers();
+        if (list.isEmpty()) {
+            return null;
+        } else {
+            return (LivingEntity)list.get(0);
+        }
     }
 
     @Override
