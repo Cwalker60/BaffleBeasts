@@ -5,6 +5,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -89,15 +90,13 @@ public class BubbleProjectile extends AbstractHurtingProjectile {
         // Slow the bubble down as it goes.
         if (this.target != null) {
             double xDistance = (target.getX() - this.getX());
-            double yDistance = (target.getY() - this.getY());
+            double yDistance = ((target.getY() + target.getBbHeight()/2) - this.getY());
             double zDistance = (target.getZ() - this.getZ());
             Vec3 travelVector = new Vec3(xDistance, yDistance, zDistance);
             Vec3 normalVector = travelVector.normalize();
 
 
             this.setDeltaMovement(normalVector.multiply(0.25,0.25,0.25));
-
-
         }
 
     }
