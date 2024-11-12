@@ -21,7 +21,7 @@ public class ModEntityTypes {
     public static final RegistryObject<EntityType<AmaroEntity>> Amaro =
             ENTITY_TYPES.register("amaro",
                     () -> EntityType.Builder.of(AmaroEntity::new, MobCategory.CREATURE)
-                            .sized(1.5f, 3.2f)
+                            .sized(1.5f, 2.0f)
                             .build(new ResourceLocation(BaffleBeasts.MODID, "amaro").toString()));
 
     public static final RegistryObject<EntityType<JellyBatEntity>> JellyBat =
@@ -33,7 +33,7 @@ public class ModEntityTypes {
     public static final RegistryObject<EntityType<DozeDrakeEntity>> DozeDrake =
             ENTITY_TYPES.register("dozedrake",
                     () -> EntityType.Builder.of(DozeDrakeEntity::new, MobCategory.CREATURE)
-                            .sized(2.0f, 4.0f)
+                            .sized(2.0f, 2.2f)
                             .build(new ResourceLocation(BaffleBeasts.MODID, "dozedrake").toString()));
 
     public static final RegistryObject<EntityType<BubbleProjectile>> BubbleProjectile =

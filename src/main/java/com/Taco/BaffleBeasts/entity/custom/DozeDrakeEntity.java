@@ -13,6 +13,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -460,12 +462,13 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
         Entity rider = this.getControllingPassenger();
         int index = this.getPassengers().indexOf(passenger) + 1;
-
+        // Try to position the rider at 2.0
+        double yOffset = this.getBbHeight() - 2.0;
         // Controlling Rider Position
         if (rider != null) {
             // 1 slot of the mount
             double xPass = this.getX();
-            double yPass = this.getY() + (this.getBbHeight() - 2);
+            double yPass = this.getY() + (this.getBbHeight() - yOffset);
             double zPass = this.getZ();
 
             switch (index) {
@@ -581,12 +584,12 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         return (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
     }
 
-    public boolean doHurtTarget(Entity pEntity) {
-        float f = this.getAttackDamage();
-        boolean flag = super.doHurtTarget(pEntity);
-
-        return flag;
-    }
+//    public boolean doHurtTarget(Entity pEntity) {
+//        float f = this.getAttackDamage();
+//        boolean flag = super.doHurtTarget(pEntity);
+//
+//        return flag;
+//    }
 
 }
 

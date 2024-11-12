@@ -426,6 +426,11 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         if (getIdleTimer() > 0) {
             setIdleTimer(getIdleTimer() - 1);
         }
+        if (this.level().isClientSide() && this.hasControllingPassenger()) {
+            BaffleBeasts.MAIN_LOGGER.debug("jellybat has no gravity is on client : " + this.isNoGravity());
+        } else if (!this.level().isClientSide() && this.hasControllingPassenger()){
+            BaffleBeasts.MAIN_LOGGER.debug("jellybat has no gravity is on server : " + this.isNoGravity());
+        }
 
         if (!this.hasFur()) {
             this.furRegrowthCooldown++;
@@ -595,6 +600,15 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     }
 
     @Override
+    public void tickRidden(Player pPlayer, Vec3 travelVec) {
+        super.tickRidden(pPlayer, travelVec);
+
+        if (this.hasControllingPassenger()) {
+            this.setNoGravity(true);
+        }
+    }
+
+    @Override
     public LivingEntity getControllingPassenger() {
         List<Entity> list = getPassengers();
         if (list.isEmpty()) {
@@ -660,6 +674,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
 
         }
     }
+
 
     @Override
     public boolean isSaddleable() {

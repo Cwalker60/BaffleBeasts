@@ -47,13 +47,6 @@ public class ModPackets {
                 .consumerMainThread((FlightEntityDashC2SPacket::handle))
                 .add();
 
-//        net.messageBuilder(AmaroGUISyncS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-//                .decoder(AmaroGUISyncS2CPacket::new)
-//                .encoder(AmaroGUISyncS2CPacket::toBytes)
-//                .consumerMainThread((AmaroGUISyncS2CPacket::handle))
-//                .add();
-
-
         net.messageBuilder(FlightEntityMovementSyncS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(FlightEntityMovementSyncS2C::new)
                 .encoder(FlightEntityMovementSyncS2C::toBytes)
@@ -72,6 +65,13 @@ public class ModPackets {
                 .decoder(MayFlyC2SPacket::new)
                 .encoder(MayFlyC2SPacket::toBytes)
                 .consumerMainThread(MayFlyC2SPacket::handle)
+                .add();
+
+        //DozeDrakeMountAttackC2SPacket
+        net.messageBuilder(DozeDrakeMountAttackC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(DozeDrakeMountAttackC2SPacket::new)
+                .encoder(DozeDrakeMountAttackC2SPacket::toBytes)
+                .consumerMainThread(DozeDrakeMountAttackC2SPacket::handle)
                 .add();
     }
 

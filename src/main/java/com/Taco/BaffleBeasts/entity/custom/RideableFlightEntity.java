@@ -1,15 +1,10 @@
 package com.taco.bafflebeasts.entity.custom;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
 import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
-import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncS2C;
-import com.taco.bafflebeasts.util.ElytraGlideCalculation;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -23,10 +18,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.server.ServerLifecycleHooks;
+
 
 import java.util.List;
 
@@ -364,6 +356,5 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     public boolean isElytraFlying() {
         return this.elytraFlying;
     }
-
 
 }

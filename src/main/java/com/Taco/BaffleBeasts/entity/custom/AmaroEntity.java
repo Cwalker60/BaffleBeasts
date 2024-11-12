@@ -481,7 +481,9 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
         Entity rider = getControllingPassenger();
         if (rider != null) {
             // Set the position of the rider to the current amaro position
-            passenger.setPos(this.getX(), this.getY() + (this.getBbHeight() - 1.75),
+            // Try to put the rider on 1.45 Y height
+            double yOffset = this.getBbHeight() - 1.45;
+            passenger.setPos(this.getX(), this.getY() + (this.getBbHeight() - yOffset),
                     this.getZ());
 
             // Face the rider the same direction the amaro is facing.

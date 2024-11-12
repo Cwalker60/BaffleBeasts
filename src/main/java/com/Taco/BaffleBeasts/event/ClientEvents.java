@@ -4,16 +4,19 @@ import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
+import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import com.taco.bafflebeasts.flight.FlightPower;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.item.JellyDonutItem;
 import com.taco.bafflebeasts.item.ModItems;
 import com.taco.bafflebeasts.networking.ModPackets;
+import com.taco.bafflebeasts.networking.packet.DozeDrakeMountAttackC2SPacket;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDescendC2SPacket;
 import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
 import com.taco.bafflebeasts.util.KeyBindings;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -32,8 +35,10 @@ public class ClientEvents {
 
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event) {
-            // Amaro Descend Keybind
+            // Check if the entity has a controlling player
             RideableFlightEntity flightEntity = null;
+            LocalPlayer player = Minecraft.getInstance().player;
+
             if (Minecraft.getInstance().player != null) {
                 if (Minecraft.getInstance().player.getVehicle() instanceof RideableFlightEntity) {
                     flightEntity = (RideableFlightEntity) Minecraft.getInstance().player.getVehicle();
@@ -44,6 +49,7 @@ public class ClientEvents {
             }
 
             if (flightEntity != null) {
+                // Descend Key bind
                 if(KeyBindings.DESCENDING_KEY.isDown() && flightEntity.isFlying()) {
                     ModPackets.sendToServer(new FlightEntityDescendC2SPacket());
                     flightEntity.setDescend(true);
@@ -51,19 +57,28 @@ public class ClientEvents {
                     flightEntity.setDescend(false);
                 }
 
+                // Mount Glide Key bind
                 if (KeyBindings.GLIDE_KEY.consumeClick() && flightEntity.isFlying()) {
                         flightEntity.setElytraFlying(!flightEntity.isElytraFlying());
                         ModPackets.sendToServer(new FlightEntityMovementSyncC2S(flightEntity.isMoving,
                                 flightEntity.getId(), flightEntity.isElytraFlying()));
-//                    if (flightEntity.isElytraFlying()) {
-//                        flightEntity.setElytraFlying(false);
-//                    } else {
-//                        flightEntity.setElytraFlying(true);
-//
-//                    }
 
                 }
+
+                // Mount Attack bind
+                if (KeyBindings.MOUNT_ATTACK_KEY.consumeClick()) {
+                    // DozeDrake attack
+                    if (flightEntity instanceof DozeDrakeEntity) {
+                        DozeDrakeEntity dozeDrake = (DozeDrakeEntity)flightEntity;
+                        Vec3 playerLook = player.getLookAngle();
+                        if (dozeDrake.isBubbleBlasting()) {
+                            ModPackets.sendToServer(new DozeDrakeMountAttackC2SPacket(playerLook.x, playerLook.y, playerLook.z));
+                        }
+
+                    }
+                }
             }
+
         }
 
         //AmaroFlightPower capability
@@ -83,7 +98,7 @@ public class ClientEvents {
             //LOGGER.debug("viewYRot is " + event.getEntity().getViewYRot(event.getPartialTick()));
             if (event.getEntity().getVehicle() != null) {
                 if (event.getEntity().getVehicle() instanceof RideableFlightEntity flightEntity) {
-                    if (flightEntity.isFallFlying()) {
+                    if (flightEntity.isElytraFlying()) {
                         float pXRot = event.getEntity().getXRot() % 360;
                         float pYRot = event.getEntity().getYRot();
                         if (pYRot < 0) {
@@ -128,6 +143,7 @@ public class ClientEvents {
         public static void onKeyRegister(RegisterKeyMappingsEvent event) {
             event.register(KeyBindings.DESCENDING_KEY);
             event.register(KeyBindings.GLIDE_KEY);
+            event.register(KeyBindings.MOUNT_ATTACK_KEY);
         }
 
         @SubscribeEvent
