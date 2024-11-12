@@ -19,7 +19,11 @@ build
 
 # other
 eclipse
+
 run
+.log
+.gz
+run-data
 
 # Files from Forge MDK
 forge*changelog.txt
