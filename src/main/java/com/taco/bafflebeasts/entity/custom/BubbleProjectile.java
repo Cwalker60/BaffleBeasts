@@ -93,10 +93,12 @@ public class BubbleProjectile extends AbstractHurtingProjectile {
             double yDistance = ((target.getY() + target.getBbHeight()/2) - this.getY());
             double zDistance = (target.getZ() - this.getZ());
             Vec3 travelVector = new Vec3(xDistance, yDistance, zDistance);
-            Vec3 normalVector = travelVector.normalize();
+            travelVector = travelVector.normalize().multiply(0.25, 0.25, 0.25);
+            Vec3 normalVector = travelVector.lerp(this.getDeltaMovement(), 0.40);
 
 
-            this.setDeltaMovement(normalVector.multiply(0.25,0.25,0.25));
+
+            this.setDeltaMovement(normalVector);
         }
 
     }

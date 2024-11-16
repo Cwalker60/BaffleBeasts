@@ -2,6 +2,8 @@ package com.taco.bafflebeasts.entity.custom;
 
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
+import com.taco.bafflebeasts.entity.client.BubblePowerHud;
+import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
@@ -53,6 +55,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     private int bubbleBlastCooldown = 0;
 
     private int remainingPersistentAngerTime;
+    private boolean bubbleBlastGUIFlicker;
 
     private UUID persistentAngerTarget;
 
@@ -342,7 +345,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
         if (this.getEntityWakeUpState()) {
             this.animationbuffer -= 1;
-            BaffleBeasts.MAIN_LOGGER.debug("waking up!");
             if (this.animationbuffer < 0) {
                 this.setEntityWakeUpState(false);
                 this.setSleep(false);
@@ -366,8 +368,20 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             if (bubbleBlastCooldown > 100) {
                 bubbleBlastCooldown = 0;
                 this.setBubbleBlast(true);
+                // If true, set the bubbleBlastGUIFlicker to tick to animate the GUI.
+                this.bubbleBlastGUIFlicker = true;
             }
         }
+        if (this.level().isClientSide) {
+            if (bubbleBlastGUIFlicker == true) {
+                BubblePowerHud.updateBubbleGUI();
+                if (BubblePowerHud.getBubbleAnimationDrawstate() > 9) {
+                    this.bubbleBlastGUIFlicker = false;
+                    BubblePowerHud.BUBBLE_ANIMATION_DRAWSTATE = -1;
+                }
+            }
+        }
+
     }
 
     @Override
@@ -497,7 +511,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 //                ((LivingEntity) rider).yBodyRot = this.yBodyRot;
 //            }
             if (passenger instanceof LivingEntity) {
-                ((LivingEntity) passenger).yBodyRot = this.yBodyRot;
+                passenger.setYBodyRot(this.yBodyRot);;
             }
 
         }
@@ -582,6 +596,10 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     private float getAttackDamage() {
         return (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+    }
+
+    public int getBubbleBlastCooldown () {
+        return this.bubbleBlastCooldown;
     }
 
 //    public boolean doHurtTarget(Entity pEntity) {

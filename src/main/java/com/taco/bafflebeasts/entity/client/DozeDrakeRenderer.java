@@ -62,6 +62,7 @@ public class DozeDrakeRenderer extends GeoEntityRenderer<DozeDrakeEntity> {
                 double d2 = (vec31.x * vec3.x + vec31.z * vec3.z) / Math.sqrt(d0 * d1);
                 double d3 = vec31.x * vec3.z - vec31.z * vec3.x;
                 float d4 = (float)(Math.signum(d3) * Math.acos(d2)); // angle to change tilt in positive/negative
+
                 poseStack.mulPose(Axis.ZP.rotation((float)Math.cos( ((pYRot * Math.PI) / 180)) * d4));
                 poseStack.mulPose(Axis.XP.rotation((float)Math.sin( ((pYRot * Math.PI) / 180)) * -d4));
             }

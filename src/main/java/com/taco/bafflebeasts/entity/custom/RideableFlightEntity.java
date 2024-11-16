@@ -123,56 +123,58 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     @Override
     public void tickRidden(Player pPlayer, Vec3 travelVec) {
         super.tickRidden(pPlayer, travelVec);
-        // Set the mob to look at where the player is and rotate the body too.
-        Vec2 riderLookVec = new Vec2(pPlayer.getXRot(), pPlayer.getYRot());
-        this.setRot(riderLookVec.y, riderLookVec.x);
-        this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
+        if (this.level().isClientSide()) {
+            // Set the mob to look at where the player is and rotate the body too.
+            Vec2 riderLookVec = new Vec2(pPlayer.getXRot(), pPlayer.getYRot());
+            this.setRot(riderLookVec.y, riderLookVec.x);
+            this.yRotO = this.yBodyRot = this.yHeadRot = this.getYRot();
 
-        AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
-        double gravityValue = gravity.getValue();
+            AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
+            double gravityValue = gravity.getValue();
 
-
-        if (this.isNoGravity()) {
-            this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue / 4.0D, 0.0D));
-        }
-
-
-        double strafex = pPlayer.xxa * 0.5f;
-        double yascend = pPlayer.yya;
-        double forwardz = pPlayer.zza;
-
-        // make backward movement twice as slow.
-        if (forwardz <= 0.0f) {
-            forwardz *= 0.5f;
-        }
-
-        if (this.isControlledByLocalInstance()) {
-            Vec3 jvec = this.getDeltaMovement();
-            // Launch off the ground with more power
-            if (this.isJumping && this.onGround() && !this.isElytraFlying()) {
-                //this.executeRidersJump(travelVec, 1.8f);
-                this.setDeltaMovement(jvec.x, 1.8, jvec.z);
-                this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
-                this.isJumping = false;
-            } // Launch in the air with less power
-            if (this.flying && this.isJumping && !this.isElytraFlying()) {
-                this.setDeltaMovement(jvec.x, jvec.y + 1.5, jvec.z);
-                this.isJumping = false;
-            }
-            // Launch the amaro forward in the air with elytra gliding, similar to a minecraft rocket.
-            if (this.flying && this.isJumping && this.isElytraFlying()) {
-                ModPackets.sendToServer(new FlightEntityDashC2SPacket());
-                this.isJumping = false;
-            }
-            // Descend the amaro if the Descend key is called
-            if (this.flying && this.descend && !this.isElytraFlying()) {
-                this.moveRelative(0.1F, new Vec3(strafex, -20, forwardz));
+            // If there's no gravity, add the gravity back.
+            if (this.isNoGravity() && !this.isElytraFlying()) {
+                this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue, 0.0D));
             }
 
-            if (this.isElytraFlying()) {
-                //ElytraGlideCalculation.calculateGlide(this, this.getLookAngle());
+
+            double strafex = pPlayer.xxa * 0.5f;
+            double yascend = pPlayer.yya;
+            double forwardz = pPlayer.zza;
+
+            // make backward movement twice as slow.
+            if (forwardz <= 0.0f) {
+                forwardz *= 0.5f;
             }
 
+            if (this.isControlledByLocalInstance()) {
+
+                Vec3 jvec = this.getDeltaMovement();
+                // Launch off the ground with more power
+                if (this.isJumping && this.onGround() && !this.isElytraFlying()) {
+                    //this.executeRidersJump(travelVec, 1.8f);
+                    this.setDeltaMovement(jvec.x, 1.8, jvec.z);
+                    this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENDER_DRAGON_FLAP, this.getSoundSource(), 5.0F, 0.8F + this.random.nextFloat() * 0.3F, false);
+                    this.isJumping = false;
+                } // Launch in the air with less power
+                if (this.flying && this.isJumping && !this.isElytraFlying()) {
+                    this.setDeltaMovement(jvec.x, jvec.y + 1.5, jvec.z);
+                    this.isJumping = false;
+                }
+                // Launch the amaro forward in the air with elytra gliding, similar to a minecraft rocket.
+                if (this.flying && this.isJumping && this.isElytraFlying()) {
+                    ModPackets.sendToServer(new FlightEntityDashC2SPacket());
+                    this.isJumping = false;
+                }
+                // Descend the amaro if the Descend key is called
+                if (this.flying && this.descend && !this.isElytraFlying()) {
+                    this.moveRelative(0.1F, new Vec3(strafex, -20, forwardz));
+                }
+
+                if (this.isElytraFlying()) {
+                    //ElytraGlideCalculation.calculateGlide(this, this.getLookAngle());
+                }
+            }
         }
 
         // If on ground, set all fly states to false;

@@ -3,6 +3,7 @@ package com.taco.bafflebeasts.event;
 import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.entity.client.BubblePowerHud;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
@@ -94,21 +95,24 @@ public class ClientEvents {
 
 
         @SubscribeEvent
-        public static void onPlayerRender(RenderPlayerEvent.Pre event) {
+        public static void onPlayerRender(RenderPlayerEvent event) {
             //LOGGER.debug("viewYRot is " + event.getEntity().getViewYRot(event.getPartialTick()));
             if (event.getEntity().getVehicle() != null) {
                 if (event.getEntity().getVehicle() instanceof RideableFlightEntity flightEntity) {
                     if (flightEntity.isElytraFlying()) {
-                        float pXRot = event.getEntity().getXRot() % 360;
-                        float pYRot = event.getEntity().getYRot();
+                        float pXRot = flightEntity.getXRot() % 360;
+                        float pYRot = flightEntity.getYRot();
+
                         if (pYRot < 0) {
                             pYRot += 360;
                         } else {
                             pYRot = pYRot % 360;
                         }
-                        // Face the player wherever the flightEntity is turning
-                        event.getPoseStack().mulPose(Axis.XP.rotationDegrees((float)Math.cos( ((pYRot * Math.PI) / 180)) * pXRot));
-                        event.getPoseStack().mulPose(Axis.ZP.rotationDegrees((float)Math.sin( ((pYRot * Math.PI) / 180)) * pXRot));
+
+                        // Face the player wherever the flightEntity is tilting
+                        event.getPoseStack().mulPose(Axis.XP.rotationDegrees((float) Math.cos(((pYRot * Math.PI) / 180)) * pXRot));
+                        event.getPoseStack().mulPose(Axis.ZP.rotationDegrees((float) Math.sin(((pYRot * Math.PI) / 180)) * pXRot));
+
 
                         Vec3 vec3 = flightEntity.getViewVector(event.getPartialTick());
                         Vec3 vec31 = flightEntity.getDeltaMovement();
@@ -149,6 +153,7 @@ public class ClientEvents {
         @SubscribeEvent
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerAboveAll("flightgui", FlightPowerHud.HUD_AMARO_FLIGHTBAR);
+            event.registerAboveAll("dozedrake_mountattack", BubblePowerHud.HUD_BUBBLE_ATTACK);
         }
         @SubscribeEvent
         public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
