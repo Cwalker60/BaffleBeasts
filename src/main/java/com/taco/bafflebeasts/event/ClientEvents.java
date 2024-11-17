@@ -73,7 +73,7 @@ public class ClientEvents {
                         DozeDrakeEntity dozeDrake = (DozeDrakeEntity)flightEntity;
                         Vec3 playerLook = player.getLookAngle();
                         if (dozeDrake.isBubbleBlasting()) {
-                            ModPackets.sendToServer(new DozeDrakeMountAttackC2SPacket(playerLook.x, playerLook.y, playerLook.z));
+                            ModPackets.sendToServer(new DozeDrakeMountAttackC2SPacket(playerLook.x, playerLook.y, playerLook.z));;
                         }
 
                     }

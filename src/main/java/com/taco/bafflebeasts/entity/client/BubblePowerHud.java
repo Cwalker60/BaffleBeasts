@@ -2,6 +2,7 @@ package com.taco.bafflebeasts.entity.client;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.taco.bafflebeasts.BaffleBeasts;
+import com.taco.bafflebeasts.config.BaffleClientConfig;
 import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -31,24 +32,24 @@ public class BubblePowerHud {
             RenderSystem.setShaderTexture(0, EMPTY_BUBBLE_ICON);
             // Draw Empty Bubble at middle of the screen.
             // 85 is base height
-            guiGraphics.blit(EMPTY_BUBBLE_ICON,xOffset,y - 85,
+            guiGraphics.blit(EMPTY_BUBBLE_ICON,xOffset + BaffleClientConfig.MOUNT_ATTACK_HUD_X_OFFSET.get(),y - 85 + BaffleClientConfig.MOUNT_ATTACK_HUD_Y_OFFSET.get(),
                     0,0,24,24,24,24);
 
             // Filled in Bubble.
             RenderSystem.setShaderTexture(0, FULL_BUBBLE_ICON);
             int gradualFill = dozeDrake.getBubbleBlastCooldown() / ( 100 / 24);
             if (!dozeDrake.isBubbleBlasting()) {
-                guiGraphics.blit(FULL_BUBBLE_ICON,xOffset,y - 61 - gradualFill,
+                guiGraphics.blit(FULL_BUBBLE_ICON,xOffset + BaffleClientConfig.MOUNT_ATTACK_HUD_X_OFFSET.get(),y - 61 - gradualFill + BaffleClientConfig.MOUNT_ATTACK_HUD_Y_OFFSET.get(),
                         0, 24 - gradualFill,24, gradualFill ,24,24);
             } else {
-                guiGraphics.blit(FULL_BUBBLE_ICON,xOffset,y - 85,
+                guiGraphics.blit(FULL_BUBBLE_ICON,xOffset + BaffleClientConfig.MOUNT_ATTACK_HUD_X_OFFSET.get(),y - 85 + BaffleClientConfig.MOUNT_ATTACK_HUD_Y_OFFSET.get(),
                         0,0,24,24 ,24,24);
             }
 
             // Animated Bubble
             RenderSystem.setShaderTexture(0, ANIMATED_BUBBLE_ICON);
             if (!STOP_DRAW && dozeDrake.isBubbleBlasting()) {
-                guiGraphics.blit(ANIMATED_BUBBLE_ICON,xOffset,y - 85,
+                guiGraphics.blit(ANIMATED_BUBBLE_ICON,xOffset + BaffleClientConfig.MOUNT_ATTACK_HUD_X_OFFSET.get(),y - 85 + BaffleClientConfig.MOUNT_ATTACK_HUD_Y_OFFSET.get(),
                         0,BUBBLE_ANIMATION_DRAWSTATE * 24,24,24,24,216);
             }
         }

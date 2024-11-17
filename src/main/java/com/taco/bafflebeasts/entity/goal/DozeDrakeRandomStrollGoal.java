@@ -56,9 +56,11 @@ public class DozeDrakeRandomStrollGoal extends Goal {
                 }
             }
 
-            if (this.entity.isAsleep()) {
+            if (this.entity.isOrderedToSit() && this.entity.isAsleep()) {
                 return false;
             }
+
+
 
             Vec3 vec3 = this.getPosition();
             if (vec3 == null) {

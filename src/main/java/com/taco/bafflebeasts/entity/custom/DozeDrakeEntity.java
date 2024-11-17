@@ -26,6 +26,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
+import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
@@ -69,6 +71,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     protected static final RawAnimation DOZEDRAKE_SLEEP = RawAnimation.begin().thenPlay("animation.doze_drake.gotosleep").thenPlay("animation.doze_drake.sleep");
     protected static final RawAnimation DOZEDRAKE_WAKEUP = RawAnimation.begin().thenPlay("animation.doze_drake.wakeup");
     protected static final RawAnimation DOZEDRAKE_BUBBLE_BLAST = RawAnimation.begin().thenPlay("animation.doze_drake.bubble_charge");
+    protected static final RawAnimation DOZEDRAKE_MOUNT_ATTACK = RawAnimation.begin().thenPlay("animation.doze_drake.mount_attack");
     protected static final RawAnimation DOZEDRAKE_BLINK = RawAnimation.begin().thenLoop("animation.doze_drake.blink");
     protected static final RawAnimation DOZEDRAKE_ATTACK = RawAnimation.begin().thenPlay("animation.doze_drake.attack");
     protected static final RawAnimation DOZEDRAKE_IDLE1 = RawAnimation.begin().thenPlay("animation.doze_drake.idle1");
@@ -86,6 +89,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     public DozeDrakeEntity(EntityType<? extends RideableFlightEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel, 6, 150);
         sleepTickCooldown = 0;
+        this.setEntityWakeUpState(true);
     }
 
     public static AttributeSupplier setAttributes() {
@@ -130,13 +134,16 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         this.goalSelector.addGoal(5, new FloatGoal(this));
         this.goalSelector.addGoal(6, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(7, new IdleAnimationGoal(this, 5));
-        this.goalSelector.addGoal(8, new FlyEntityLookAtPlayer(this, Player.class, 6F));
-        this.goalSelector.addGoal(9, new FlyEntityRandomLookAtGoal(this));
-        this.goalSelector.addGoal(10, new DozeDrakeRandomStrollGoal(this, 1.00));
-        this.goalSelector.addGoal(11, new DozeDrakeSleepGoal(this));
+        this.goalSelector.addGoal(8, new FlyEntityFollowOwnerGoal(this,2.2d,15,4,true));
+        this.goalSelector.addGoal(9, new FlyEntityLookAtPlayer(this, Player.class, 6F));
+        this.goalSelector.addGoal(10, new FlyEntityRandomLookAtGoal(this));
+        this.goalSelector.addGoal(11, new DozeDrakeRandomStrollGoal(this, 1.00));
+        this.goalSelector.addGoal(12, new DozeDrakeSleepGoal(this));
 
         this.targetSelector.addGoal(1,new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
+        this.targetSelector.addGoal(3, new OwnerHurtByTargetGoal(this));
+        this.targetSelector.addGoal(4, new OwnerHurtTargetGoal(this));
     }
 
     @Override
@@ -170,7 +177,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     private <E extends GeoAnimatable> PlayState movementPredicate(AnimationState<E> event) {
 
         // If the amaro is moving
-        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger() && !this.isAsleep()) {
+        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger() && !this.isAsleep() && !this.isOrderedToSit()) {
             event.getController().setAnimation(DOZEDRAKE_WALK);
             return PlayState.CONTINUE;
         // If the Amaro is moving with a rider
@@ -273,8 +280,9 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         controllers.add(movementController);
         controllers.add(new AnimationController(this, "idle", 15, this::idlePredicate));
         controllers.add(new AnimationController(this, "blink", 0, this::blinkPredicate));
-        controllers.add(new AnimationController(this, "attack", 0, this::attackPredicate).
-                triggerableAnim("bubble_blast", DOZEDRAKE_BUBBLE_BLAST));
+        controllers.add(new AnimationController(this, "attack", 0, this::attackPredicate)
+                .triggerableAnim("bubble_blast", DOZEDRAKE_BUBBLE_BLAST)
+                .triggerableAnim("mount_attack", DOZEDRAKE_MOUNT_ATTACK));
     }
 
     @Override
@@ -297,7 +305,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     protected SoundEvent getAmbientSound() {
 
-        if (this.isAsleep()) {
+        if (this.isAsleep() && this.isOrderedToSit()) {
             if (this.random.nextInt(100) == 0) {
                 return SoundRegistry.DOZEDRAKE_HONK_MIMI.get();
             } else {
@@ -340,6 +348,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         // if dozedrake is actively targeting someone, wake it up
         if (this.targetSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof HurtByTargetGoal))) {
             this.setEntityWakeUpState(true);
+            this.setOrderedToSit(false);
             this.sleepTickCooldown = 0;
         }
 
@@ -358,6 +367,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             if (sleepTickCooldown > 300) {
                 sleepTickCooldown = 0;
                 this.setEntityWakeUpState(true);
+                this.setOrderedToSit(false);
             }
         }
 
@@ -415,23 +425,28 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 return InteractionResult.sidedSuccess(level().isClientSide());
             }
 
+            // Breed Check
+            if (itemStack.is(Items.COOKED_BEEF) && this.age == 0 && this.canFallInLove()) {
+                this.setInLove(player);
+                this.usePlayerItem(player, hand, itemStack);
+                return InteractionResult.sidedSuccess(level().isClientSide());
+            }
+
 
             InteractionResult emptyhand = super.mobInteract(player, hand);
             if (!emptyhand.consumesAction() && player.isShiftKeyDown()) {
+                if (this.isOrderedToSit()) {
+                    this.setEntityWakeUpState(true);
+                }
                 this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
                 this.navigation.stop();
                 this.flying = false;
-//                if (this.isInSittingPose()) {
-//                    player.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting"), false);
-//                } else {
-//                    player.displayClientMessage(Component.literal(this.getName().getString() + " is now not sitting"), false);
-//                }
                 return InteractionResult.SUCCESS;
             }
 
         } else {
             // Tame Attempt Check
-            if (itemStack.is(Items.BEEF) && !this.isBaby()) {
+            if (itemStack.is(Items.BEEF)) {
                 itemStack.shrink(1);
                 // Have a 1-3 chance of taming the amaro
                 if (this.random.nextInt(3) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, player)) {

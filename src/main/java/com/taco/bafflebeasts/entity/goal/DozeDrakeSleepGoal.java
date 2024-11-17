@@ -25,5 +25,6 @@ public class DozeDrakeSleepGoal extends Goal {
         BaffleBeasts.MAIN_LOGGER.debug("Dozedrake is going to sleep!");
         this.entity.setSleep(true);
         this.entity.setIdlePose(0);
+        this.entity.setOrderedToSit(true);
     }
 }

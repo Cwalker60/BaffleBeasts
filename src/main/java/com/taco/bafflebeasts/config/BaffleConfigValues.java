@@ -3,17 +3,8 @@ package com.taco.bafflebeasts.config;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.util.RegistryUtility;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.ForgeRegistry;
-import net.minecraftforge.registries.RegistryObject;
-import org.w3c.dom.Entity;
 
 import java.util.ArrayList;
 
@@ -23,6 +14,8 @@ public class BaffleConfigValues {
             validateBiomes(new ArrayList<String>(BaffleServerConfig.AMARO_SPAWN_BIOMES.get()), "AMARO");
     public static final ArrayList<String> JELLYBAT_BIOME_SPAWN_LIST =
             validateBiomes(new ArrayList<String>(BaffleServerConfig.JELLYBAT_SPAWN_BIOMES.get()), "JELLYBAT");
+    public static final ArrayList<String> DOZE_DRAKE_SPAWN_LIST =
+            validateBiomes(new ArrayList<String>(BaffleServerConfig.DOZEDRAKE_SPAWN_BIOMES.get()), "DOZEDRAKE");
 
     public static final EntityConfigData AMARO_CONFIG_DATA = new EntityConfigData(ModEntityTypes.Amaro.get(),
             BaffleServerConfig.AMARO_SPAWN_AMOUNT_MAX.get(),
@@ -32,6 +25,11 @@ public class BaffleConfigValues {
     public static final EntityConfigData JELLYBAT_CONFIG_DATA = new EntityConfigData(ModEntityTypes.JellyBat.get(),
             BaffleServerConfig.JELLYBAT_SPAWN_AMOUNT_MAX.get(), BaffleServerConfig.JELLYBAT_SPAWN_AMOUNT_MIN.get(),
             BaffleServerConfig.JELLYBAT_SPAWN_WEIGHT.get(),JELLYBAT_BIOME_SPAWN_LIST);
+
+    public static final EntityConfigData DOZEDRAKE_CONFIG_DATA = new EntityConfigData(ModEntityTypes.DozeDrake.get(),
+            BaffleServerConfig.DOZEDRAKE_AMOUNT_MAX.get(),BaffleServerConfig.DOZEDRAKE_AMOUNT_MIN.get(),
+            BaffleServerConfig.DOZEDRAKE_SPAWN_WEIGHT.get(),DOZE_DRAKE_SPAWN_LIST);
+
 
 
     /**

@@ -1463,6 +1463,140 @@
 				}
 			}
 		},
+		"animation.doze_drake.mount_attack": {
+			"animation_length": 1,
+			"bones": {
+				"r_wing": {
+					"rotation": {
+						"vector": [0, 0, 75]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"r_wing_mid": {
+					"rotation": {
+						"vector": [0, 0, -150]
+					}
+				},
+				"l_wing": {
+					"rotation": {
+						"vector": [0, 0, -75]
+					},
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"l_wing_mid": {
+					"rotation": {
+						"vector": [0, 0, 150]
+					}
+				},
+				"l_wing_far": {
+					"rotation": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"tail": {
+					"rotation": {
+						"vector": [-35, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -4]
+					}
+				},
+				"tail2": {
+					"rotation": {
+						"vector": [7.5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -1]
+					}
+				},
+				"tail3": {
+					"rotation": {
+						"vector": [5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -1]
+					}
+				},
+				"tail4": {
+					"rotation": {
+						"vector": [7.5, 0, 0]
+					},
+					"position": {
+						"vector": [0, 0, -1]
+					}
+				},
+				"body": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"neck": {
+					"position": {
+						"vector": [0, 0, 0]
+					}
+				},
+				"jaw": {
+					"rotation": {
+						"0.125": {
+							"vector": [0, 0, 0]
+						},
+						"0.4583": {
+							"vector": [20, 0, 0]
+						},
+						"0.75": {
+							"vector": [20, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"upper_neck": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.4583": {
+							"vector": [10, 0, 0]
+						},
+						"0.6667": {
+							"vector": [10, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						}
+					}
+				},
+				"head": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.4583": {
+							"vector": [-5, 0, 0]
+						},
+						"0.6667": {
+							"vector": [-5, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [0, 0, 0]
+						}
+					}
+				}
+			}
+		},
 		"animation.doze_drake.attack": {
 			"animation_length": 0.5,
 			"bones": {

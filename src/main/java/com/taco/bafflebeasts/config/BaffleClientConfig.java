@@ -9,6 +9,9 @@ public class BaffleClientConfig {
     public static ForgeConfigSpec.ConfigValue<Integer> FLIGHT_HUD_X_OFFSET;
     public static ForgeConfigSpec.ConfigValue<Integer> FLIGHT_HUD_Y_OFFSET;
 
+    public static ForgeConfigSpec.ConfigValue<Integer> MOUNT_ATTACK_HUD_X_OFFSET;
+    public static ForgeConfigSpec.ConfigValue<Integer> MOUNT_ATTACK_HUD_Y_OFFSET;
+
     public static void createConfig(ForgeConfigSpec.Builder builder) {
         builder.push("HUD Elements");
         FLIGHT_HUD_X_OFFSET = builder.comment("The following X and Y offset are to move the feathers in the flight gauge when " +
@@ -17,6 +20,9 @@ public class BaffleClientConfig {
                 .define("Flight_Hud_X_Offset", 0);
 
         FLIGHT_HUD_Y_OFFSET = builder.define("Flight_Hud_Y_Offset", 0);
+
+        MOUNT_ATTACK_HUD_X_OFFSET = builder.define("Mount_Attack_Hud_X_Offset", 0);
+        MOUNT_ATTACK_HUD_Y_OFFSET = builder.define("Mount_Attack_Hud_Y_Offset",0);
 
         builder.pop();
 

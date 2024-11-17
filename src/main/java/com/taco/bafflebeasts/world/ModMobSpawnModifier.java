@@ -34,6 +34,7 @@ public record ModMobSpawnModifier(boolean config) implements BiomeModifier {
                 // if the tag is in the config list, add the amaro to that biome with that tag.
                 addEntitySpawn(BaffleConfigValues.AMARO_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.CREATURE);
                 addEntitySpawn(BaffleConfigValues.JELLYBAT_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.AMBIENT);
+                addEntitySpawn(BaffleConfigValues.DOZEDRAKE_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.CREATURE);
             });
 
         }

@@ -78,20 +78,6 @@ public class DozeDrakeMountAttackC2SPacket {
             // If the entity list is not null, create a homing bubble targeting the first entity in the list.
             if (!entities.isEmpty()) {
                 if (shooter != null) {
-//                    if (entities.get(0) instanceof LivingEntity) {
-//                        LivingEntity target = (LivingEntity) entities.get(0);
-//                        double d0 = shooter.distanceToSqr(entities.get(0));
-//                        double xdist = entities.get(0).getX() - shooter.getX();
-//                        double d2 = entities.get(0).getY(0.5D) - shooter.getY(0.5D);
-//                        double d3 = entities.get(0).getZ() - shooter.getZ();
-//                        double d4 = Math.sqrt(Math.sqrt(d0)) * 0.5D;
-//
-//                        BaffleBeasts.MAIN_LOGGER.debug("Firing Bubble at target : " + target.getName().getString());
-//
-//                        server.addFreshEntity(new BubbleProjectile(ModEntityTypes.BubbleProjectile.get(), shooter,
-//                                target,shooter.getRandom().triangle(xdist, d4),d2,
-//                                shooter.getRandom().triangle(d3, d4),shooter.level()));
-//                    }
                     for (Entity target : entities) {
                         if (target instanceof LivingEntity) {
                             // If the mob is the shooter itself, skip
@@ -116,6 +102,7 @@ public class DozeDrakeMountAttackC2SPacket {
                             shooter.getServer().getLevel(shooter.getCommandSenderWorld().dimension())
                                     .playSound(shooter,shooter.blockPosition(), CustomSoundEvents.DOZEDRAKE_BUBBLE_SHOOT
                                             ,shooter.getSoundSource(), 1.0f, 1.0f);
+                            shooter.triggerAnim("attack", "mount_attack");
                             break;
 
                         }
