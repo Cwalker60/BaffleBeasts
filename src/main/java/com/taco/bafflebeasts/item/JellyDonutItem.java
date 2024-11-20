@@ -15,6 +15,7 @@ import java.util.List;
 public class JellyDonutItem extends Item {
     private static final String NBT_EFFECTS = "Potion";
     private static final String DONUT_COLOR = "DonutColor";
+    private static final String SECONDARY_NBT_EFFECTS = "SecondaryPotion";
 
     private int color;
 
@@ -31,10 +32,15 @@ public class JellyDonutItem extends Item {
         // Add the potion effects storeed from the NBT data of the item.
         if (pStack.getTag() != null) {
             Potion p = ForgeRegistries.POTIONS.getValue(new ResourceLocation(pStack.getTag().getString(NBT_EFFECTS)));
+            Potion p2 = ForgeRegistries.POTIONS.getValue(new ResourceLocation(pStack.getTag().getString(SECONDARY_NBT_EFFECTS)));
             // For each effects of the potion, apply the the entity using the item.
             // Check if the effect is instantaneous, and then apply it.
 
             p.getEffects().iterator().forEachRemaining(effects -> {
+                pLivingEntity.addEffect(effects);
+            });
+            // Secondary
+            p2.getEffects().iterator().forEachRemaining(effects -> {
                 pLivingEntity.addEffect(effects);
             });
         }
@@ -57,6 +63,16 @@ public class JellyDonutItem extends Item {
         }
 
         stack.getOrCreateTag().putString(NBT_EFFECTS, potionNameSpace);
+    }
+
+    public static void addSecondaryEffects(ItemStack stack, Potion potion) {
+        String potionNameSpace = "";
+
+        if (ForgeRegistries.POTIONS.containsValue(potion)) {
+            potionNameSpace = ForgeRegistries.POTIONS.getKey(potion).getPath();
+        }
+
+        stack.getOrCreateTag().putString(SECONDARY_NBT_EFFECTS, potionNameSpace);
     }
 
     public static void addEffects(ItemStack stack, List<Potion> potionsIn) {

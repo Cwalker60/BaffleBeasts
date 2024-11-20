@@ -55,11 +55,6 @@ public class FlightEntityMovementSyncC2S {
                 // Send the packet to nearby clients
                 PacketDistributor.TargetPoint  areaForSync = new PacketDistributor.TargetPoint(context.getSender(), rideableFlightEntity.getX(),
                         rideableFlightEntity.getY(), rideableFlightEntity.getZ(), 50,serverLevel.dimension());
-                //BaffleBeasts.MAIN_LOGGER.debug("Sending targetpoint of sync packed too " + areaForSync.toString());
-                BaffleBeasts.MAIN_LOGGER.debug("dozedrake id passed from packet is  " + this.mobId);
-                BaffleBeasts.MAIN_LOGGER.debug("dozedrake id found on server is " + rideableFlightEntity.getId());
-                BaffleBeasts.MAIN_LOGGER.debug("dozedrake id found on server is " + rideableFlightEntity.getId());
-                //ModPackets.sendToAllPlayers(new FlightEntityMovementSyncS2C(this.movement,this.mobId, this.isElytraGliding));
                 ModPackets.sendToNearbyPlayersByEntity(new FlightEntityMovementSyncS2C(this.movement,this.mobId, this.isElytraGliding), areaForSync);
             }
 

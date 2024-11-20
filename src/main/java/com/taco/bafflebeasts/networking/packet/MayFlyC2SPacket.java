@@ -41,7 +41,6 @@ public class MayFlyC2SPacket {
                 if (player.getVehicle() != null) {
                     if (player.getVehicle() instanceof RideableFlightEntity a) {
                         a.setNoGravity(canFly);
-                        LOGGER.debug("amaro gravity is : " + a.isNoGravity());
                     }
                 }
             } else {

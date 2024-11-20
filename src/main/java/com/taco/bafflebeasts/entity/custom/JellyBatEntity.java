@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -81,8 +82,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     protected static final RawAnimation JELLYBAT_NUETRAL = RawAnimation.begin().thenLoop("animation.jellybat.neutral");
     protected static final RawAnimation JELLYBAT_FLY = RawAnimation.begin().thenLoop("animation.jellybat.fly");
     protected static final RawAnimation JELLYBAT_BLINK = RawAnimation.begin().thenLoop("animation.jellybat.blink");
-    protected static final RawAnimation JELLYBAT_GOTO_SLEEP = RawAnimation.begin().thenLoop("animation.jellybat.ground_gotosleep");
-    protected static final RawAnimation JELLYBAT_GROUND_SLEEP = RawAnimation.begin().thenLoop("animation.jellybat.ground_sleep");
+    protected static final RawAnimation JELLYBAT_GROUND_SLEEP = RawAnimation.begin().thenPlay("animation.jellybat.ground_gotosleep").thenLoop("animation.jellybat.ground_sleep");
     protected static final RawAnimation JELLYBAT_GROUND_IDLE1 = RawAnimation.begin().thenPlay("animation.jellybat.ground_idle1");
     protected static final RawAnimation JELLYBAT_GROUND_IDLE2 = RawAnimation.begin().thenPlay("animation.jellybat.ground_idle2");
     protected static final RawAnimation JELLYBAT_UPSIDEDOWN = RawAnimation.begin().thenPlay("animation.jellybat.upsidedown");
@@ -92,6 +92,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DONUT_EFFECT_COLOR = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<String> DONUT_EFFECT = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<String> SECONDARY_DONUT_EFFECT = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> SUPER_SIZE = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
 
     private PathNavigation groundNavigation;
@@ -106,6 +107,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
 
     public boolean roamDelay;
     public boolean upsideDownDelay;
+    public boolean shouldTickRefresh = true;
 
     public JellyBatEntity(EntityType<? extends RideableFlightEntity> entityType, Level level) {
         super(entityType, level, 4,100);
@@ -128,6 +130,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.entityData.define(HAS_JELLY_FUR, true);
         this.entityData.define(DONUT_EFFECT_COLOR, 0);
         this.entityData.define(DONUT_EFFECT, "");
+        this.entityData.define(SECONDARY_DONUT_EFFECT, "");
         this.entityData.define(SUPER_SIZE, false);
         this.entityData.define(HAS_SADDLE, false);
     }
@@ -139,6 +142,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         tag.putBoolean("JellyBatHasFur", this.hasFur());
         tag.putInt("JellyBatDonutColor", this.getDonutColor());
         tag.putString("DonutEffect", this.getDonutEffect());
+        tag.putString("DonutEffect2", this.get2ndDonutEffect());
         tag.putBoolean("SuperSize", this.getSuperSize());
         tag.putBoolean("HasSaddle", this.isSaddled());
     }
@@ -151,6 +155,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.setFur(tag.getBoolean("JellyBatHasFur"));
         this.setDonutColor(tag.getInt("JellyBatDonutColor"));
         this.setDonutEffect(tag.getString("DonutEffect"));
+        this.set2ndDonutEffect(tag.getString("DonutEffect2"));
         this.setSuperSize(tag.getBoolean("SuperSize"));
         this.setSaddle(tag.getBoolean("HasSaddle"));
     }
@@ -179,8 +184,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.goalSelector.addGoal(3, new PanicGoal(this, 1.1));
         this.goalSelector.addGoal(4, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(5, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
-        this.goalSelector.addGoal(6, new FlyEntityFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
-        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 12F));
+        this.goalSelector.addGoal(6, new JellyBatFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
+        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 6F));
         this.goalSelector.addGoal(8, new IdleAnimationGoal(this, 2));
         this.goalSelector.addGoal(9, new JellyBatRoamGoal(this, 1.0d));
         this.goalSelector.addGoal(10, new JellyBatUpsideDownGoal(this));
@@ -226,6 +231,15 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.entityData.set(DONUT_EFFECT_COLOR, color);
     }
 
+    public String get2ndDonutEffect() {
+        return this.entityData.get(SECONDARY_DONUT_EFFECT);
+    }
+
+    public void set2ndDonutEffect(String p) {
+        this.entityData.set(SECONDARY_DONUT_EFFECT, p);
+    }
+
+
     public boolean hasFur() {
         return this.entityData.get(HAS_JELLY_FUR);
     }
@@ -239,9 +253,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     }
 
     public void setSuperSize(boolean b) {
-        BaffleBeasts.MAIN_LOGGER.debug("Setting supersize to : " + b);
-        BaffleBeasts.MAIN_LOGGER.debug("Current Pose : " + this.getPose());
-        BaffleBeasts.MAIN_LOGGER.debug("Current bounding box size : " + this.getBoundingBox().getSize());
 
         this.entityData.set(SUPER_SIZE, b);
         if (b == true) {
@@ -249,9 +260,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             this.setBoundingBox(this.getBoundingBox().inflate(2.0,2.0,2.0));
             this.refreshDimensions();
         }
-        BaffleBeasts.MAIN_LOGGER.debug("After Resize");
-        BaffleBeasts.MAIN_LOGGER.debug("Current Pose : " + this.getPose());
-        BaffleBeasts.MAIN_LOGGER.debug("Current bounding box size : " + this.getBoundingBox().getSize());
     }
 
     public boolean isUpsideDown() {
@@ -299,11 +307,14 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             for (int i = 0; i < amount; i++) {
                 ItemStack droppedItems = new ItemStack(ModItems.JELLYBAT_DONUT.get());
                 Potion p = ForgeRegistries.POTIONS.getValue(new ResourceLocation(this.getDonutEffect()));
+                Potion p2 = ForgeRegistries.POTIONS.getValue(new ResourceLocation(this.get2ndDonutEffect()));
 
                 JellyDonutItem.addEffects(droppedItems, p);
+                JellyDonutItem.addSecondaryEffects(droppedItems,p2);
                 JellyDonutItem.setDonutColor(droppedItems, this.getDonutColor());
 
-                BaffleBeasts.MAIN_LOGGER.debug(droppedItems.getTag().getString("Potion"));
+//                BaffleBeasts.MAIN_LOGGER.debug(droppedItems.getTag().getString("Potion"));
+//                BaffleBeasts.MAIN_LOGGER.debug(droppedItems.getTag().getString("SecondaryPotion"));
 
                 donuts.add(droppedItems);
             }
@@ -316,6 +327,19 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     @Override
     public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
         JellyBatEntity baby = ModEntityTypes.JellyBat.get().create(pLevel);
+        JellyBatEntity parent = (JellyBatEntity)pOtherParent;
+        baby.setDonutEffect(this.getDonutEffect());
+        baby.set2ndDonutEffect(parent.getDonutEffect());
+        baby.setTame(true);
+
+        if (baby.get2ndDonutEffect().isEmpty()) {
+            baby.setDonutColor(this.getDonutColor());
+        } else {
+            int blendedColor = this.getDonutColor() + parent.getDonutColor();
+            blendedColor /= 2;
+            baby.setDonutColor(blendedColor);
+
+        }
         return baby;
     }
 
@@ -352,6 +376,10 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             if (!event.isMoving() && this.isUpsideDown()) {
                 event.getController().setAnimation(JELLYBAT_UPSIDEDOWN);
                 return PlayState.CONTINUE;
+            } else if (!event.isMoving() && this.isInSittingPose() && this.isAsleep()) {
+                event.getController().stop();
+                event.getController().setAnimation(JELLYBAT_GROUND_SLEEP);
+                return PlayState.CONTINUE;
             } else {
                 event.getController().setAnimation(JELLYBAT_NUETRAL);
                 return PlayState.CONTINUE;
@@ -360,9 +388,12 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     }
 
     private <E extends GeoAnimatable>PlayState blinkPredicate(AnimationState<E> event) {
-        event.getController().setAnimation(JELLYBAT_BLINK);
+        if (!this.isAsleep()) {
+            event.getController().setAnimation(JELLYBAT_BLINK);
+            return PlayState.CONTINUE;
+        }
 
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     private <E extends GeoAnimatable>PlayState idlePredicate(AnimationState<E> event) {
@@ -399,7 +430,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     public static AttributeSupplier setAttributes() {
 
         return Animal.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 8)
+                .add(Attributes.MAX_HEALTH, 14)
                 .add(Attributes.ATTACK_DAMAGE, 1.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.2f)
@@ -419,17 +450,25 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     }
 
     @Override
+    public void setIdlePose(int pose) {
+        super.setIdlePose(pose);
+        if (pose == 1) {
+            this.setSleep(true);
+        } else {
+           this.setSleep(false);
+        }
+    }
+
+    @Override
     public void tick() {
         super.tick();
-        this.refreshDimensions();
+        if (shouldTickRefresh == true) {
+            this.refreshDimensions();
+            shouldTickRefresh = false;
+        }
         // Idle timer
         if (getIdleTimer() > 0) {
             setIdleTimer(getIdleTimer() - 1);
-        }
-        if (this.level().isClientSide() && this.hasControllingPassenger()) {
-            BaffleBeasts.MAIN_LOGGER.debug("jellybat has no gravity is on client : " + this.isNoGravity());
-        } else if (!this.level().isClientSide() && this.hasControllingPassenger()){
-            BaffleBeasts.MAIN_LOGGER.debug("jellybat has no gravity is on server : " + this.isNoGravity());
         }
 
         if (!this.hasFur()) {
@@ -440,14 +479,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             }
         }
 
-        if (this.getGoToSleepState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setSleep(true);
-                this.setGoToSleepState(false);
-                this.animationbuffer = 5;
-            }
-        }
         if (this.getEntityWakeUpState()) {
             this.animationbuffer -= 1;
             if (this.animationbuffer < 0) {
@@ -458,7 +489,13 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
         if (this.isUpsideDown()) {
             this.setDeltaMovement(Vec3.ZERO);
+        }
 
+        if (this.goalSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof TemptGoal) )) {
+            if (this.isUpsideDown()) {
+                this.setUpsideDown(false);
+                this.ticksUpsideDownCooldown = MAX_TICKS_UPSIDEDOWN_COOLDOWN;
+            }
         }
     }
 
@@ -549,6 +586,12 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         InteractionResult emptyhand = super.mobInteract(pPlayer, pHand);
         if (pPlayer.isShiftKeyDown() && !emptyhand.consumesAction()) {
             this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
+            if (this.isOrderedToSit()) {
+                pPlayer.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting!"), true);
+            } else {
+                pPlayer.displayClientMessage(Component.literal(this.getName().getString() + " is now following!"), true);
+            }
+
             this.navigation.stop();
             this.flying = false;
             return InteractionResult.sidedSuccess(level().isClientSide());
@@ -648,6 +691,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             this.ticksRoamCooldown = 0;
             this.roamDelay = false;
             this.upsideDownDelay = true;
+            this.setOrderedToSit(false);
         }
 
         // When the bat is finished being upside down, tick the time before it can be upside down again.
@@ -663,12 +707,12 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         if (!isUpsideDown() && upsideDownBlock != null) {
             //BaffleBeasts.MAIN_LOGGER.debug("Upside downblock is : " + upsideDownBlock.getX() + "," +  upsideDownBlock.getY() + "," + upsideDownBlock.getZ());
             //BaffleBeasts.MAIN_LOGGER.debug("Current Block Position is : " + this.blockPosition().getX() + "," + this.blockPosition().getY() + "," + this.blockPosition().getZ());
-            if (this.blockPosition().above(1).equals(upsideDownBlock) || this.blockPosition().above(2).equals(upsideDownBlock)) {
-                BaffleBeasts.MAIN_LOGGER.debug("Upside down block found!");
+            if (this.blockPosition().above((int)this.getBbHeight() + 0).equals(upsideDownBlock)  || this.blockPosition().above((int)this.getBbHeight() + 2).equals(upsideDownBlock)) {
                 this.setUpsideDown(true);
-                this.setPos(upsideDownBlock.getX() + 0.5, upsideDownBlock.getY() - 1.2, upsideDownBlock.getZ() + 0.5);
-                BaffleBeasts.MAIN_LOGGER.debug("JellyBat pos after moving : " + this.getX() + "," + this.getY() + "," + this.getZ());
                 this.setDeltaMovement(Vec3.ZERO);
+                this.setOrderedToSit(true);
+                this.navigation.stop();
+                this.setPos(upsideDownBlock.getX() + 0.5, upsideDownBlock.getY() - this.getBbHeight(), upsideDownBlock.getZ() + 0.5);
                 upsideDownBlock = null;
             }
 

@@ -9,6 +9,21 @@
   "item.bafflebeasts.jellybat_donut": "Jelly Donut",
   "item.bafflebeasts.super_shake": "Super Shake",
 
+  "sound.bafflebeasts.amaro_idle": "Amaro coo",
+  "sound.bafflebeasts.amaro_hurt": "Amaro hurt coo",
+  "sound.bafflebeasts.amaro_death": "Amaro death coo",
+  "sound.bafflebeasts.jellybat_idle": "Jelly Bat chitter",
+  "sound.bafflebeasts.jellybat_hurt1": "Jelly Bat hurt",
+  "sound.bafflebeasts.jellybat_death1": "Jelly Bat death chatter",
+  "sound.bafflebeasts.jellybat_growth_effect": "Jelly Bat battle cry",
+  "sound.bafflebeasts.dozedrake_idle": "Doze Drake low growl",
+  "sound.bafflebeasts.dozedrake_hurt1": "Doze Drake hurt snarl",
+  "sound.bafflebeasts.dozedrake_death": "Doze Drake death growl",
+  "sound.bafflebeasts.dozedrake_snooze": "Doze Drake light snore",
+  "sound.bafflebeasts.dozedrake_honk_mimimi": "Doze Drake mimimi",
+  "sound.bafflebeasts.dozedrake_bubble_shoot": "Doze Drake bubble attack splash",
+  "sound.bafflebeasts.dozedrake_bubble_explode": "Bubble pop explosion",
+
   "key.category.bafflebeasts.keybinds": "Cozy Companions",
   "key.bafflebeasts.descend": "Descend",
   "key.bafflebeasts.glide": "Glide"

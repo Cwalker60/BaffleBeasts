@@ -9,6 +9,7 @@ import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -394,6 +395,11 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
                 InteractionResult emptyhand = super.mobInteract(player, hand);
                 if (player.isShiftKeyDown() && !emptyhand.consumesAction()) {
                     this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
+                    if (this.isOrderedToSit()) {
+                        player.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting!"), true);
+                    } else {
+                        player.displayClientMessage(Component.literal(this.getName().getString() + " is now following!"), true);
+                    }
                     this.navigation.stop();
                     this.flying = false;
                     return InteractionResult.sidedSuccess(level().isClientSide());
@@ -419,7 +425,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     //Mob Attributes
     public static AttributeSupplier setAttributes() {
         return Animal.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 10)
+                .add(Attributes.MAX_HEALTH, 18)
                 .add(Attributes.ATTACK_DAMAGE, 3.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
