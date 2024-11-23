@@ -101,6 +101,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 .add(Attributes.ATTACK_DAMAGE, 5.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.2f)
+                .add(Attributes.ARMOR, 4.0d)
                 .add(Attributes.FOLLOW_RANGE, 48.0f).build();
     }
 
@@ -402,13 +403,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     @Override
     public InteractionResult mobInteract(Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-
-        // DEBUG LINE
-        if (itemStack.is(Items.MELON_SLICE)) {
-            this.setIdlePose(2);
-            this.setSleep(true);
-            return InteractionResult.sidedSuccess(level().isClientSide());
-        }
 
         if (this.isTame()) {
             //  Attempt to Saddle the Dragon

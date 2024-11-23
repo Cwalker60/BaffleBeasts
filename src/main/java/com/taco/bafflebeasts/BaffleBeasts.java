@@ -74,7 +74,6 @@ public class BaffleBeasts
     private void commonSetup(final FMLCommonSetupEvent event)
     {
         // Some common setup code
-        MAIN_LOGGER.info("HELLO FROM COMMON SETUP");
         event.enqueueWork(() -> {
             ModPackets.register();
             BrewingRecipeRegistry.addRecipe(new ModPotionRecipes(Potions.STRONG_HEALING, Items.GOLDEN_CARROT,
@@ -87,7 +86,6 @@ public class BaffleBeasts
     public void onServerStarting(ServerStartingEvent event)
     {
         // Do something when the server starts
-        MAIN_LOGGER.info("HELLO from server starting");
     }
 
     // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
@@ -98,8 +96,7 @@ public class BaffleBeasts
         public static void onClientSetup(FMLClientSetupEvent event)
         {
             // Some client setup code
-            MAIN_LOGGER.info("HELLO FROM CLIENT SETUP");
-            MAIN_LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+            MAIN_LOGGER.info("BaffleBeasts mobs on your client will now be visible even in 144p!");
 
             EntityRenderers.register(ModEntityTypes.Amaro.get(), AmaroRenderer::new);
             EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);

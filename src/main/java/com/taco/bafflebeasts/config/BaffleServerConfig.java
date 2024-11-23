@@ -38,7 +38,7 @@ public class BaffleServerConfig {
                 .define("Amaro_Spawn_Amount", 2);
 
         AMARO_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how often Amaros can spawn.")
-                .define("Amaro_Spawn_Weight", 25);
+                .define("Amaro_Spawn_Weight", 15);
 
         builder.push("Spawn Biomes");
         AMARO_SPAWN_BIOMES = BUILDER.comment("These values are the biomes that the Amaro will spawn in. They are seperated by ,'s." +
@@ -71,10 +71,10 @@ public class BaffleServerConfig {
                 .define("Dozedrake_Spawn_Amount", 1);
 
         DOZEDRAKE_AMOUNT_MAX = BUILDER.comment("This value is the MAX number of Doze Drakes that spawn when they are chosen to spawn by the weight.")
-                .define("Dozedrake_Spawn_Amount", 2);
+                .define("Dozedrake_Spawn_Amount", 1);
 
         DOZEDRAKE_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how often Doze Drakes can spawn.")
-                .define("Dozedrake_Spawn_Amount", 15);
+                .define("Dozedrake_Spawn_Amount", 5);
         builder.push("Spawn Biomes");
         DOZEDRAKE_SPAWN_BIOMES = BUILDER.defineListAllowEmpty("Dozedrake_Spawn_Biomes", createDefaultSpawnBiomes("DOZEDRAKE"), entry -> true);
 

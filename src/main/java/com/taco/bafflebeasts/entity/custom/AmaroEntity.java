@@ -56,7 +56,6 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(AmaroEntity.class, EntityDataSerializers.BOOLEAN);
 
     private static final Ingredient FOOD_ITEMS = Ingredient.of(Items.MELON_SLICE, Items.GLISTERING_MELON_SLICE);
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     protected static final RawAnimation AMARO_SPRINT = RawAnimation.begin().thenLoop("animation.amaro.sprint");
     protected static final RawAnimation AMARO_FLY = RawAnimation.begin().thenLoop("animation.amaro.fly");
@@ -428,6 +427,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
                 .add(Attributes.MAX_HEALTH, 18)
                 .add(Attributes.ATTACK_DAMAGE, 3.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
+                .add(Attributes.ARMOR, 2.0d)
                 .add(Attributes.MOVEMENT_SPEED, 0.2f).build();
     }
 
