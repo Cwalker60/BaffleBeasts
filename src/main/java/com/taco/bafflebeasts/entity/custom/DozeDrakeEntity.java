@@ -181,7 +181,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     private <E extends GeoAnimatable> PlayState movementPredicate(AnimationState<E> event) {
 
         // If the amaro is moving
-        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger() && !this.isAsleep() && !this.isOrderedToSit()) {
+        if (event.isMoving() && this.onGround() && !this.hasControllingPassenger() && !this.isAsleep() && !this.isInSittingPose()) {
             event.getController().setAnimation(DOZEDRAKE_WALK);
             return PlayState.CONTINUE;
         // If the Amaro is moving with a rider
