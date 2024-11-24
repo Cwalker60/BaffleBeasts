@@ -68,10 +68,13 @@ public class ModEvents {
 
         @SubscribeEvent
         public static void entitySpawnRestriction(SpawnPlacementRegisterEvent event) {
-            event.register(ModEntityTypes.Amaro.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+            event.register(ModEntityTypes.Amaro.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
                     Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
             event.register(ModEntityTypes.JellyBat.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                     JellyBatEntity::jellyBatSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+            event.register(ModEntityTypes.DozeDrake.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
+                    JellyBatEntity::jellyBatSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+
         }
 
 

@@ -31,10 +31,10 @@ public class BaffleServerConfig {
         builder.push("Amaro");
 
         AMARO_SPAWN_AMOUNT_MIN = BUILDER.comment("This value is the MIN number of Amaros that spawn when they are chosen to spawn by the weight.")
-                .define("Amaro_Spawn_Amount", 1);
+                .define("Amaro_Min_Spawn_Amount", 1);
 
         AMARO_SPAWN_AMOUNT_MAX = BUILDER.comment("This value is the MAX number of Amaros that spawn when they are chosen to spawn by the weight.")
-                .define("Amaro_Spawn_Amount", 2);
+                .define("Amaro_Max_Spawn_Amount", 2);
 
         AMARO_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how often Amaros can spawn.")
                 .define("Amaro_Spawn_Weight", 15);
@@ -51,13 +51,13 @@ public class BaffleServerConfig {
         builder.push("Jelly Bat");
 
         JELLYBAT_SPAWN_AMOUNT_MIN = BUILDER.comment("This value is the MIN number of Jelly Bats that spawn when they are chosen to spawn by the weight.")
-                .define("JellyBat_Spawn_Amount", 2);
+                .define("JellyBat_Min_Spawn_Amount", 2);
 
         JELLYBAT_SPAWN_AMOUNT_MAX = BUILDER.comment("This value is the MAX number of Jelly Bats that spawn when they are chosen to spawn by the weight.")
-                .define("JellyBat_Spawn_Amount", 4);
+                .define("JellyBat_Max_Spawn_Amount", 4);
 
         JELLYBAT_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how often Jelly Bats can spawn.")
-                .define("JellyBat_Spawn_Weight", 30);
+                .define("JellyBat_Spawn_Weight", 20);
 
         builder.push("Spawn Biomes");
         JELLYBAT_SPAWN_BIOMES = BUILDER.defineListAllowEmpty("JellyBat_Spawn_Biomes",  createDefaultSpawnBiomes("JELLYBAT"), entry -> true);
@@ -67,17 +67,18 @@ public class BaffleServerConfig {
         builder.push("Doze Drake");
 
         DOZEDRAKE_AMOUNT_MIN = BUILDER.comment("This value is the MIN number of Doze Drakes that spawn when they are chosen to spawn by the weight.")
-                .define("Dozedrake_Spawn_Amount", 1);
+                .define("Dozedrake_Min_Spawn_Amount", 1);
 
         DOZEDRAKE_AMOUNT_MAX = BUILDER.comment("This value is the MAX number of Doze Drakes that spawn when they are chosen to spawn by the weight.")
-                .define("Dozedrake_Spawn_Amount", 1);
+                .define("Dozedrake_Max_Spawn_Amount", 1);
 
         DOZEDRAKE_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how often Doze Drakes can spawn.")
-                .define("Dozedrake_Spawn_Amount", 5);
+                .define("Dozedrake_Spawn_Weight", 2);
+
         builder.push("Spawn Biomes");
         DOZEDRAKE_SPAWN_BIOMES = BUILDER.defineListAllowEmpty("Dozedrake_Spawn_Biomes", createDefaultSpawnBiomes("DOZEDRAKE"), entry -> true);
-
-
+        builder.pop();
+        builder.pop();
 
 
         BAFFLE_COMPANIONS_CONFIG = builder.build();
@@ -90,7 +91,7 @@ public class BaffleServerConfig {
                 defaultList.add("minecraft:taiga"); defaultList.add("minecraft:windswept_hills"); defaultList.add("#is_taiga");
                 break;
             case "JELLYBAT" :
-                defaultList.add("minecraft:lush_caves"); defaultList.add("minecraft:plains");
+                defaultList.add("minecraft:lush_caves"); defaultList.add("minecraft:sparse_jungle"); defaultList.add("minecraft:jungle");
                 break;
             case "DOZEDRAKE" :
                 defaultList.add("minecraft:birch_forest"); defaultList.add("minecraft:flower_forest"); defaultList.add("minecraft:old_growth_birch_forest");
