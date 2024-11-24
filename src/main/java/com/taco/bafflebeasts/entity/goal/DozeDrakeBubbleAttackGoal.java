@@ -1,15 +1,12 @@
 package com.taco.bafflebeasts.entity.goal;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.custom.BubbleProjectile;
 import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.sound.CustomSoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.player.Player;
 
 public class DozeDrakeBubbleAttackGoal extends Goal {
     private final DozeDrakeEntity dozedrake;
@@ -30,7 +27,6 @@ public class DozeDrakeBubbleAttackGoal extends Goal {
     public void start() {
         this.dozedrake.triggerAnim("attack", "bubble_blast");
 
-        BaffleBeasts.MAIN_LOGGER.debug("Starting bubble attack!");
         chargeTime = 0;
     }
 

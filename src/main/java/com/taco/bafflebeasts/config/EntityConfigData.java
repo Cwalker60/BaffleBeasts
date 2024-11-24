@@ -3,7 +3,6 @@ package com.taco.bafflebeasts.config;
 import net.minecraft.world.entity.EntityType;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class EntityConfigData {
 

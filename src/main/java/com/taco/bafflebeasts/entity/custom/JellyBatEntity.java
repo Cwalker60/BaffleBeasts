@@ -1,6 +1,5 @@
 package com.taco.bafflebeasts.entity.custom;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.item.JellyDonutItem;
@@ -571,7 +570,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
         // Ride Check
-        if (isSaddled() && this.isTame() && !pPlayer.isShiftKeyDown() && !itemStack.is(Items.SHEARS)) {
+        if (isSaddled() && this.isTame() && !pPlayer.isShiftKeyDown() && !itemStack.is(Items.SHEARS) && !this.isHealItem(itemStack.getItem())) {
             if (!level().isClientSide) {
                 setRidingPlayer(pPlayer);
                 this.setOrderedToSit(false);
@@ -598,7 +597,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
         // Heal check
-        if (isHealItem(itemStack.getItem()) &&!pPlayer.isShiftKeyDown()) {
+        if (isHealItem(itemStack.getItem()) && !pPlayer.isShiftKeyDown()) {
             itemStack.shrink(1);
             this.heal(4.0f);
             this.spawnTamingParticles(true);

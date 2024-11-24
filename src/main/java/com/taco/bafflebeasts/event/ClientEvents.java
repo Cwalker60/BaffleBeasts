@@ -1,6 +1,5 @@
 package com.taco.bafflebeasts.event;
 
-import com.mojang.logging.LogUtils;
 import com.mojang.math.Axis;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.client.BubblePowerHud;
@@ -27,10 +26,8 @@ import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.slf4j.Logger;
 
 public class ClientEvents {
-    private static final Logger LOGGER = LogUtils.getLogger();
     @Mod.EventBusSubscriber(modid = BaffleBeasts.MODID, value = Dist.CLIENT)
     public static class ClientForgeEvents {
 

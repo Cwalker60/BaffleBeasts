@@ -13,7 +13,6 @@ import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.recipes.ModPotionRecipes;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.world.BiomeModifierRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potions;
@@ -76,8 +75,6 @@ public class BaffleBeasts
         // Some common setup code
         event.enqueueWork(() -> {
             ModPackets.register();
-            BrewingRecipeRegistry.addRecipe(new ModPotionRecipes(Potions.STRONG_HEALING, Items.GOLDEN_CARROT,
-                    ModItems.SUPER_SHAKE.get()));
         });
     }
 

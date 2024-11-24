@@ -1,7 +1,6 @@
 package com.taco.bafflebeasts.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.data.ForgeBiomeTagsProvider;
 
 import java.util.ArrayList;
 import java.util.List;

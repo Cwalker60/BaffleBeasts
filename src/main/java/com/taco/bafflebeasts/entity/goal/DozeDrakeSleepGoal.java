@@ -1,8 +1,6 @@
 package com.taco.bafflebeasts.entity.goal;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
-import com.taco.bafflebeasts.networking.ModPackets;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 public class DozeDrakeSleepGoal extends Goal {
@@ -22,7 +20,6 @@ public class DozeDrakeSleepGoal extends Goal {
 
     @Override
     public void start() {
-        BaffleBeasts.MAIN_LOGGER.debug("Dozedrake is going to sleep!");
         this.entity.setSleep(true);
         this.entity.setIdlePose(0);
         this.entity.setOrderedToSit(true);

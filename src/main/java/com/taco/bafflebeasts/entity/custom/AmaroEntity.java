@@ -1,6 +1,5 @@
 package com.taco.bafflebeasts.entity.custom;
 
-import com.mojang.logging.LogUtils;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.goal.FlyEntityFollowOwnerGoal;
 import com.taco.bafflebeasts.entity.goal.FlyEntityLookAtPlayer;
@@ -37,7 +36,6 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 import software.bernie.geckolib.animatable.GeoEntity;
 import software.bernie.geckolib.core.animatable.GeoAnimatable;
 import software.bernie.geckolib.core.animatable.instance.AnimatableInstanceCache;
@@ -67,8 +65,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     protected static final RawAnimation AMARO_IDLE3 = RawAnimation.begin().thenPlay("animation.amaro.idle3");
     protected static final RawAnimation AMARO_IDLE4 = RawAnimation.begin().thenPlay("animation.amaro.idle4");
     protected static final RawAnimation AMARO_IDLE5 = RawAnimation.begin().thenPlay("animation.amaro.idle5");
-    protected static final RawAnimation AMARO_SLEEP = RawAnimation.begin().thenPlay("animation.amaro.sleep");
-    protected static final RawAnimation AMARO_GOTOSLEEP = RawAnimation.begin().thenPlay("animation.amaro.gotosleep");
+    protected static final RawAnimation AMARO_SLEEP = RawAnimation.begin().thenPlay("animation.amaro.gotosleep").thenLoop("animation.amaro.sleep");
     protected static final RawAnimation AMARO_WAKEUP = RawAnimation.begin().thenPlay("animation.amaro.wakeup");
     protected static final RawAnimation AMARO_BLINK = RawAnimation.begin().thenLoop("animation.amaro.blink");
     protected static final RawAnimation AMARO_GLIDE = RawAnimation.begin().thenLoop("animation.amaro.glide");
@@ -196,6 +193,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
                 return PlayState.CONTINUE;
             }
             if (this.isInSittingPose() && this.isAsleep()) {
+                event.getController().stop();
                 event.getController().setAnimation(AMARO_SLEEP);
                 return PlayState.CONTINUE;
             }

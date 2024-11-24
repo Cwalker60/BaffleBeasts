@@ -3,7 +3,6 @@ package com.taco.bafflebeasts.entity.custom;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.client.BubblePowerHud;
-import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
@@ -17,8 +16,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.DamageTypeTags;
-import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -33,6 +30,7 @@ import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.FlyingAnimal;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -413,7 +411,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 return InteractionResult.sidedSuccess(level().isClientSide());
 
            // Ride Check
-            } else if (isSaddled() && !this.isBaby() && !player.isShiftKeyDown()) {
+            } else if (isSaddled() && !this.isBaby() && !player.isShiftKeyDown() && !isHealItem(itemStack.getItem())) {
                 if (!level().isClientSide) {
                     this.setRidingPlayer(player);
                     this.setOrderedToSit(false);
@@ -464,6 +462,14 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                 return InteractionResult.sidedSuccess(level().isClientSide());
             }
 
+        }
+
+        // Heal Check
+        if (this.isHealItem(itemStack.getItem())) {
+            itemStack.shrink(1);
+            this.spawnTamingParticles(true);
+            this.heal(4.0f);
+            return InteractionResult.sidedSuccess(level().isClientSide());
         }
 
         return super.mobInteract(player, hand);
@@ -525,18 +531,18 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
             passenger.setPos(xPass, yPass, zPass);
 
-
-//            if (rider instanceof LivingEntity) {
-//                ((LivingEntity) rider).yBodyRot = this.yBodyRot;
-//            }
             if (passenger instanceof LivingEntity) {
-                passenger.setYBodyRot(this.yBodyRot);;
+                passenger.setYBodyRot(this.yBodyRot);
             }
 
         }
+    }
 
-
-
+    private boolean isHealItem(Item food) {
+        if (food == Items.PORKCHOP || food == Items.CHICKEN || food == Items.MUTTON ) {
+            return true;
+        }
+        return false;
     }
 
     @Override

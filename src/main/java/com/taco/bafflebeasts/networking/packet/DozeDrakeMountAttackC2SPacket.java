@@ -15,7 +15,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class DozeDrakeMountAttackC2SPacket {
@@ -56,23 +55,12 @@ public class DozeDrakeMountAttackC2SPacket {
             clientPlayerLook = clientPlayerLook.normalize();
             clientPlayerLook = clientPlayerLook.multiply(20,20,20);
             // Check if the client player look is looking at a mob to send a homing bubble towards.
-            BaffleBeasts.MAIN_LOGGER.debug("Packet recieved for DozeDrakeMountAttack key");
-            BaffleBeasts.MAIN_LOGGER.debug("lookVector is : (" + clientPlayerLook.x + ", " + clientPlayerLook.y + ", " + clientPlayerLook.z + ")");
 
             // rayCastCheck will create a AABB box from the clientPlayerLook to a certain range of clientPlayerLook, and then check if there's a mob in it.
             AABB rayCastCheck = AABB.ofSize(clientPlayerLook, clientPlayerLook.x, clientPlayerLook.y * 3, clientPlayerLook.z);
             rayCastCheck = rayCastCheck.move(player.getOnPos());
 
-            BaffleBeasts.MAIN_LOGGER.debug("rayCastCheck AABB is : " + rayCastCheck.toString());
-            BaffleBeasts.MAIN_LOGGER.debug("rayCastCheck AABB is : " + rayCastCheck.toString());
-
-
-
             ArrayList<Entity> entities = new ArrayList<>(server.getEntities(player,rayCastCheck));
-            BaffleBeasts.MAIN_LOGGER.debug("Entities found in box are...");
-            for (Entity e : entities) {
-                BaffleBeasts.MAIN_LOGGER.debug(e.getName().getString());
-            }
 
             DozeDrakeEntity shooter = this.getDozeDrake(player);
             // If the entity list is not null, create a homing bubble targeting the first entity in the list.
@@ -90,8 +78,6 @@ public class DozeDrakeMountAttackC2SPacket {
                             double d2 = target.getY(0.5D) - shooter.getY(0.5D);
                             double d3 = target.getZ() - shooter.getZ();
                             double d4 = Math.sqrt(Math.sqrt(d0)) * 0.5D;
-
-                            BaffleBeasts.MAIN_LOGGER.debug("Firing Bubble at target : " + target.getName().getString());
 
                             server.addFreshEntity(new BubbleProjectile(ModEntityTypes.BubbleProjectile.get(), shooter,
                                     (LivingEntity)target,shooter.getRandom().triangle(xdist, d4),d2,
@@ -111,7 +97,7 @@ public class DozeDrakeMountAttackC2SPacket {
                 }
             // If there are no entities found, fire a bubble that will fly slowly with no homing target.
             } else {
-               BaffleBeasts.MAIN_LOGGER.debug("Target not found, firing bubble : ");
+
             }
 
 

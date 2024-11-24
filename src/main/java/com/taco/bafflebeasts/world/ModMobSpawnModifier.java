@@ -1,14 +1,9 @@
 package com.taco.bafflebeasts.world;
 
 import com.mojang.serialization.Codec;
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.config.BaffleConfigValues;
-import com.taco.bafflebeasts.config.BaffleServerConfig;
 import com.taco.bafflebeasts.config.EntityConfigData;
-import com.taco.bafflebeasts.entity.ModEntityTypes;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;

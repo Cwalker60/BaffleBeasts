@@ -2,7 +2,6 @@ package com.taco.bafflebeasts.datagen;
 
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.item.ModItems;
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.generators.ItemModelBuilder;

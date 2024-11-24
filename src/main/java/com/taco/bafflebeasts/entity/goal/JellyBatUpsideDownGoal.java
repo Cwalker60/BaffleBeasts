@@ -1,14 +1,9 @@
 package com.taco.bafflebeasts.entity.goal;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.tags.TagsProvider;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
 
 public class JellyBatUpsideDownGoal extends Goal {
 

@@ -1,18 +1,15 @@
 package com.taco.bafflebeasts.networking.packet;
 
-import com.mojang.logging.LogUtils;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkEvent;
-import org.slf4j.Logger;
 
 import java.util.function.Supplier;
 
 public class MayFlyC2SPacket {
     private boolean canFly;
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     public MayFlyC2SPacket() {
 

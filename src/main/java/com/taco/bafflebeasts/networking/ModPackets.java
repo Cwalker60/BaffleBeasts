@@ -1,11 +1,8 @@
 package com.taco.bafflebeasts.networking;
 
 import com.taco.bafflebeasts.BaffleBeasts;
-import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import com.taco.bafflebeasts.networking.packet.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;

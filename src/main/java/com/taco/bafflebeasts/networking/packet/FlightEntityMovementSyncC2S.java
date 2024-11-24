@@ -1,7 +1,5 @@
 package com.taco.bafflebeasts.networking.packet;
 
-import com.taco.bafflebeasts.BaffleBeasts;
-import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
 import com.taco.bafflebeasts.networking.ModPackets;
 import net.minecraft.network.FriendlyByteBuf;
