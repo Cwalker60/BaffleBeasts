@@ -43,6 +43,13 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     public boolean isMoving;
     public boolean hasMoved;
 
+    /**
+     * RideableFlightEntities will have the ability to fly with the FlightPower capability.
+     * @param pEntityType Entity type of mob
+     * @param pLevel Level to create the mob in.
+     * @param flightP The amount of jumps (feathers on hud) that the mob can use to fly with.
+     * @param flightRecharge The amount of ticks required to restore a jump.
+     */
     public RideableFlightEntity(EntityType<? extends TamableAnimal> pEntityType, Level pLevel, int flightP, int flightRecharge) {
         super(pEntityType, pLevel);
         this.flightPower = flightP;
@@ -132,7 +139,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
             AttributeInstance gravity = this.getAttribute(net.minecraftforge.common.ForgeMod.ENTITY_GRAVITY.get());
             double gravityValue = gravity.getValue();
 
-            // If there's no gravity, add the gravity back.
+            // If there's no gravity, add the gravity back. This is used to workaround the "Kicked for flying a vehicle" check
             if (this.isNoGravity() && !this.isElytraFlying()) {
                 this.setDeltaMovement(this.getDeltaMovement().add(0.0D, -gravityValue, 0.0D));
             }
@@ -247,6 +254,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
                 this.flightGUIFlicker = true;
             }
 
+            // Used to tell the client to animate the "glow" effect for the feathers in the hud.
             if (this.flightGUIFlicker == true) {
                 FlightPowerHud.updateFlightPowerGUI();
                 if (FlightPowerHud.getFlightAnimationDrawstate() > 16) {

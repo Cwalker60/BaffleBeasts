@@ -461,6 +461,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     @Override
     public void tick() {
         super.tick();
+        // Do one tick to refresh dimensions when the JellyBat spawns on the world.
         if (shouldTickRefresh == true) {
             this.refreshDimensions();
             shouldTickRefresh = false;
@@ -470,6 +471,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             setIdleTimer(getIdleTimer() - 1);
         }
 
+        // Regrow fur when sheared.
         if (!this.hasFur()) {
             this.furRegrowthCooldown++;
             if (this.furRegrowthCooldown > FUR_REGROWTH) {
@@ -489,7 +491,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         if (this.isUpsideDown()) {
             this.setDeltaMovement(Vec3.ZERO);
         }
-
+        // If a player is trying to tempt a jellybat, set upsideDown to false and reset the cooldown.
         if (this.goalSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof TemptGoal) )) {
             if (this.isUpsideDown()) {
                 this.setUpsideDown(false);

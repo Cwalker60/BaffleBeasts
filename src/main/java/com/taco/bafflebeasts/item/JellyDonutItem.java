@@ -13,6 +13,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import java.util.List;
 
 public class JellyDonutItem extends Item {
+
     private static final String NBT_EFFECTS = "Potion";
     private static final String DONUT_COLOR = "DonutColor";
     private static final String SECONDARY_NBT_EFFECTS = "SecondaryPotion";
@@ -27,6 +28,8 @@ public class JellyDonutItem extends Item {
         color = c;
     }
 
+    // Called when using the item. Creates potions based off of the NBT_EFFECTS string and SECONDARY_NBT_EFFECTS and applies
+    // them to the player when called
     @Override
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
         // Add the potion effects storeed from the NBT data of the item.
@@ -55,6 +58,11 @@ public class JellyDonutItem extends Item {
         stack.getOrCreateTag().putInt(DONUT_COLOR, c);
     }
 
+    /**
+     * Used to set the potion effect the item will give on creation.
+     * @param stack ItemStack of the item being created.
+     * @param potion Potion Effect to store in JellyDonutItem's NBT_EFFECTS field.
+     */
     public static void addEffects(ItemStack stack, Potion potion) {
         String potionNameSpace = "";
 
@@ -65,6 +73,11 @@ public class JellyDonutItem extends Item {
         stack.getOrCreateTag().putString(NBT_EFFECTS, potionNameSpace);
     }
 
+    /**
+     * Used to set the secondary potion effect the item will give on creation.
+     * @param stack ItemStack of the item being created.
+     * @param potion Potion Effect to store in JellyDonutItem's SECONDARY_NBT_EFFECTS field.
+     */
     public static void addSecondaryEffects(ItemStack stack, Potion potion) {
         String potionNameSpace = "";
 

@@ -47,6 +47,8 @@ public class ModEvents {
     @Mod.EventBusSubscriber(modid = BaffleBeasts.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.DEDICATED_SERVER)
     public class ForgeBus {
         @SubscribeEvent
+        // When mounting a RideableFlightEntity, call setNoGravity(true) to get around the floating vehicle kick check from
+        // ServerGamePacketLIstenerImpl.
         public static void entityMountEvent(EntityMountEvent event) {
             if (event.getEntityBeingMounted() != null && event.getEntityMounting() != null) {
                 Entity rider = event.getEntityMounting();
@@ -66,6 +68,7 @@ public class ModEvents {
 
         }
 
+
         @SubscribeEvent
         public static void entitySpawnRestriction(SpawnPlacementRegisterEvent event) {
             event.register(ModEntityTypes.Amaro.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
@@ -79,6 +82,5 @@ public class ModEvents {
 
 
     }
-
 
 }

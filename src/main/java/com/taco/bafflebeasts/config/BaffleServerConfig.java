@@ -83,7 +83,7 @@ public class BaffleServerConfig {
 
         BAFFLE_COMPANIONS_CONFIG = builder.build();
     }
-
+    // Helper method to create a default list of biomes in the config when createConfig() is called. Uses a mob ID for specific mob.
     public static ArrayList<String> createDefaultSpawnBiomes(String mob) {
         ArrayList<String> defaultList = new ArrayList<>();
         switch (mob) {
