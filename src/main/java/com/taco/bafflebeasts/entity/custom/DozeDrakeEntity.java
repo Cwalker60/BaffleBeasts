@@ -612,7 +612,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     @Override
     public void startPersistentAngerTimer() {
-        BaffleBeasts.MAIN_LOGGER.debug("dozedrake wants to attack!");
+
     }
 
     public boolean canAttackType(EntityType<?> pType) {
