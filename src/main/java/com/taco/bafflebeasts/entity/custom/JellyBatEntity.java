@@ -585,7 +585,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
 
         // Sit check
         InteractionResult emptyhand = super.mobInteract(pPlayer, pHand);
-        if (pPlayer.isShiftKeyDown() && !emptyhand.consumesAction()) {
+        if (pPlayer.isShiftKeyDown() && !emptyhand.consumesAction() && this.isTame() && this.getSuperSize()) {
             this.setOrderedToSit(!this.isOrderedToSit()); // toggle the opposite of sit
             if (this.isOrderedToSit()) {
                 pPlayer.displayClientMessage(Component.literal(this.getName().getString() + " is now sitting!"), true);
