@@ -3,13 +3,17 @@ package com.taco.bafflebeasts.item;
 import com.taco.bafflebeasts.BaffleBeasts;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class JellyDonutItem extends Item {
@@ -34,18 +38,25 @@ public class JellyDonutItem extends Item {
     public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
         // Add the potion effects storeed from the NBT data of the item.
         if (pStack.getTag() != null) {
-            Potion p = ForgeRegistries.POTIONS.getValue(new ResourceLocation(pStack.getTag().getString(NBT_EFFECTS)));
-            Potion p2 = ForgeRegistries.POTIONS.getValue(new ResourceLocation(pStack.getTag().getString(SECONDARY_NBT_EFFECTS)));
+            Potion p = PotionUtils.getPotion(pStack.getTag());
+            CompoundTag potionTag = new CompoundTag();
+            if (pStack.getOrCreateTag().get(SECONDARY_NBT_EFFECTS) != null) {
+                potionTag.put("Potion", pStack.getOrCreateTag().get(SECONDARY_NBT_EFFECTS));
+            }
+
+            Potion p2 = PotionUtils.getPotion(potionTag);
+
             // For each effects of the potion, apply the the entity using the item.
             // Check if the effect is instantaneous, and then apply it.
+            if (!pLevel.isClientSide()) {
+                // Primary Effect
+                if (!p.getEffects().isEmpty()) {
 
-            p.getEffects().iterator().forEachRemaining(effects -> {
-                pLivingEntity.addEffect(effects);
-            });
-            // Secondary
-            p2.getEffects().iterator().forEachRemaining(effects -> {
-                pLivingEntity.addEffect(effects);
-            });
+                }
+                applyEffects(pLivingEntity, p);
+                applyEffects(pLivingEntity, p2);
+            }
+
         }
         return this.isEdible() ? pLivingEntity.eat(pLevel, pStack) : pStack;
     }
@@ -63,14 +74,13 @@ public class JellyDonutItem extends Item {
      * @param stack ItemStack of the item being created.
      * @param potion Potion Effect to store in JellyDonutItem's NBT_EFFECTS field.
      */
-    public static void addEffects(ItemStack stack, Potion potion) {
+    public static void addEffects(ItemStack stack, CompoundTag potion) {
         String potionNameSpace = "";
 
-        if (ForgeRegistries.POTIONS.containsValue(potion)) {
-            potionNameSpace = ForgeRegistries.POTIONS.getKey(potion).getPath();
+        if (!potion.isEmpty()) {
+            stack.getOrCreateTag().put(NBT_EFFECTS, potion.get("Potion"));
         }
 
-        stack.getOrCreateTag().putString(NBT_EFFECTS, potionNameSpace);
     }
 
     /**
@@ -78,34 +88,22 @@ public class JellyDonutItem extends Item {
      * @param stack ItemStack of the item being created.
      * @param potion Potion Effect to store in JellyDonutItem's SECONDARY_NBT_EFFECTS field.
      */
-    public static void addSecondaryEffects(ItemStack stack, Potion potion) {
+    public static void addSecondaryEffects(ItemStack stack, CompoundTag potion) {
         String potionNameSpace = "";
 
-        if (ForgeRegistries.POTIONS.containsValue(potion)) {
-            potionNameSpace = ForgeRegistries.POTIONS.getKey(potion).getPath();
+
+
+        if (!potion.isEmpty()) {
+            stack.getOrCreateTag().put(SECONDARY_NBT_EFFECTS, potion.get("Potion"));
         }
-
-        stack.getOrCreateTag().putString(SECONDARY_NBT_EFFECTS, potionNameSpace);
     }
 
-    public static void addEffects(ItemStack stack, List<Potion> potionsIn) {
-        potionsIn.iterator().forEachRemaining(potions -> {
-            String potionNameSpace = "";
-            if (ForgeRegistries.POTIONS.containsValue(potions)) {
-                potionNameSpace = ForgeRegistries.POTIONS.getKey(potions).getPath();
-
-                BaffleBeasts.MAIN_LOGGER.debug("Checking Input Potion of : " + potions.getName("") + " to " +
-                        ForgeRegistries.POTIONS.getKey(potions));
-            }
-
-            CompoundTag t = new CompoundTag();
-            t.putString(NBT_EFFECTS, potionNameSpace);
-            stack.setTag(t);
-        });
-
+    private void applyEffects(LivingEntity pLivingEntity, Potion potion) {
+        ArrayList<MobEffectInstance> effects = new ArrayList<MobEffectInstance>(potion.getEffects());
+        for (MobEffectInstance e : effects) {
+            pLivingEntity.addEffect(new MobEffectInstance(e));
+        }
     }
-
-
 
     public static int getColor(ItemStack pStack, int pTintIndex) {
         if (pTintIndex == 0) {

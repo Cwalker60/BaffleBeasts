@@ -1,5 +1,6 @@
 package com.taco.bafflebeasts.entity.custom;
 
+import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.item.JellyDonutItem;
@@ -10,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -90,8 +92,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     private static final EntityDataAccessor<Boolean> HAS_JELLY_FUR = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HAS_SADDLE = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DONUT_EFFECT_COLOR = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<String> DONUT_EFFECT = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.STRING);
-    private static final EntityDataAccessor<String> SECONDARY_DONUT_EFFECT = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.STRING);
+    private static final EntityDataAccessor<CompoundTag> DONUT_EFFECT = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.COMPOUND_TAG);
+    private static final EntityDataAccessor<CompoundTag> SECONDARY_DONUT_EFFECT = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.COMPOUND_TAG);
     private static final EntityDataAccessor<Boolean> SUPER_SIZE = SynchedEntityData.defineId(JellyBatEntity.class, EntityDataSerializers.BOOLEAN);
 
     private PathNavigation groundNavigation;
@@ -128,8 +130,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.entityData.define(HANGING_ON_CEILING, false);
         this.entityData.define(HAS_JELLY_FUR, true);
         this.entityData.define(DONUT_EFFECT_COLOR, 0);
-        this.entityData.define(DONUT_EFFECT, "");
-        this.entityData.define(SECONDARY_DONUT_EFFECT, "");
+        this.entityData.define(DONUT_EFFECT, new CompoundTag());
+        this.entityData.define(SECONDARY_DONUT_EFFECT, new CompoundTag());
         this.entityData.define(SUPER_SIZE, false);
         this.entityData.define(HAS_SADDLE, false);
     }
@@ -140,12 +142,11 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         tag.putBoolean("JellyBatIsUpsideDown", this.isUpsideDown());
         tag.putBoolean("JellyBatHasFur", this.hasFur());
         tag.putInt("JellyBatDonutColor", this.getDonutColor());
-        tag.putString("DonutEffect", this.getDonutEffect());
-        tag.putString("DonutEffect2", this.get2ndDonutEffect());
+        tag.put("DonutEffect", this.getDonutEffect());
+        tag.put("DonutEffect2", this.get2ndDonutEffect());
         tag.putBoolean("SuperSize", this.getSuperSize());
         tag.putBoolean("HasSaddle", this.isSaddled());
     }
-
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
@@ -153,8 +154,8 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.setUpsideDown(tag.getBoolean("JellyBatIsUpsideDown"));
         this.setFur(tag.getBoolean("JellyBatHasFur"));
         this.setDonutColor(tag.getInt("JellyBatDonutColor"));
-        this.setDonutEffect(tag.getString("DonutEffect"));
-        this.set2ndDonutEffect(tag.getString("DonutEffect2"));
+        this.setDonutEffect(tag.getCompound("DonutEffect"));
+        this.set2ndDonutEffect(tag.getCompound("DonutEffect2"));
         this.setSuperSize(tag.getBoolean("SuperSize"));
         this.setSaddle(tag.getBoolean("HasSaddle"));
     }
@@ -214,11 +215,11 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         return false;
 
     }
-    public String getDonutEffect() {
+    public CompoundTag getDonutEffect() {
         return this.entityData.get(DONUT_EFFECT);
     }
 
-    public void setDonutEffect(String p) {
+    public void setDonutEffect(CompoundTag p) {
         this.entityData.set(DONUT_EFFECT, p);
     }
 
@@ -230,11 +231,11 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.entityData.set(DONUT_EFFECT_COLOR, color);
     }
 
-    public String get2ndDonutEffect() {
+    public CompoundTag get2ndDonutEffect() {
         return this.entityData.get(SECONDARY_DONUT_EFFECT);
     }
 
-    public void set2ndDonutEffect(String p) {
+    public void set2ndDonutEffect(CompoundTag p) {
         this.entityData.set(SECONDARY_DONUT_EFFECT, p);
     }
 
@@ -305,15 +306,10 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             List<ItemStack> donuts = new ArrayList<>();
             for (int i = 0; i < amount; i++) {
                 ItemStack droppedItems = new ItemStack(ModItems.JELLYBAT_DONUT.get());
-                Potion p = ForgeRegistries.POTIONS.getValue(new ResourceLocation(this.getDonutEffect()));
-                Potion p2 = ForgeRegistries.POTIONS.getValue(new ResourceLocation(this.get2ndDonutEffect()));
 
-                JellyDonutItem.addEffects(droppedItems, p);
-                JellyDonutItem.addSecondaryEffects(droppedItems,p2);
+                JellyDonutItem.addEffects(droppedItems, this.getDonutEffect());
+                JellyDonutItem.addSecondaryEffects(droppedItems, this.get2ndDonutEffect());
                 JellyDonutItem.setDonutColor(droppedItems, this.getDonutColor());
-
-//                BaffleBeasts.MAIN_LOGGER.debug(droppedItems.getTag().getString("Potion"));
-//                BaffleBeasts.MAIN_LOGGER.debug(droppedItems.getTag().getString("SecondaryPotion"));
 
                 donuts.add(droppedItems);
             }
@@ -528,13 +524,13 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         // Potion Check
         if (itemStack.getItem() instanceof PotionItem) {
             Potion potion = PotionUtils.getPotion(itemStack);
-            String potionName = "";
+            Tag potionName;
+            potionName = itemStack.getOrCreateTag().get("Potion");
 
-            if (ForgeRegistries.POTIONS.containsValue(potion)) {
-                potionName = ForgeRegistries.POTIONS.getKey(potion).getPath();
-            }
+            CompoundTag tag = new CompoundTag();
+            tag.put("Potion", potionName);
 
-            this.setDonutEffect(potionName);
+            this.setDonutEffect(tag);
             this.setDonutColor(potion.getEffects().get(0).getEffect().getColor());
 
             this.usePlayerItem(pPlayer, pHand, itemStack);
