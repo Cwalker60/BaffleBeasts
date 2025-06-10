@@ -20,4 +20,9 @@ public class CustomSoundEvents {
     public static final SoundEvent DOZEDRAKE_BUBBLE_SHOOT = SoundRegistry.DOZEDRAKE_BUBBLE_SHOOT.get();
     public static final SoundEvent DOZEDRAKE_BUBBLE_EXPLODE = SoundRegistry.DOZEDRAKE_BUBBLE_EXPLODE.get();
 
+    public static final SoundEvent WRYMIST_IDLE = SoundRegistry.WRYMIST_IDLE.get();
+    public static final SoundEvent WRYMIST_HURT = SoundRegistry.WRYMIST_HURT.get();
+    public static final SoundEvent WRYMIST_DEATH = SoundRegistry.WRYMIST_DEATH.get();
+    public static final SoundEvent WRYMIST_TAIL_SLAP = SoundRegistry.WRYMIST_TAIL_SLAP.get();
+
 }

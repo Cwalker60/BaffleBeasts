@@ -71,8 +71,23 @@ public class SoundGenerator extends SoundDefinitionsProvider {
                 .subtitle("sound.bafflebeasts.dozedrake_bubble_explode")
                 .with(sound(SoundRegistry.DOZEDRAKE_BUBBLE_EXPLODE.getId(), SoundDefinition.SoundType.SOUND)));
 
-
-
+        // Wrymist Sound Generation
+        this.add(CustomSoundEvents.WRYMIST_IDLE, definition()
+        .subtitle("sound.bafflebeasts.wrymist_idle")
+        .with(sound(SoundRegistry.WRYMIST_IDLE.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle2", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle3", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle4", SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        this.add(CustomSoundEvents.WRYMIST_HURT, definition()
+        .subtitle("sound.bafflebeasts.wrymist_hurt")
+        .with(sound(SoundRegistry.WRYMIST_HURT.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_hurt2", SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        this.add(CustomSoundEvents.WRYMIST_DEATH,definition()
+        .subtitle("sound.bafflebeasts.wrymist_death")
+        .with(sound(SoundRegistry.WRYMIST_DEATH.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        this.add(CustomSoundEvents.WRYMIST_TAIL_SLAP,definition()
+        .subtitle("sound.bafflebeasts.wrymist_tail_slap")
+        .with(sound(SoundRegistry.WRYMIST_TAIL_SLAP.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
 
     }
 }

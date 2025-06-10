@@ -2,6 +2,7 @@ package com.taco.bafflebeasts.world;
 
 import com.mojang.serialization.Codec;
 import com.taco.bafflebeasts.config.BaffleConfigValues;
+import com.taco.bafflebeasts.config.BaffleServerConfig;
 import com.taco.bafflebeasts.config.EntityConfigData;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
@@ -30,6 +31,7 @@ public record ModMobSpawnModifier(boolean config) implements BiomeModifier {
                 addEntitySpawn(BaffleConfigValues.AMARO_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.CREATURE);
                 addEntitySpawn(BaffleConfigValues.JELLYBAT_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.AMBIENT);
                 addEntitySpawn(BaffleConfigValues.DOZEDRAKE_CONFIG_DATA, biomeResourceKey, biome, builder, MobCategory.CREATURE);
+                addEntitySpawn(BaffleConfigValues.WRYMIST_CONFIG_DATA,biomeResourceKey,biome,builder,MobCategory.CREATURE);
             });
 
         }

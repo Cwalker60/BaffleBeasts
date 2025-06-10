@@ -24,6 +24,11 @@ public class BaffleServerConfig {
     public static ForgeConfigSpec.ConfigValue<Integer> DOZEDRAKE_SPAWN_WEIGHT;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> DOZEDRAKE_SPAWN_BIOMES;
 
+    public static ForgeConfigSpec.ConfigValue<Integer> WRYMIST_AMOUNT_MIN;
+    public static ForgeConfigSpec.ConfigValue<Integer> WRYMIST_AMOUNT_MAX;
+    public static ForgeConfigSpec.ConfigValue<Integer> WRYMIST_SPAWN_WEIGHT;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> WRYMIST_SPAWN_BIOMES;
+
 
 
     public static void createConfig(ForgeConfigSpec.Builder builder) {
@@ -80,6 +85,22 @@ public class BaffleServerConfig {
         builder.pop();
         builder.pop();
 
+        builder.push("Wrymist");
+
+        WRYMIST_AMOUNT_MIN = BUILDER.comment("This value is the MIN number of Wrymist that spawn when they are chosen to spawn by the weight.")
+                .define("Wrymist_Min_Spawn_Amount", 1);
+
+        WRYMIST_AMOUNT_MAX = BUILDER.comment("This value is the MAX number of Wrymist that spawn when they are chosen to spawn by the weight.")
+                .define("Wrymist_Max_Spawn_Amount", 1);
+
+        WRYMIST_SPAWN_WEIGHT = BUILDER.comment("This value is the weight of how Wrymist can spawn.")
+                .define("Wrymist_Spawn_Weight", 2);
+
+        builder.push("Spawn Biomes");
+        WRYMIST_SPAWN_BIOMES = BUILDER.defineListAllowEmpty("Wrymist_Spawn_Biomes",createDefaultSpawnBiomes("WRYMIST"), entry -> true);
+        builder.pop();
+        builder.pop();
+
 
         BAFFLE_COMPANIONS_CONFIG = builder.build();
     }
@@ -95,6 +116,8 @@ public class BaffleServerConfig {
                 break;
             case "DOZEDRAKE" :
                 defaultList.add("minecraft:birch_forest"); defaultList.add("minecraft:flower_forest"); defaultList.add("minecraft:old_growth_birch_forest");
+            case "WRYMIST" :
+                defaultList.add("minecraft:meadow"); defaultList.add("minecraft:cherry_grove");
         }
 
         return defaultList;

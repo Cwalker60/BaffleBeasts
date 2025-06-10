@@ -2,10 +2,7 @@ package com.taco.bafflebeasts.event;
 
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
-import com.taco.bafflebeasts.entity.custom.AmaroEntity;
-import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
-import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
-import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.*;
 import com.taco.bafflebeasts.item.ModItems;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.SpawnPlacements;
@@ -27,6 +24,7 @@ public class ModEvents {
         event.put(ModEntityTypes.Amaro.get(), AmaroEntity.setAttributes());
         event.put(ModEntityTypes.JellyBat.get(), JellyBatEntity.setAttributes());
         event.put(ModEntityTypes.DozeDrake.get(), DozeDrakeEntity.setAttributes());
+        event.put(ModEntityTypes.Wrymist.get(), WrymistEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -35,6 +33,7 @@ public class ModEvents {
             event.accept(ModItems.AMARO_SPAWN_EGG);
             event.accept(ModItems.JELLYBAT_SPAWN_EGG);
             event.accept(ModItems.DOZEDRAKE_SPAWN_EGG);
+            event.accept(ModItems.WRYMIST_SPAWN_EGG);
         }
 
         if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
@@ -76,7 +75,9 @@ public class ModEvents {
             event.register(ModEntityTypes.JellyBat.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                     JellyBatEntity::jellyBatSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
             event.register(ModEntityTypes.DozeDrake.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
-                    JellyBatEntity::jellyBatSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+                    Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+            event.register(ModEntityTypes.Wrymist.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
+                    Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
 
         }
 

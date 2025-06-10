@@ -70,6 +70,12 @@ public class ModPackets {
                 .encoder(DozeDrakeMountAttackC2SPacket::toBytes)
                 .consumerMainThread(DozeDrakeMountAttackC2SPacket::handle)
                 .add();
+        //WrymistMountAttackC2sPacket
+        net.messageBuilder(WrymistTailAttackC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(WrymistTailAttackC2SPacket::new)
+                .encoder(WrymistTailAttackC2SPacket::toBytes)
+                .consumerMainThread(WrymistTailAttackC2SPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

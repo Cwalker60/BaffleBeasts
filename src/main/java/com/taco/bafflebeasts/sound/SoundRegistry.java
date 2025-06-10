@@ -30,6 +30,11 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> DOZEDRAKE_BUBBLE_SHOOT = createSoundEvent("dozedrake/dozedrake_bubble_shoot");
     public static final RegistryObject<SoundEvent> DOZEDRAKE_BUBBLE_EXPLODE = createSoundEvent("dozedrake/dozedrake_bubble_explode");
 
+    public static final RegistryObject<SoundEvent> WRYMIST_IDLE = createSoundEvent("wrymist/wrymist_idle1");
+    public static final RegistryObject<SoundEvent> WRYMIST_DEATH = createSoundEvent("wrymist/wrymist_death");
+    public static final RegistryObject<SoundEvent> WRYMIST_HURT = createSoundEvent("wrymist/wrymist_hurt1");
+    public static final RegistryObject<SoundEvent> WRYMIST_TAIL_SLAP = createSoundEvent("wrymist/wrymist_tail_slap");
+
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {
         return SOUND_REG.register(soundName, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BaffleBeasts.MODID, soundName)));

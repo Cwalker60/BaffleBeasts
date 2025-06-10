@@ -4,8 +4,10 @@ import com.mojang.math.Axis;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.client.BubblePowerHud;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
+import com.taco.bafflebeasts.entity.client.WrymistPowerHud;
 import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.WrymistEntity;
 import com.taco.bafflebeasts.flight.FlightPower;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.item.JellyDonutItem;
@@ -14,6 +16,9 @@ import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.DozeDrakeMountAttackC2SPacket;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDescendC2SPacket;
 import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
+import com.taco.bafflebeasts.networking.packet.WrymistTailAttackC2SPacket;
+import com.taco.bafflebeasts.particle.ModParticles;
+import com.taco.bafflebeasts.particle.WrymistSlashParticle;
 import com.taco.bafflebeasts.util.KeyBindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -70,9 +75,16 @@ public class ClientEvents {
                         DozeDrakeEntity dozeDrake = (DozeDrakeEntity)flightEntity;
                         Vec3 playerLook = player.getLookAngle();
                         if (dozeDrake.isBubbleBlasting()) {
-                            ModPackets.sendToServer(new DozeDrakeMountAttackC2SPacket(playerLook.x, playerLook.y, playerLook.z));;
+                            ModPackets.sendToServer(new DozeDrakeMountAttackC2SPacket(playerLook.x, playerLook.y, playerLook.z));
                         }
-
+                    }
+                    // Wrymist Tail Attack
+                    if (flightEntity instanceof WrymistEntity) {
+                        WrymistEntity wrymist = (WrymistEntity)flightEntity;
+                        Vec3 playerLook = player.getLookAngle();
+                        if (wrymist.canTailAttack()) {
+                            ModPackets.sendToServer(new WrymistTailAttackC2SPacket(playerLook.x, playerLook.y, playerLook.z));
+                        }
                     }
                 }
             }
@@ -151,10 +163,16 @@ public class ClientEvents {
         public static void registerGuiOverlays(RegisterGuiOverlaysEvent event) {
             event.registerAboveAll("flightgui", FlightPowerHud.HUD_AMARO_FLIGHTBAR);
             event.registerAboveAll("dozedrake_mountattack", BubblePowerHud.HUD_BUBBLE_ATTACK);
+            event.registerAboveAll("wrymist_mountattack", WrymistPowerHud.HUD_BRUSH_ATTACK);
         }
         @SubscribeEvent
         public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
             event.register(JellyDonutItem::getColor, ModItems.JELLYBAT_DONUT.get());
+        }
+
+        @SubscribeEvent
+        public static void registerParticles(RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(ModParticles.WRYMIST_SLASH.get(), WrymistSlashParticle.Provider::new);
         }
 
 

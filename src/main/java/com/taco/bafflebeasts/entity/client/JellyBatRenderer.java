@@ -89,6 +89,9 @@ public class JellyBatRenderer extends GeoEntityRenderer<JellyBatEntity> {
         if (entity.isBaby()) {
             poseStack.scale(0.4f, 0.4f, 0.4f);
             model.getBone("head").get().updateScale(1.6f, 1.6f, 1.6f);
+        } else {
+            poseStack.scale(1.0f,1.0f,1.0f);
+            model.getBone("head").get().updateScale(1.0f, 1.0f, 1.0f);
         }
 
 

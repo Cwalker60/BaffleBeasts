@@ -4,13 +4,12 @@ import com.mojang.logging.LogUtils;
 import com.taco.bafflebeasts.config.BaffleClientConfig;
 import com.taco.bafflebeasts.config.BaffleServerConfig;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
-import com.taco.bafflebeasts.entity.client.AmaroRenderer;
-import com.taco.bafflebeasts.entity.client.BubbleProjectileRenderer;
-import com.taco.bafflebeasts.entity.client.DozeDrakeRenderer;
-import com.taco.bafflebeasts.entity.client.JellyBatRenderer;
+import com.taco.bafflebeasts.entity.client.*;
 import com.taco.bafflebeasts.item.ModItems;
 import com.taco.bafflebeasts.networking.ModPackets;
+import com.taco.bafflebeasts.particle.ModParticles;
 import com.taco.bafflebeasts.sound.SoundRegistry;
+import com.taco.bafflebeasts.util.TailColorCheck;
 import com.taco.bafflebeasts.world.BiomeModifierRegistry;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
@@ -44,11 +43,13 @@ public class BaffleBeasts
         modEventBus.addListener(this::commonSetup);
 
         ModItems.register(modEventBus);
+        ModParticles.register(modEventBus);
         SoundRegistry.register(modEventBus);
         ModEntityTypes.register(modEventBus);
         BiomeModifierRegistry.register(modEventBus);
         GeckoLib.initialize();
 
+        TailColorCheck.init();
         BaffleServerConfig.createConfig(BaffleServerConfig.BUILDER);
         BaffleClientConfig.createConfig(BaffleClientConfig.BUILDER);
 
@@ -94,6 +95,7 @@ public class BaffleBeasts
             EntityRenderers.register(ModEntityTypes.Amaro.get(), AmaroRenderer::new);
             EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);
             EntityRenderers.register(ModEntityTypes.DozeDrake.get(), DozeDrakeRenderer::new);
+            EntityRenderers.register(ModEntityTypes.Wrymist.get(), WrymistRenderer::new);
 
             EntityRenderers.register(ModEntityTypes.BubbleProjectile.get(), BubbleProjectileRenderer::new);
         }

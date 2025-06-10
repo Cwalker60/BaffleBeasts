@@ -1,10 +1,7 @@
 package com.taco.bafflebeasts.entity;
 
 import com.taco.bafflebeasts.BaffleBeasts;
-import com.taco.bafflebeasts.entity.custom.AmaroEntity;
-import com.taco.bafflebeasts.entity.custom.BubbleProjectile;
-import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
-import com.taco.bafflebeasts.entity.custom.JellyBatEntity;
+import com.taco.bafflebeasts.entity.custom.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -35,6 +32,12 @@ public class ModEntityTypes {
                     () -> EntityType.Builder.of(DozeDrakeEntity::new, MobCategory.CREATURE)
                             .sized(2.0f, 2.2f)
                             .build(new ResourceLocation(BaffleBeasts.MODID, "dozedrake").toString()));
+
+    public static final RegistryObject<EntityType<WrymistEntity>> Wrymist =
+            ENTITY_TYPES.register("wrymist",
+                    () -> EntityType.Builder.of(WrymistEntity::new, MobCategory.CREATURE)
+                            .sized(1.5f,2.0f)
+                            .build(new ResourceLocation(BaffleBeasts.MODID, "wrymist").toString()));
 
     public static final RegistryObject<EntityType<BubbleProjectile>> BubbleProjectile =
             ENTITY_TYPES.register("bubble_projectile",

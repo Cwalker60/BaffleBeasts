@@ -8,9 +8,16 @@ import com.taco.bafflebeasts.sound.CustomSoundEvents;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -51,19 +58,22 @@ public class DozeDrakeMountAttackC2SPacket {
         ServerLevel server = context.getSender().serverLevel();
 
         context.enqueueWork(() -> {
-            Vec3 clientPlayerLook = new Vec3(this.xLook,this.yLook,this.zLook);
-            clientPlayerLook = clientPlayerLook.normalize();
-            clientPlayerLook = clientPlayerLook.multiply(20,20,20);
+//            Vec3 clientPlayerLook = new Vec3(this.xLook,this.yLook,this.zLook);
+//            clientPlayerLook = clientPlayerLook.normalize();
+//            clientPlayerLook = clientPlayerLook.multiply(20,20,20);
+
+            Vec3 clientPlayerLook = player.getEyePosition();
+            Vec3 viewVec = player.getViewVector(1.0f);
+            Vec3 rayVec = clientPlayerLook.add(viewVec.x * 50.0d, viewVec.y * 50.0d, viewVec.z * 50.0d);
             // Check if the client player look is looking at a mob to send a homing bubble towards.
 
             // rayCastCheck will create a AABB box from the clientPlayerLook to a certain range of clientPlayerLook, and then check if there's a mob in it.
-            AABB rayCastCheck = AABB.ofSize(clientPlayerLook, clientPlayerLook.x, clientPlayerLook.y * 3, clientPlayerLook.z);
-            rayCastCheck = rayCastCheck.move(player.getOnPos());
+            AABB rayCastCheck = new AABB(clientPlayerLook, rayVec);
+            BaffleBeasts.MAIN_LOGGER.debug(rayCastCheck.toString());
 
             ArrayList<Entity> entities = new ArrayList<>(server.getEntities(player,rayCastCheck));
-
             DozeDrakeEntity shooter = this.getDozeDrake(player);
-            // If the entity list is not null, create a homing bubble targeting the first entity in the list.
+
             if (!entities.isEmpty()) {
                 if (shooter != null) {
                     for (Entity target : entities) {
@@ -117,4 +127,5 @@ public class DozeDrakeMountAttackC2SPacket {
 
         return null;
     }
+
 }

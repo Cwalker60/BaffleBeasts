@@ -422,7 +422,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     //Mob Attributes
     public static AttributeSupplier setAttributes() {
         return Animal.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 18)
+                .add(Attributes.MAX_HEALTH, 30)
                 .add(Attributes.ATTACK_DAMAGE, 3.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
                 .add(Attributes.ARMOR, 2.0d)

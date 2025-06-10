@@ -1,6 +1,5 @@
 package com.taco.bafflebeasts.entity.custom;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.client.BubblePowerHud;
 import com.taco.bafflebeasts.entity.goal.*;
@@ -95,7 +94,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
 
     public static AttributeSupplier setAttributes() {
         return Animal.createMobAttributes()
-                .add(Attributes.MAX_HEALTH, 30)
+                .add(Attributes.MAX_HEALTH, 40)
                 .add(Attributes.ATTACK_DAMAGE, 5.0f)
                 .add(Attributes.ATTACK_SPEED, 2.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.2f)

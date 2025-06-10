@@ -1,6 +1,5 @@
 package com.taco.bafflebeasts.entity.custom;
 
-import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.goal.*;
 import com.taco.bafflebeasts.item.JellyDonutItem;
@@ -11,12 +10,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -51,7 +48,6 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.IForgeShearable;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.animatable.GeoEntity;
@@ -523,15 +519,27 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
 
         // Potion Check
         if (itemStack.getItem() instanceof PotionItem) {
-            Potion potion = PotionUtils.getPotion(itemStack);
-            Tag potionName;
-            potionName = itemStack.getOrCreateTag().get("Potion");
+            Potion potion = null;
+            CompoundTag potionName = new CompoundTag();
+            potionName = itemStack.getOrCreateTag();
+            // If the potion is a custom effects potion
+            if (potionName.contains("CustomPotionEffects")) {
+                CompoundTag tag = new CompoundTag();
+                tag.put("CustomPotionEffects", potionName);
 
-            CompoundTag tag = new CompoundTag();
-            tag.put("Potion", potionName);
+                this.setDonutEffect(tag);
+                this.setDonutColor(PotionUtils.getColor(itemStack));
 
-            this.setDonutEffect(tag);
-            this.setDonutColor(potion.getEffects().get(0).getEffect().getColor());
+            // Else do a normal potion
+            } else if (potionName.contains("Potion")) {
+                CompoundTag tag = new CompoundTag();
+                tag.put("Potion", potionName);
+                potion = PotionUtils.getPotion(potionName);
+
+                this.setDonutEffect(tag);
+                this.setDonutColor(potion.getEffects().get(0).getEffect().getColor());
+            }
+
 
             this.usePlayerItem(pPlayer, pHand, itemStack);
             this.level().playSound((Player)null, this, SoundEvents.BOTTLE_FILL, this.getSoundSource(), 0.5F, 1.0F);

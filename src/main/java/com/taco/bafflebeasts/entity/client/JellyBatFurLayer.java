@@ -12,7 +12,7 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
-import java.awt.*;
+import java.awt.Color;
 
 public class JellyBatFurLayer extends GeoRenderLayer<JellyBatEntity> {
     public JellyBatFurLayer(GeoEntityRenderer<JellyBatEntity> entityRenderIn) {

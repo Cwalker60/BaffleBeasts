@@ -98,5 +98,57 @@
       }
     ],
     "subtitle": "sound.bafflebeasts.jellybat_idle"
+  },
+  "wrymist/wrymist_death": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_death"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.wrymist_death"
+  },
+  "wrymist/wrymist_hurt1": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_hurt1"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_hurt2"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.wrymist_hurt"
+  },
+  "wrymist/wrymist_idle1": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_idle1"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_idle2"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_idle3"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_idle4"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.wrymist_idle"
+  },
+  "wrymist/wrymist_tail_slap": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:wrymist/wrymist_tail_slap"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.wrymist_tail_slap"
   }
 }
