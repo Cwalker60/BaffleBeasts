@@ -495,4 +495,13 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
         }
     }
 
+    public void dropEquipment() {
+        if (this.isSaddled()) {
+            if (!this.level().isClientSide()) {
+                this.spawnAtLocation(Items.SADDLE);
+            }
+        }
+        super.dropEquipment();
+    }
+
 }

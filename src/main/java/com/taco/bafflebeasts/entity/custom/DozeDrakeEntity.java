@@ -611,6 +611,15 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         return this.bubbleBlastCooldown;
     }
 
+    public void dropEquipment() {
+        if (this.isSaddled()) {
+            if (!this.level().isClientSide()) {
+                this.spawnAtLocation(Items.SADDLE);
+            }
+        }
+        super.dropEquipment();
+    }
+
 
 }
 

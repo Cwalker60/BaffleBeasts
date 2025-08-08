@@ -544,4 +544,13 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
 
     }
 
+    public void dropEquipment() {
+        if (this.isSaddled()) {
+            if (!this.level().isClientSide()) {
+                this.spawnAtLocation(Items.SADDLE);
+            }
+        }
+        super.dropEquipment();
+    }
+
 }

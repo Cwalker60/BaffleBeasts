@@ -1036,7 +1036,9 @@ public class SeikretEntity extends IdleAnimatedEntity implements GeoEntity, Play
     public void dropEquipment() {
 
         if (this.isSaddled()) {
-
+            if (!this.level().isClientSide()) {
+                this.spawnAtLocation(Items.SADDLE);
+            }
         }
         
         for (int i = 0; i < this.getInventorySize(); i++) {
