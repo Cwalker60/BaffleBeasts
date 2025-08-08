@@ -2,7 +2,7 @@ package com.taco.bafflebeasts.entity.custom;
 
 import com.taco.bafflebeasts.entity.ModEntityTypes;
 import com.taco.bafflebeasts.entity.goal.FlyEntityFollowOwnerGoal;
-import com.taco.bafflebeasts.entity.goal.FlyEntityLookAtPlayer;
+import com.taco.bafflebeasts.entity.goal.IdleEntityLookAtPlayer;
 import com.taco.bafflebeasts.entity.goal.IdleAnimationGoal;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.ElytraGlideCalculation;
@@ -71,11 +71,10 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     protected static final RawAnimation AMARO_GLIDE = RawAnimation.begin().thenLoop("animation.amaro.glide");
     protected static final RawAnimation AMARO_FLIGHT_DASH = RawAnimation.begin().thenPlay("animation.amaro.fly_dash");
 
-    public int animationbuffer = 5;
 
     //Amaro Constructor
     public AmaroEntity(EntityType<? extends RideableFlightEntity> entityType, Level level) {
-        super(entityType, level, 6, 100);
+        super(entityType, level, 6, 100, 5, 3);
         this.setTame(false);
     }
 
@@ -120,7 +119,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
         this.goalSelector.addGoal(4, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
         this.goalSelector.addGoal(5, new FlyEntityFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
         this.goalSelector.addGoal(6, new PanicGoal(this, 1.250));
-        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 12F));
+        this.goalSelector.addGoal(7, new IdleEntityLookAtPlayer(this, Player.class, 12F));
         this.goalSelector.addGoal(8, new IdleAnimationGoal(this, 5));
         this.goalSelector.addGoal(9, new WaterAvoidingRandomStrollGoal(this, 1.00));
         this.goalSelector.addGoal(10, new RandomLookAroundGoal(this));
@@ -306,27 +305,6 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     @Override
     public void tick() {
         super.tick();
-        // Idle timer
-        if (getIdleTimer() > 0) {
-            setIdleTimer(getIdleTimer() - 1);
-        }
-
-        if (this.getGoToSleepState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setSleep(true);
-                this.setGoToSleepState(false);
-                this.animationbuffer = 5;
-            }
-        }
-        if (this.getEntityWakeUpState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setEntityWakeUpState(false);
-                this.setSleep(false);
-                this.animationbuffer = 5;
-            }
-        }
     }
 
     @Override

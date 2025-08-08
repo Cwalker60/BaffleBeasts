@@ -24,7 +24,6 @@ public class FlightPowerHud {
         int x = screenWidth;
         int y = screenHeight;
         // (x-16*6)/2 is the distance 6 feathers are drawn from the center
-
         if (Minecraft.getInstance().player.getVehicle() instanceof RideableFlightEntity flightEntity) {
             int feathers = flightEntity.flightPower;
             int xOffset = (x - 16 * feathers)/2;
@@ -61,8 +60,8 @@ public class FlightPowerHud {
                             FLIGHT_ANIMATION_DRAWSTATE * 16 , 16, 16, 16, 256);
                 }
 
-
             });
+
         }
 
 

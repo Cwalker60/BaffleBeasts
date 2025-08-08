@@ -99,6 +99,57 @@
     ],
     "subtitle": "sound.bafflebeasts.jellybat_idle"
   },
+  "seikret/seikret_death": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_death"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.seikret_death"
+  },
+  "seikret/seikret_hurt1": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_hurt1"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_hurt2"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_hurt3"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.seikret_hurt"
+  },
+  "seikret/seikret_idle1": {
+    "sounds": [
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_idle1"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_idle2"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_idle3"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_idle4"
+      },
+      {
+        "attenuation_distance": 3,
+        "name": "bafflebeasts:seikret/seikret_idle5"
+      }
+    ],
+    "subtitle": "sound.bafflebeasts.seikret_idle"
+  },
   "wrymist/wrymist_death": {
     "sounds": [
       {
@@ -112,11 +163,13 @@
     "sounds": [
       {
         "attenuation_distance": 3,
-        "name": "bafflebeasts:wrymist/wrymist_hurt1"
+        "name": "bafflebeasts:wrymist/wrymist_hurt1",
+        "volume": 0.7
       },
       {
         "attenuation_distance": 3,
-        "name": "bafflebeasts:wrymist/wrymist_hurt2"
+        "name": "bafflebeasts:wrymist/wrymist_hurt2",
+        "volume": 0.7
       }
     ],
     "subtitle": "sound.bafflebeasts.wrymist_hurt"
@@ -125,19 +178,23 @@
     "sounds": [
       {
         "attenuation_distance": 3,
-        "name": "bafflebeasts:wrymist/wrymist_idle1"
+        "name": "bafflebeasts:wrymist/wrymist_idle1",
+        "volume": 0.7
       },
       {
         "attenuation_distance": 3,
-        "name": "bafflebeasts:wrymist/wrymist_idle2"
+        "name": "bafflebeasts:wrymist/wrymist_idle2",
+        "volume": 0.7
       },
       {
         "attenuation_distance": 3,
-        "name": "bafflebeasts:wrymist/wrymist_idle3"
+        "name": "bafflebeasts:wrymist/wrymist_idle3",
+        "volume": 0.7
       },
       {
         "attenuation_distance": 3,
-        "name": "bafflebeasts:wrymist/wrymist_idle4"
+        "name": "bafflebeasts:wrymist/wrymist_idle4",
+        "volume": 0.7
       }
     ],
     "subtitle": "sound.bafflebeasts.wrymist_idle"

@@ -3,11 +3,13 @@
   "entity.bafflebeasts.amaro": "Amaro",
   "entity.bafflebeasts.dozedrake": "Doze Drake",
   "entity.bafflebeasts.wrymist": "Wrymist",
+  "entity.bafflebeasts.seikret" : "Seikret",
 
   "item.bafflebeasts.amaro_spawn_egg": "Amaro Spawn Egg",
   "item.bafflebeasts.jellybat_spawn_egg": "Jelly Bat Spawn Egg",
   "item.bafflebeasts.dozedrake_spawn_egg": "Doze Drake Spawn Egg",
   "item.bafflebeasts.wrymist_spawn_egg": "Wrymist Dpawn Egg",
+  "item.bafflebeasts.seikret_spawn_egg": "Seikret Spawn Egg",
   "item.bafflebeasts.jellybat_donut": "Jelly Donut",
   "item.bafflebeasts.super_shake": "Super Shake",
 
@@ -26,7 +28,7 @@
   "sound.bafflebeasts.dozedrake_bubble_shoot": "Doze Drake bubble attack splash",
   "sound.bafflebeasts.dozedrake_bubble_explode": "Bubble pop explosion",
 
-  "key.category.bafflebeasts.keybinds": "Cozy Companions",
+  "key.category.bafflebeasts.keybinds": "Baffle Beasts",
   "key.bafflebeasts.descend": "Descend",
   "key.bafflebeasts.glide": "Glide"
 }

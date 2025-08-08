@@ -84,10 +84,8 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     private static final EntityDataAccessor<Boolean> CAN_AI_SLEEP = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> BUBBLE_CHARGE = SynchedEntityData.defineId(DozeDrakeEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public int animationbuffer = 5;
-
     public DozeDrakeEntity(EntityType<? extends RideableFlightEntity> pEntityType, Level pLevel) {
-        super(pEntityType, pLevel, 6, 150);
+        super(pEntityType, pLevel, 6, 150, 5, 3);
         sleepTickCooldown = 0;
         this.setEntityWakeUpState(true);
     }
@@ -129,15 +127,15 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 2.2D, true));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.2D, true));
         this.goalSelector.addGoal(3, new DozeDrakeBubbleAttackGoal(this));
-        this.goalSelector.addGoal(4, new MoveTowardsTargetGoal(this, 2.2D, 32.0F));
+        this.goalSelector.addGoal(4, new MoveTowardsTargetGoal(this, 1.2D, 32.0F));
         this.goalSelector.addGoal(5, new FloatGoal(this));
         this.goalSelector.addGoal(6, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(7, new IdleAnimationGoal(this, 5));
-        this.goalSelector.addGoal(8, new FlyEntityFollowOwnerGoal(this,2.2d,15,4,true));
-        this.goalSelector.addGoal(9, new FlyEntityLookAtPlayer(this, Player.class, 6F));
-        this.goalSelector.addGoal(10, new FlyEntityRandomLookAtGoal(this));
+        this.goalSelector.addGoal(8, new FlyEntityFollowOwnerGoal(this,1.2d,15,4,true));
+        this.goalSelector.addGoal(9, new IdleEntityLookAtPlayer(this, Player.class, 6F));
+        this.goalSelector.addGoal(10, new IdleEntityRandomLookAtGoal(this));
         this.goalSelector.addGoal(11, new DozeDrakeRandomStrollGoal(this, 1.00));
         this.goalSelector.addGoal(12, new DozeDrakeSleepGoal(this));
 
@@ -344,24 +342,12 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     @Override
     public void tick() {
         super.tick();
-        if (getIdleTimer() > 0) {
-            setIdleTimer(getIdleTimer() - 1);
-        }
 
         // if dozedrake is actively targeting someone, wake it up
         if (this.targetSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof HurtByTargetGoal))) {
             this.setEntityWakeUpState(true);
             this.setOrderedToSit(false);
             this.sleepTickCooldown = 0;
-        }
-
-        if (this.getEntityWakeUpState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setEntityWakeUpState(false);
-                this.setSleep(false);
-                this.animationbuffer = 5;
-            }
         }
 
         // If a wild Dozedrake is asleep, start ticking the cooldown before it can sleep again.
@@ -402,6 +388,12 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         ItemStack itemStack = player.getItemInHand(hand);
 
         if (this.isTame()) {
+            // Breed Check
+            if (itemStack.is(Items.COOKED_BEEF) && this.age == 0 && this.canFallInLove()) {
+                this.setInLove(player);
+                this.usePlayerItem(player, hand, itemStack);
+                return InteractionResult.sidedSuccess(level().isClientSide());
+            }
             //  Attempt to Saddle the Dragon
             if (isSaddleable() && !this.isBaby() && itemStack.is(Items.SADDLE)) {
                 itemStack.shrink(1);
@@ -418,13 +410,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
                     navigation.stop();
                     this.setTarget(null);
                 }
-                return InteractionResult.sidedSuccess(level().isClientSide());
-            }
-
-            // Breed Check
-            if (itemStack.is(Items.COOKED_BEEF) && this.age == 0 && this.canFallInLove()) {
-                this.setInLove(player);
-                this.usePlayerItem(player, hand, itemStack);
                 return InteractionResult.sidedSuccess(level().isClientSide());
             }
 
@@ -626,12 +611,6 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         return this.bubbleBlastCooldown;
     }
 
-//    public boolean doHurtTarget(Entity pEntity) {
-//        float f = this.getAttackDamage();
-//        boolean flag = super.doHurtTarget(pEntity);
-//
-//        return flag;
-//    }
 
 }
 

@@ -1,16 +1,16 @@
 package com.taco.bafflebeasts.entity.goal;
 
-import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.IdleAnimatedEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 
-public class FlyEntityRandomLookAtGoal extends RandomLookAroundGoal {
-    protected RideableFlightEntity entity;
+public class IdleEntityRandomLookAtGoal extends RandomLookAroundGoal {
+    protected IdleAnimatedEntity entity;
 
 
-    public FlyEntityRandomLookAtGoal(Mob pMob) {
+    public IdleEntityRandomLookAtGoal(Mob pMob) {
         super(pMob);
-        entity = (RideableFlightEntity) pMob;
+        entity = (IdleAnimatedEntity) pMob;
     }
 
     @Override

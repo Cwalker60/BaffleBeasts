@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 
@@ -24,6 +25,23 @@ public class WrymistRenderer extends GeoEntityRenderer<WrymistEntity> {
     @Override
     public ResourceLocation getTextureLocation(WrymistEntity instance) {
         return new ResourceLocation(BaffleBeasts.MODID, "textures/entity/wrymist/wrymist.png");
+    }
+
+    @Override
+    public void preRender(PoseStack poseStack, WrymistEntity animatable, BakedGeoModel model, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue,
+                          float alpha) {
+
+        this.entityRenderTranslations = new Matrix4f(poseStack.last().pose());
+        if (animatable.isBaby()) {
+            this.scaleHeight = 0.4f;
+            this.scaleWidth = 0.4f;
+
+        } else {
+            this.scaleHeight = 0.9f;
+            this.scaleWidth = 0.9f;
+        }
+
+        scaleModelForRender(this.scaleWidth, this.scaleHeight, poseStack, animatable, model, isReRender, partialTick, packedLight, packedOverlay);
     }
 
     @Override

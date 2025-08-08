@@ -35,6 +35,10 @@ public class SoundRegistry {
     public static final RegistryObject<SoundEvent> WRYMIST_HURT = createSoundEvent("wrymist/wrymist_hurt1");
     public static final RegistryObject<SoundEvent> WRYMIST_TAIL_SLAP = createSoundEvent("wrymist/wrymist_tail_slap");
 
+    public static final RegistryObject<SoundEvent> SEIKRET_IDLE = createSoundEvent("seikret/seikret_idle1");
+    public static final RegistryObject<SoundEvent> SEIKRET_DEATH = createSoundEvent("seikret/seikret_death");
+    public static final RegistryObject<SoundEvent> SEIKRET_HURT = createSoundEvent("seikret/seikret_hurt1");
+
 
     private static RegistryObject<SoundEvent> createSoundEvent(final String soundName) {
         return SOUND_REG.register(soundName, () -> SoundEvent.createVariableRangeEvent(new ResourceLocation(BaffleBeasts.MODID, soundName)));

@@ -26,6 +26,7 @@ public class DozeDrakeRenderer extends GeoEntityRenderer<DozeDrakeEntity> {
 
     @Override
     public void actuallyRender(PoseStack poseStack, DozeDrakeEntity entity, BakedGeoModel model, RenderType renderType, MultiBufferSource bufferSource, VertexConsumer buffer, boolean isReRender, float partialTick, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
+
         if (!entity.isSaddled()) {
             getGeoModel().getBone("saddle").get().setHidden(true);
         } else {
@@ -67,6 +68,8 @@ public class DozeDrakeRenderer extends GeoEntityRenderer<DozeDrakeEntity> {
                 poseStack.mulPose(Axis.XP.rotation((float)Math.sin( ((pYRot * Math.PI) / 180)) * -d4));
             }
         }
+
         super.actuallyRender(poseStack, entity,  model,  renderType,  bufferSource,  buffer,  isReRender,  partialTick,  packedLight,  packedOverlay,  red,  green,  blue,  alpha);
     }
+
 }

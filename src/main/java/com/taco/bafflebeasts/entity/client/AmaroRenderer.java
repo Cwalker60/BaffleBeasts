@@ -18,6 +18,7 @@ public class AmaroRenderer extends GeoEntityRenderer<AmaroEntity> {
         super(renderManager, new AmaroModel());
         this.shadowRadius = 1.0F;
     }
+
     @Override
     public ResourceLocation getTextureLocation(AmaroEntity instance) {
         switch (instance.getVariant()) {

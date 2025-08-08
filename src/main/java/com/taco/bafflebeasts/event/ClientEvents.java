@@ -4,9 +4,11 @@ import com.mojang.math.Axis;
 import com.taco.bafflebeasts.BaffleBeasts;
 import com.taco.bafflebeasts.entity.client.BubblePowerHud;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
+import com.taco.bafflebeasts.entity.client.SeikretInventoryMenu;
 import com.taco.bafflebeasts.entity.client.WrymistPowerHud;
 import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
 import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.SeikretEntity;
 import com.taco.bafflebeasts.entity.custom.WrymistEntity;
 import com.taco.bafflebeasts.flight.FlightPower;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
@@ -15,7 +17,7 @@ import com.taco.bafflebeasts.item.ModItems;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.DozeDrakeMountAttackC2SPacket;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDescendC2SPacket;
-import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
+import com.taco.bafflebeasts.networking.packet.IdleEntityMovementSyncC2S;
 import com.taco.bafflebeasts.networking.packet.WrymistTailAttackC2SPacket;
 import com.taco.bafflebeasts.particle.ModParticles;
 import com.taco.bafflebeasts.particle.WrymistSlashParticle;
@@ -29,6 +31,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -40,13 +43,41 @@ public class ClientEvents {
         public static void onKeyInput(InputEvent.Key event) {
             // Check if the entity has a controlling player
             RideableFlightEntity flightEntity = null;
+            SeikretEntity seikret = null;
             LocalPlayer player = Minecraft.getInstance().player;
 
+            // Get the mob if available
             if (Minecraft.getInstance().player != null) {
                 if (Minecraft.getInstance().player.getVehicle() instanceof RideableFlightEntity) {
                     flightEntity = (RideableFlightEntity) Minecraft.getInstance().player.getVehicle();
                     if (!flightEntity.hasControllingPassenger()) {
                         flightEntity = null;
+                    }
+                }
+
+                if (Minecraft.getInstance().player.getVehicle() instanceof SeikretEntity) {
+                    seikret = (SeikretEntity) Minecraft.getInstance().player.getVehicle();
+                    if (!seikret.hasControllingPassenger()) {
+                        seikret = null;
+                    }
+                }
+            }
+
+            // Seikret glide key on holding spacebar
+            if (seikret != null) {
+                if (seikret instanceof SeikretEntity) {
+                    if (Minecraft.getInstance().options.keyJump.isDown() && !seikret.onGround()) {
+                        seikret.gliding = true;
+                    } else {
+                        seikret.gliding = false;
+                    }
+
+                    if (Minecraft.getInstance().options.keySprint.isDown() && seikret.onGround()) {
+                        //seikret.setSeikretSprint(true);
+                        seikret.setSprinting(true);
+                    } else {
+                        //seikret.setSeikretSprint(false);
+                        seikret.setSprinting(false);
                     }
                 }
             }
@@ -60,10 +91,11 @@ public class ClientEvents {
                     flightEntity.setDescend(false);
                 }
 
+
                 // Mount Glide Key bind
                 if (KeyBindings.GLIDE_KEY.consumeClick() && flightEntity.isFlying()) {
                         flightEntity.setElytraFlying(!flightEntity.isElytraFlying());
-                        ModPackets.sendToServer(new FlightEntityMovementSyncC2S(flightEntity.isMoving,
+                        ModPackets.sendToServer(new IdleEntityMovementSyncC2S(flightEntity.isMoving,
                                 flightEntity.getId(), flightEntity.isElytraFlying()));
 
                 }
@@ -148,6 +180,13 @@ public class ClientEvents {
         public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
             event.register(FlightPower.class);
         }
+
+        @SubscribeEvent
+        public static void onOpenInventory(PlayerContainerEvent event) {
+            if (event.getContainer() instanceof SeikretInventoryMenu) {
+
+            }
+        }
     }
 
     @Mod.EventBusSubscriber(modid = BaffleBeasts.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -165,6 +204,7 @@ public class ClientEvents {
             event.registerAboveAll("dozedrake_mountattack", BubblePowerHud.HUD_BUBBLE_ATTACK);
             event.registerAboveAll("wrymist_mountattack", WrymistPowerHud.HUD_BRUSH_ATTACK);
         }
+
         @SubscribeEvent
         public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
             event.register(JellyDonutItem::getColor, ModItems.JELLYBAT_DONUT.get());

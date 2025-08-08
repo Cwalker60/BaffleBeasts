@@ -39,11 +39,20 @@ public class ModEntityTypes {
                             .sized(1.5f,2.0f)
                             .build(new ResourceLocation(BaffleBeasts.MODID, "wrymist").toString()));
 
+    public static final RegistryObject<EntityType<SeikretEntity>> Seikret =
+            ENTITY_TYPES.register("seikret",
+                    () -> EntityType.Builder.of(SeikretEntity::new, MobCategory.CREATURE)
+                            .sized(1.5f, 2.0f)
+                            .build(new ResourceLocation(BaffleBeasts.MODID,"seikret").toString()));
+
+
+
     public static final RegistryObject<EntityType<BubbleProjectile>> BubbleProjectile =
             ENTITY_TYPES.register("bubble_projectile",
                     () -> EntityType.Builder.<BubbleProjectile>of(BubbleProjectile::new, MobCategory.MISC)
                             .sized(0.5f, 0.5f)
                             .build(new ResourceLocation(BaffleBeasts.MODID, "bubble_projectile").toString()));
+
 
 
 

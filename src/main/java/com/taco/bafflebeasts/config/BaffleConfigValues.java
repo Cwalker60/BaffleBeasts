@@ -18,6 +18,8 @@ public class BaffleConfigValues {
             validateBiomes(new ArrayList<String>(BaffleServerConfig.DOZEDRAKE_SPAWN_BIOMES.get()), "DOZEDRAKE");
     public static final ArrayList<String> WRYMIST_SPAWN_LIST =
             validateBiomes(new ArrayList<String>(BaffleServerConfig.WRYMIST_SPAWN_BIOMES.get()), "WRYMIST");
+    public static final ArrayList<String> SEIKRET_SPAWN_LIST =
+            validateBiomes(new ArrayList<String>(BaffleServerConfig.SEIKRET_SPAWN_BIOMES.get()),"SEIKRET");
 
     public static final EntityConfigData AMARO_CONFIG_DATA = new EntityConfigData(ModEntityTypes.Amaro.get(),
             BaffleServerConfig.AMARO_SPAWN_AMOUNT_MAX.get(),
@@ -35,6 +37,10 @@ public class BaffleConfigValues {
     public static final EntityConfigData WRYMIST_CONFIG_DATA = new EntityConfigData(ModEntityTypes.Wrymist.get(),
             BaffleServerConfig.WRYMIST_AMOUNT_MAX.get(),BaffleServerConfig.WRYMIST_AMOUNT_MIN.get(),
             BaffleServerConfig.WRYMIST_SPAWN_WEIGHT.get(),WRYMIST_SPAWN_LIST);
+
+    public static final EntityConfigData SEIKRET_CONFIG_DATA = new EntityConfigData(ModEntityTypes.Seikret.get(),
+            BaffleServerConfig.SEIKRET_AMOUNT_MAX.get(), BaffleServerConfig.SEIKRET_AMOUNT_MIN.get(),
+            BaffleServerConfig.SEIKRET_AMOUNT_WEIGHT.get(),SEIKRET_SPAWN_LIST);
 
 
 

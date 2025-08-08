@@ -44,16 +44,16 @@ public class ModPackets {
                 .consumerMainThread((FlightEntityDashC2SPacket::handle))
                 .add();
 
-        net.messageBuilder(FlightEntityMovementSyncS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
-                .decoder(FlightEntityMovementSyncS2C::new)
-                .encoder(FlightEntityMovementSyncS2C::toBytes)
-                .consumerMainThread(FlightEntityMovementSyncS2C::handle)
+        net.messageBuilder(IdleEntityMovementSyncS2C.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(IdleEntityMovementSyncS2C::new)
+                .encoder(IdleEntityMovementSyncS2C::toBytes)
+                .consumerMainThread(IdleEntityMovementSyncS2C::handle)
                 .add();
 
-        net.messageBuilder(FlightEntityMovementSyncC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(FlightEntityMovementSyncC2S::new)
-                .encoder(FlightEntityMovementSyncC2S::toBytes)
-                .consumerMainThread(FlightEntityMovementSyncC2S::handle)
+        net.messageBuilder(IdleEntityMovementSyncC2S.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(IdleEntityMovementSyncC2S::new)
+                .encoder(IdleEntityMovementSyncC2S::toBytes)
+                .consumerMainThread(IdleEntityMovementSyncC2S::handle)
                 .add();
 
 
@@ -76,6 +76,7 @@ public class ModPackets {
                 .encoder(WrymistTailAttackC2SPacket::toBytes)
                 .consumerMainThread(WrymistTailAttackC2SPacket::handle)
                 .add();
+
     }
 
     public static <MSG> void sendToServer(MSG message) {

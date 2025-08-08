@@ -10,6 +10,7 @@ public class KeyBindings {
     public static final String KEY_DESCEND = "key.bafflebeasts.descend";
     public static final String KEY_GLIDE = "key.bafflebeasts.glide";
     public static final String KEY_MOUNT_ATTACK = "key.bafflebeasts.mount_attack";
+    public static final String SEIKRET_GLIDE = "key.bafflebeasts.seikret_glide";
 
     public static final KeyMapping DESCENDING_KEY = new KeyMapping(KEY_DESCEND, KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_C, KEY_CATEGORY_COZYCOMPANIONS);
@@ -19,4 +20,8 @@ public class KeyBindings {
 
     public static final KeyMapping MOUNT_ATTACK_KEY = new KeyMapping(KEY_MOUNT_ATTACK, KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_R, KEY_CATEGORY_COZYCOMPANIONS);
+
+    public static final KeyMapping SEIKRET_GLIDE_KEY = new KeyMapping(SEIKRET_GLIDE,KeyConflictContext.IN_GAME,
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_SPACE, KEY_CATEGORY_COZYCOMPANIONS);
+
 }

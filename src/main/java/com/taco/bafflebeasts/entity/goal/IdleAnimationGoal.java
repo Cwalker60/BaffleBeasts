@@ -1,19 +1,19 @@
 package com.taco.bafflebeasts.entity.goal;
 
-import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
+import com.taco.bafflebeasts.entity.custom.IdleAnimatedEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
 public class IdleAnimationGoal extends Goal {
-    private final RideableFlightEntity entity;
+    private final IdleAnimatedEntity entity;
     private final int maxposes;
 
     /**
-     *  IdleAnimationGoal sets an idle pose for a RideableFlightEntity when fired if their "IdleTimer" is 0.
+     *  IdleAnimationGoal sets an idle pose for a IdleAnimatedEntity when fired if their "IdleTimer" is 0.
      *  It will take in the mob, and the number of idle animations available.
      * @param mob Mob for the goal.
      * @param maxPoses Number of idle animations.
      */
-    public IdleAnimationGoal(RideableFlightEntity mob, int maxPoses) {
+    public IdleAnimationGoal(IdleAnimatedEntity mob, int maxPoses) {
         this.entity = mob;
         this.maxposes = maxPoses;
     }
@@ -31,6 +31,5 @@ public class IdleAnimationGoal extends Goal {
         int pose = (int)(Math.random() * maxposes) + 1;
         this.entity.setIdlePose(pose);
         this.entity.setIdleTimer(400);
-
     }
 }

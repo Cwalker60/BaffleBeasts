@@ -74,20 +74,36 @@ public class SoundGenerator extends SoundDefinitionsProvider {
         // Wrymist Sound Generation
         this.add(CustomSoundEvents.WRYMIST_IDLE, definition()
         .subtitle("sound.bafflebeasts.wrymist_idle")
-        .with(sound(SoundRegistry.WRYMIST_IDLE.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3))
-        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle2", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
-        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle3", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
-        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle4", SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        .with(sound(SoundRegistry.WRYMIST_IDLE.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3).volume(0.7f))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle2", SoundDefinition.SoundType.SOUND).attenuationDistance(3).volume(0.7f))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle3", SoundDefinition.SoundType.SOUND).attenuationDistance(3).volume(0.7f))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_idle4", SoundDefinition.SoundType.SOUND).attenuationDistance(3).volume(0.7f)));
         this.add(CustomSoundEvents.WRYMIST_HURT, definition()
         .subtitle("sound.bafflebeasts.wrymist_hurt")
-        .with(sound(SoundRegistry.WRYMIST_HURT.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3))
-        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_hurt2", SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        .with(sound(SoundRegistry.WRYMIST_HURT.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3).volume(0.7f))
+        .with(sound(BaffleBeasts.MODID + ":wrymist/wrymist_hurt2", SoundDefinition.SoundType.SOUND).attenuationDistance(3).volume(0.7f)));
         this.add(CustomSoundEvents.WRYMIST_DEATH,definition()
         .subtitle("sound.bafflebeasts.wrymist_death")
         .with(sound(SoundRegistry.WRYMIST_DEATH.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
         this.add(CustomSoundEvents.WRYMIST_TAIL_SLAP,definition()
         .subtitle("sound.bafflebeasts.wrymist_tail_slap")
         .with(sound(SoundRegistry.WRYMIST_TAIL_SLAP.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+
+        this.add(CustomSoundEvents.SEIKRET_IDLE, definition()
+        .subtitle("sound.bafflebeasts.seikret_idle")
+        .with(SoundDefinition.Sound.sound(SoundRegistry.SEIKRET_IDLE.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":seikret/seikret_idle2", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":seikret/seikret_idle3", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":seikret/seikret_idle4", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+        .with(sound(BaffleBeasts.MODID + ":seikret/seikret_idle5", SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        this.add(CustomSoundEvents.SEIKRET_HURT, definition()
+                .subtitle("sound.bafflebeasts.seikret_hurt")
+                .with(sound(SoundRegistry.SEIKRET_HURT.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+                .with(sound(BaffleBeasts.MODID + ":seikret/seikret_hurt2", SoundDefinition.SoundType.SOUND).attenuationDistance(3))
+                .with(sound(BaffleBeasts.MODID + ":seikret/seikret_hurt3", SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
+        this.add(CustomSoundEvents.SEIKRET_DEATH, definition()
+                .subtitle("sound.bafflebeasts.seikret_death")
+                .with(sound(SoundRegistry.SEIKRET_DEATH.getId(), SoundDefinition.SoundType.SOUND).attenuationDistance(3)));
 
     }
 }

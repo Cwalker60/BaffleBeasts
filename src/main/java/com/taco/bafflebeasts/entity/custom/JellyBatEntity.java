@@ -96,7 +96,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     private FlyingPathNavigation flyingNavigation;
 
     public BlockPos upsideDownBlock;
-    public int animationbuffer = 5;
 
     private int ticksRoamCooldown;
     private int ticksUpsideDownCooldown;
@@ -107,7 +106,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
     public boolean shouldTickRefresh = true;
 
     public JellyBatEntity(EntityType<? extends RideableFlightEntity> entityType, Level level) {
-        super(entityType, level, 4,100);
+        super(entityType, level, 4,100, 2, 1);
         this.flying = true;
         this.moveControl = new FlyingMoveControl(this, 10, false);
         this.setTame(false);
@@ -181,7 +180,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         this.goalSelector.addGoal(4, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(5, new TemptGoal(this, 1.2D, FOOD_ITEMS, false));
         this.goalSelector.addGoal(6, new JellyBatFollowOwnerGoal(this, 2.0D, 10.F, 2.0F, true));
-        this.goalSelector.addGoal(7, new FlyEntityLookAtPlayer(this, Player.class, 6F));
+        this.goalSelector.addGoal(7, new IdleEntityLookAtPlayer(this, Player.class, 6F));
         this.goalSelector.addGoal(8, new IdleAnimationGoal(this, 2));
         this.goalSelector.addGoal(9, new JellyBatRoamGoal(this, 1.0d));
         this.goalSelector.addGoal(10, new JellyBatUpsideDownGoal(this));
@@ -458,10 +457,6 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             this.refreshDimensions();
             shouldTickRefresh = false;
         }
-        // Idle timer
-        if (getIdleTimer() > 0) {
-            setIdleTimer(getIdleTimer() - 1);
-        }
 
         // Regrow fur when sheared.
         if (!this.hasFur()) {
@@ -472,17 +467,10 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
             }
         }
 
-        if (this.getEntityWakeUpState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setEntityWakeUpState(false);
-                this.setSleep(false);
-                this.animationbuffer = 5;
-            }
-        }
         if (this.isUpsideDown()) {
             this.setDeltaMovement(Vec3.ZERO);
         }
+
         // If a player is trying to tempt a jellybat, set upsideDown to false and reset the cooldown.
         if (this.goalSelector.getRunningGoals().anyMatch(target -> (target.getGoal() instanceof TemptGoal) )) {
             if (this.isUpsideDown()) {

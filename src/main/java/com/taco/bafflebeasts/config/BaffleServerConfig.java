@@ -29,6 +29,11 @@ public class BaffleServerConfig {
     public static ForgeConfigSpec.ConfigValue<Integer> WRYMIST_SPAWN_WEIGHT;
     public static ForgeConfigSpec.ConfigValue<List<? extends String>> WRYMIST_SPAWN_BIOMES;
 
+    public static ForgeConfigSpec.ConfigValue<Integer> SEIKRET_AMOUNT_MIN;
+    public static ForgeConfigSpec.ConfigValue<Integer> SEIKRET_AMOUNT_MAX;
+    public static ForgeConfigSpec.ConfigValue<Integer> SEIKRET_AMOUNT_WEIGHT;
+    public static ForgeConfigSpec.ConfigValue<List<? extends String>> SEIKRET_SPAWN_BIOMES;
+
 
 
     public static void createConfig(ForgeConfigSpec.Builder builder) {
@@ -101,6 +106,23 @@ public class BaffleServerConfig {
         builder.pop();
         builder.pop();
 
+        builder.push("Seikret");
+
+        SEIKRET_AMOUNT_MIN = BUILDER.comment("This value is the MIN number of Seikret that spawn when they are chosen to spawn by the weight.")
+                .define("Seikret_Min_Spawn_Amount", 1);
+
+        SEIKRET_AMOUNT_MAX = BUILDER.comment("This value is the MAX number of Seikret that spawn when they are chosen to spawn by the weight.")
+                .define("Seikret_Max_Spawn_Amount", 1);
+
+        SEIKRET_AMOUNT_WEIGHT = BUILDER.comment("This value is the weight of how Seikret can spawn.")
+                .define("Seikret_Spawn_Weight", 2);
+
+        builder.push("Spawn Biomes");
+        SEIKRET_SPAWN_BIOMES = BUILDER.defineListAllowEmpty("Seikret_Spawn_Biomes",createDefaultSpawnBiomes("SEIKRET"),entry -> true);
+
+        builder.pop();
+        builder.pop();
+
 
         BAFFLE_COMPANIONS_CONFIG = builder.build();
     }
@@ -116,8 +138,13 @@ public class BaffleServerConfig {
                 break;
             case "DOZEDRAKE" :
                 defaultList.add("minecraft:birch_forest"); defaultList.add("minecraft:flower_forest"); defaultList.add("minecraft:old_growth_birch_forest");
+                break;
             case "WRYMIST" :
                 defaultList.add("minecraft:meadow"); defaultList.add("minecraft:cherry_grove");
+                break;
+            case "SEIKRET" :
+                defaultList.add("minecraft:savanna");
+                break;
         }
 
         return defaultList;

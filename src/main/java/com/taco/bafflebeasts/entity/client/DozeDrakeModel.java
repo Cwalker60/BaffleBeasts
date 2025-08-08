@@ -15,15 +15,14 @@ public class DozeDrakeModel extends GeoModel<DozeDrakeEntity> {
 
     @Override
     public void setCustomAnimations(DozeDrakeEntity entity, long uniqueID, @Nullable AnimationState<DozeDrakeEntity> customPredicate) {
-        super.setCustomAnimations(entity, uniqueID, customPredicate);
-        CoreGeoBone head = this.getAnimationProcessor().getBone("head");
+        super.setCustomAnimations(entity,uniqueID,customPredicate);
+
         EntityModelData as;
         if (customPredicate.getData(DataTickets.ENTITY_MODEL_DATA) != null) {
-            if (!entity.isAsleep()) {
-                as = customPredicate.getData(DataTickets.ENTITY_MODEL_DATA);
-                head.setRotX(as.headPitch() * 0.017453292F);
-                head.setRotY(as.netHeadYaw() * 0.017453292F);
-            }
+            CoreGeoBone head = this.getAnimationProcessor().getBone("head");
+            as = customPredicate.getData(DataTickets.ENTITY_MODEL_DATA);
+            head.setRotX(as.headPitch() * 0.017453292F);
+            head.setRotY(as.netHeadYaw() * 0.017453292F);
         }
 
     }

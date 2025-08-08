@@ -8,9 +8,11 @@ import com.taco.bafflebeasts.entity.client.*;
 import com.taco.bafflebeasts.item.ModItems;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.particle.ModParticles;
+import com.taco.bafflebeasts.screens.SeikretGUIScreen;
 import com.taco.bafflebeasts.sound.SoundRegistry;
 import com.taco.bafflebeasts.util.TailColorCheck;
 import com.taco.bafflebeasts.world.BiomeModifierRegistry;
+import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,6 +48,7 @@ public class BaffleBeasts
         ModParticles.register(modEventBus);
         SoundRegistry.register(modEventBus);
         ModEntityTypes.register(modEventBus);
+        BaffleMenuRegistry.register(modEventBus);
         BiomeModifierRegistry.register(modEventBus);
         GeckoLib.initialize();
 
@@ -96,8 +99,13 @@ public class BaffleBeasts
             EntityRenderers.register(ModEntityTypes.JellyBat.get(), JellyBatRenderer::new);
             EntityRenderers.register(ModEntityTypes.DozeDrake.get(), DozeDrakeRenderer::new);
             EntityRenderers.register(ModEntityTypes.Wrymist.get(), WrymistRenderer::new);
+            EntityRenderers.register(ModEntityTypes.Seikret.get(), SeikretRenderer::new);
 
             EntityRenderers.register(ModEntityTypes.BubbleProjectile.get(), BubbleProjectileRenderer::new);
+
+            event.enqueueWork( () ->
+                    MenuScreens.register(BaffleMenuRegistry.SEIKRET_MENU.get(), SeikretGUIScreen::new));
+
         }
     }
 }

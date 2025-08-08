@@ -25,4 +25,8 @@ public class CustomSoundEvents {
     public static final SoundEvent WRYMIST_DEATH = SoundRegistry.WRYMIST_DEATH.get();
     public static final SoundEvent WRYMIST_TAIL_SLAP = SoundRegistry.WRYMIST_TAIL_SLAP.get();
 
+    public static final SoundEvent SEIKRET_IDLE = SoundRegistry.SEIKRET_IDLE.get();
+    public static final SoundEvent SEIKRET_HURT = SoundRegistry.SEIKRET_HURT.get();
+    public static final SoundEvent SEIKRET_DEATH = SoundRegistry.SEIKRET_DEATH.get();
+
 }

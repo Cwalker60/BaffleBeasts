@@ -4,13 +4,8 @@ import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
-import com.taco.bafflebeasts.networking.packet.FlightEntityMovementSyncC2S;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -22,7 +17,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 
-public abstract class RideableFlightEntity extends TamableAnimal implements Saddleable, PlayerRideable, PlayerRideableJumping {
+public abstract class RideableFlightEntity extends IdleAnimatedEntity implements Saddleable, PlayerRideable, PlayerRideableJumping {
 
     public boolean flying = false;
     public boolean isJumping = false;
@@ -34,24 +29,17 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     public int flightRechargeBuffer;
     public int flightPower;
 
-    protected static final EntityDataAccessor<Boolean> GOTOSLEEPSTATE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
-    protected static final EntityDataAccessor<Boolean> ASLEEP = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
-    protected static final EntityDataAccessor<Boolean> WAKEUPSTATE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.BOOLEAN);
-    protected static final EntityDataAccessor<Integer> IDLE_POSE = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.INT);
-    protected static final EntityDataAccessor<Integer> IDLE_TIMER = SynchedEntityData.defineId(RideableFlightEntity.class, EntityDataSerializers.INT);
-
-    public boolean isMoving;
-    public boolean hasMoved;
-
     /**
      * RideableFlightEntities will have the ability to fly with the FlightPower capability.
      * @param pEntityType Entity type of mob
      * @param pLevel Level to create the mob in.
      * @param flightP The amount of jumps (feathers on hud) that the mob can use to fly with.
      * @param flightRecharge The amount of ticks required to restore a jump.
+     * @param idleAnimations The amount of idle animations
+     * @param sleepVar The threshold to when "sleep" is called when an idle animation is below that value.
      */
-    public RideableFlightEntity(EntityType<? extends TamableAnimal> pEntityType, Level pLevel, int flightP, int flightRecharge) {
-        super(pEntityType, pLevel);
+    public RideableFlightEntity(EntityType<? extends IdleAnimatedEntity> pEntityType, Level pLevel, int flightP, int flightRecharge, int idleAnimations, int sleepVar) {
+        super(pEntityType, pLevel, idleAnimations, sleepVar);
         this.flightPower = flightP;
         this.maxFlightRechargeBuffer = flightRecharge;
         this.flightRechargeBuffer = this.maxFlightRechargeBuffer;
@@ -67,58 +55,18 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     @Override
     public void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(IDLE_POSE, 1);
-        this.entityData.define(IDLE_TIMER, 400);
-        this.entityData.define(ASLEEP, false);
-        this.entityData.define(GOTOSLEEPSTATE, false);
-        this.entityData.define(WAKEUPSTATE, false);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putInt("EntityIdlePose", this.getIdlePose());
-        tag.putInt("EntityIdleTimer", this.getIdleTimer());
-        tag.putBoolean("EntityGoToSleep", this.getGoToSleepState());
-        tag.putBoolean("EntityAsleep", this.isAsleep());
-        tag.putBoolean("EntityWakeUpState", this.getEntityWakeUpState());
     }
 
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-        this.setIdlePose(tag.getInt("EntityIdlePose"));
-        this.setIdleTimer(tag.getInt("EntityIdleTimer"));
-        this.setSleep(tag.getBoolean("EntityAsleep"));
-        this.setGoToSleepState(tag.getBoolean("EntityGoToSleep"));
-        this.setEntityWakeUpState(tag.getBoolean("EntityWakeUpState"));
     }
-
-    // isMoving() will send a datapacket to ensure that the moving animation is synched via client/server.
-    // isMoving will try to only send this data packet by checking if lastMoving is true/false to ensure a packet is only sent when the mob stops,
-    // or starts moving. There probably is a better solution but this is what I have come up with.
-    public void isMovingCheck() {
-        Vec2 groundmovement = new Vec2((float)this.getDeltaMovement().x, (float)this.getDeltaMovement().z);
-        groundmovement = groundmovement.normalized();
-
-        boolean moving = (Mth.abs(groundmovement.x) > 0 || Mth.abs(groundmovement.y) > 0);
-        if (!this.isElytraFlying()) {
-
-            if (this.level().isClientSide) {
-                if (moving == true && hasMoved == false) {
-                    this.isMoving = true; hasMoved = true;
-                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(true, this.getId(), this.getSharedFlag(7)));
-
-                } else if (moving == false && hasMoved == true) {
-                    this.isMoving = false; hasMoved = false;
-                    ModPackets.sendToServer(new FlightEntityMovementSyncC2S(false, this.getId(), this.getSharedFlag(7)));
-                }
-            }
-        }
-
-    }
-
 
     @Override
     public void travel(Vec3 vec3) {
@@ -223,6 +171,7 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
 
         return new Vec3(strafex, yascend, forwardz);
     }
+
     @Override
     protected float getRiddenSpeed(Player pPlayer) {
         if (this.isControlledByLocalInstance()) {
@@ -301,49 +250,6 @@ public abstract class RideableFlightEntity extends TamableAnimal implements Sadd
     @Override
     public void handleStopJump() {
 
-    }
-
-    //setIdleAnimation takes in an int, and sets the Amaro's next idle animation to that int.
-    //ints will range from 1-5. if an invalid int is out of this range, it will default to 1.
-    public void setIdlePose(int idle) {
-        this.entityData.set(IDLE_POSE, idle);
-    }
-
-    public int getIdlePose() {
-        return this.entityData.get(IDLE_POSE);
-    }
-
-
-    public void setIdleTimer(int time) {
-        this.entityData.set(IDLE_TIMER, time);
-    }
-
-    public int getIdleTimer() {
-        return this.entityData.get(IDLE_TIMER);
-    }
-
-    public boolean isAsleep() {
-        return this.entityData.get(ASLEEP);
-    }
-
-    public void setSleep(boolean b) {
-        this.entityData.set(ASLEEP, b);
-    }
-
-    public void setGoToSleepState(boolean b) {
-        if (this.isAsleep()) {
-            this.entityData.set(GOTOSLEEPSTATE, false);
-        } else {
-            this.entityData.set(GOTOSLEEPSTATE, b);
-        }
-    }
-    public boolean getGoToSleepState() {return this.entityData.get(GOTOSLEEPSTATE); }
-
-    public boolean getEntityWakeUpState() { return this.entityData.get(WAKEUPSTATE);}
-    public void setEntityWakeUpState(boolean b) {
-        if (isAsleep()) {
-            this.entityData.set(WAKEUPSTATE, b);
-        }
     }
 
     public boolean isFlying() {

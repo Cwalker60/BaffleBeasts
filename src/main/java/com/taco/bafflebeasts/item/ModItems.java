@@ -29,6 +29,9 @@ public class ModItems {
     public static final RegistryObject<Item> WRYMIST_SPAWN_EGG = ITEMS.register("wrymist_spawn_egg",
             () -> new ForgeSpawnEggItem(ModEntityTypes.Wrymist, 0xdbc1e5, 0xc485df,
                     new Item.Properties()));
+    public static final RegistryObject<Item> SEIKRET_SPAWN_EGG = ITEMS.register("seikret_spawn_egg",
+            () -> new ForgeSpawnEggItem(ModEntityTypes.Seikret, 0x198031, 0xf8ffc4,
+                    new Item.Properties()));
 
     public static final RegistryObject<JellyDonutItem> JELLYBAT_DONUT = ITEMS.register("jellybat_donut",
             () -> new JellyDonutItem(new Item.Properties()

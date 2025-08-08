@@ -13,8 +13,6 @@ import software.bernie.geckolib.cache.object.BakedGeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.renderer.layer.GeoRenderLayer;
 
-import java.awt.Color;
-
 public class WrymistTailLayer extends GeoRenderLayer<WrymistEntity> {
 
     private static final ResourceLocation TAIL_LAYER_TEXTURES = new ResourceLocation(BaffleBeasts.MODID, "textures/entity/wrymist/paint_brush_layer.png");

@@ -48,7 +48,6 @@ import java.util.UUID;
 public class WrymistEntity extends RideableFlightEntity implements GeoEntity, PlayerRideable, PlayerRideableJumping, NeutralMob {
 
     private int remainingPersistentAngerTime;
-    private int animationbuffer = 0;
     private UUID persistentAngerTarget;
     private int tailAttackCooldown = 0;
     private boolean tailAttackIconFlicker = false;
@@ -77,7 +76,7 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
     private static final EntityDataAccessor<Boolean> CAN_TAIL_ATTACK = SynchedEntityData.defineId(WrymistEntity.class, EntityDataSerializers.BOOLEAN);
 
     public WrymistEntity(EntityType<? extends RideableFlightEntity> entityType, Level level) {
-        super(entityType, level, 5, 100);
+        super(entityType, level, 5, 100, 4, 2);
         this.setTame(false);
     }
 
@@ -135,15 +134,15 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(1, new SitWhenOrderedToGoal(this));
-        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 2.2D, true));
-        this.goalSelector.addGoal(3, new MoveTowardsTargetGoal(this, 2.2D, 32.0F));
+        this.goalSelector.addGoal(2, new MeleeAttackGoal(this, 1.2D, true));
+        this.goalSelector.addGoal(3, new MoveTowardsTargetGoal(this, 1.2D, 32.0F));
         this.goalSelector.addGoal(4, new FloatGoal(this));
         this.goalSelector.addGoal(5, new BreedGoal(this, 1.0));
         this.goalSelector.addGoal(6, new IdleAnimationGoal(this, 4));
         this.goalSelector.addGoal(7, new RandomStrollGoal(this, 0.5f));
         this.goalSelector.addGoal(8, new FlyEntityFollowOwnerGoal(this,1.2d,15,4,true));
-        this.goalSelector.addGoal(9, new FlyEntityLookAtPlayer(this, Player.class, 6F));
-        this.goalSelector.addGoal(10, new FlyEntityRandomLookAtGoal(this));
+        this.goalSelector.addGoal(9, new IdleEntityLookAtPlayer(this, Player.class, 6F));
+        this.goalSelector.addGoal(10, new IdleEntityRandomLookAtGoal(this));
 
         this.targetSelector.addGoal(1,new HurtByTargetGoal(this));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, 10, true, false, this::isAngryAt));
@@ -175,7 +174,6 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
     @Override
     public AgeableMob getBreedOffspring(ServerLevel pLevel, AgeableMob pOtherParent) {
         WrymistEntity offSpring = ModEntityTypes.Wrymist.get().create(pLevel);
-
         return offSpring;
     }
 
@@ -352,6 +350,12 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
         ItemStack itemStack = player.getItemInHand(hand);
 
         if (this.isTame()) {
+            // Breed Check
+            if (itemStack.is(Items.COOKED_CHICKEN) && this.age == 0 && this.canFallInLove()) {
+                this.setInLove(player);
+                this.usePlayerItem(player, hand, itemStack);
+                return InteractionResult.sidedSuccess(level().isClientSide());
+            }
             // Saddle Check
             if (isSaddleable() && !this.isBaby() && itemStack.is(Items.SADDLE)) {
                 itemStack.shrink(1);
@@ -379,12 +383,6 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
                     navigation.stop();
                     this.setTarget(null);
                 }
-                return InteractionResult.sidedSuccess(level().isClientSide());
-            }
-            // Breed Check
-            if (itemStack.is(Items.COOKED_CHICKEN) && this.age == 0 && this.canFallInLove()) {
-                this.setInLove(player);
-                this.usePlayerItem(player, hand, itemStack);
                 return InteractionResult.sidedSuccess(level().isClientSide());
             }
             // Sit check
@@ -456,18 +454,6 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
     @Override
     public void tick() {
         super.tick();
-        if (getIdleTimer() > 0) {
-            setIdleTimer(getIdleTimer() - 1);
-        }
-
-        if (this.getEntityWakeUpState()) {
-            this.animationbuffer -= 1;
-            if (this.animationbuffer < 0) {
-                this.setEntityWakeUpState(false);
-                this.setSleep(false);
-                this.animationbuffer = 5;
-            }
-        }
 
         if (!this.canTailAttack()) {
             this.tailAttackCooldown++;
@@ -498,7 +484,6 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
             this.setDeltaMovement(vec.multiply(1.0D, 0.6D, 1.0D)); // lower the gravity to 0.6
             this.flying = true;
         }
-
     }
 
     @Override
@@ -558,4 +543,5 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
     public void startPersistentAngerTimer() {
 
     }
+
 }

@@ -25,6 +25,7 @@ public class ModEvents {
         event.put(ModEntityTypes.JellyBat.get(), JellyBatEntity.setAttributes());
         event.put(ModEntityTypes.DozeDrake.get(), DozeDrakeEntity.setAttributes());
         event.put(ModEntityTypes.Wrymist.get(), WrymistEntity.setAttributes());
+        event.put(ModEntityTypes.Seikret.get(), SeikretEntity.setAttributes());
     }
 
     @SubscribeEvent
@@ -34,6 +35,7 @@ public class ModEvents {
             event.accept(ModItems.JELLYBAT_SPAWN_EGG);
             event.accept(ModItems.DOZEDRAKE_SPAWN_EGG);
             event.accept(ModItems.WRYMIST_SPAWN_EGG);
+            event.accept(ModItems.SEIKRET_SPAWN_EGG);
         }
 
         if (event.getTabKey() == CreativeModeTabs.FOOD_AND_DRINKS) {
@@ -77,6 +79,8 @@ public class ModEvents {
             event.register(ModEntityTypes.DozeDrake.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
                     Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
             event.register(ModEntityTypes.Wrymist.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
+                    Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
+            event.register(ModEntityTypes.Seikret.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.WORLD_SURFACE,
                     Animal::checkAnimalSpawnRules, SpawnPlacementRegisterEvent.Operation.OR);
 
         }
