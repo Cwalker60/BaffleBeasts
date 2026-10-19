@@ -71,7 +71,6 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     protected static final RawAnimation AMARO_GLIDE = RawAnimation.begin().thenLoop("animation.amaro.glide");
     protected static final RawAnimation AMARO_FLIGHT_DASH = RawAnimation.begin().thenPlay("animation.amaro.fly_dash");
 
-
     //Amaro Constructor
     public AmaroEntity(EntityType<? extends RideableFlightEntity> entityType, Level level) {
         super(entityType, level, 6, 100, 5, 3);
@@ -230,7 +229,7 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
             return PlayState.CONTINUE;
         }
 
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     private <E extends GeoAnimatable> PlayState blinkPredicate(AnimationState<E> event) {
@@ -442,10 +441,24 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
         return entityData.get(HAS_SADDLE);
     }
 
+    @Override
+    protected boolean canAddPassenger(Entity pPassenger) {
+        return this.getPassengers().size() < getMaxPassengers();
+    }
+
+    public int getMaxPassengers() {
+        return 2;
+    }
+
     public void setRidingPlayer(Player player) {
-        player.setYRot(getYRot());
-        player.setXRot(getXRot());
-        player.startRiding(this);
+        if (!this.level().isClientSide()) {
+            List<Entity> passengers = this.getPassengers();
+            if (passengers.size() < this.getMaxPassengers()) {
+                player.setYRot(getYRot());
+                player.setXRot(getXRot());
+                player.startRiding(this);
+            }
+        }
     }
 
     public void setSaddle(boolean b) {
@@ -457,16 +470,53 @@ public class AmaroEntity extends RideableFlightEntity implements GeoEntity, Play
     }
 
     @Override
+    public float getRiderXOffset(int index) {
+        float xOffset = 0;
+        switch (index) {
+            case 0 :
+                return xOffset = (float)(xOffset + 0.6 * Math.cos(Math.toRadians(this.getYRot() + 90)));
+            case 1 :
+                return xOffset = (float)(xOffset + 0.6 * Math.cos(Math.toRadians(this.getYRot() - 90)));
+        }
+        return xOffset;
+    }
+
+    @Override
+    public float getRiderYOffset(int index) {
+        return (this.getBbHeight() / 2);
+    }
+
+    @Override
+    public float getRiderZOffset(int index) {
+        float zOffset = 0;
+        switch (index) {
+            case 0 :
+                return zOffset = (float)(zOffset + 0.6 * Math.sin(Math.toRadians(this.getYRot() + 90)));
+            case 1 :
+                return zOffset = (float)(zOffset + 0.6 * Math.sin(Math.toRadians(this.getYRot() - 90)));
+        }
+        return zOffset;
+    }
+
+
+    @Override
     public void positionRider(Entity passenger, Entity.MoveFunction pCallback) {
         super.positionRider(passenger, pCallback);
-
         Entity rider = getControllingPassenger();
+        int index = this.getPassengers().indexOf(passenger);
+
         if (rider != null) {
             // Set the position of the rider to the current amaro position
             // Try to put the rider on 1.45 Y height
             double yOffset = this.getBbHeight() - 1.45;
-            passenger.setPos(this.getX(), this.getY() + (this.getBbHeight() - yOffset),
-                    this.getZ());
+            double xOffset = this.getX();
+            double zOffset = this.getZ();
+
+            xOffset = xOffset + this.getRiderXOffset(index);
+            zOffset = zOffset + this.getRiderZOffset(index);
+
+            passenger.setPos(xOffset, this.getY() + (this.getBbHeight() - yOffset),
+                    zOffset);
 
             // Face the rider the same direction the amaro is facing.
             if (rider instanceof LivingEntity) {

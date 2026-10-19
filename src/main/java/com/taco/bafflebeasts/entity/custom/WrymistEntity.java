@@ -236,7 +236,7 @@ public class WrymistEntity extends RideableFlightEntity implements GeoEntity, Pl
             }
         }
 
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     private <E extends GeoAnimatable>PlayState attackPredicate(AnimationState<E> event) {

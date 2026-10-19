@@ -398,7 +398,7 @@ public class JellyBatEntity extends RideableFlightEntity implements GeoEntity, F
         }
 
 
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     @Override

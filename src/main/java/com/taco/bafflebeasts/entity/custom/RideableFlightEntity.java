@@ -5,6 +5,7 @@ import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.networking.ModPackets;
 import com.taco.bafflebeasts.networking.packet.FlightEntityDashC2SPacket;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -215,6 +216,20 @@ public abstract class RideableFlightEntity extends IdleAnimatedEntity implements
         });
     }
 
+    /**
+     * playAmbientSound is overrided to make the ambient sound move with the mob. This allows the flightentitiy's ambient sound
+     * to travel when flying.
+     */
+    @Override
+    public void playAmbientSound() {
+        SoundEvent soundevent = this.getAmbientSound();
+        if (soundevent != null) {
+            if (this.level().isClientSide()) {
+                this.level().playSound(this.level().getNearestPlayer(this,30.0), this,soundevent,this.getSoundSource(),1.0f,0.8F + this.random.nextFloat() * 0.3F);
+            }
+        }
+    }
+
     @Override
     public void onPlayerJump(int pJumpPower) {
         this.getCapability(FlightPowerProvider.AMARO_FLIGHT_POWER).ifPresent(amaroFlight -> {
@@ -271,6 +286,35 @@ public abstract class RideableFlightEntity extends IdleAnimatedEntity implements
 
     public boolean isElytraFlying() {
         return this.elytraFlying;
+    }
+
+    /**
+     * getRiderXOffset calculates the xOffset used in public void positionRider(Entity passenger, Entity.MoveFunction pCallback).
+     * getRiderXOffset is also called in ClientEvents to render the player with the appropriate xOffset.
+     * @param passengerIndex is the index the passenger is currently in.
+     * @return the xOffset when positioning the rider.
+     */
+    public float getRiderXOffset(int passengerIndex) {
+        return 0;
+    }
+
+    /**
+     * getRiderYOffset calculates the yOffset used in public void positionRider(Entity passenger, Entity.MoveFunction pCallback).
+     * getRiderYOffset is also called in ClientEvents to render the player with the appropriate yOffset.
+     * @param passengerIndex is the index the passenger is currently in.
+     * @return the yOffset when positioning the rider.
+     */
+    public float getRiderYOffset(int passengerIndex) {
+        return 0;
+    }
+    /**
+     * getRiderZOffset calculates the zOffset used in public void positionRider(Entity passenger, Entity.MoveFunction pCallback).
+     * getRiderZOffset is also called in ClientEvents to render the player with the appropriate ZOffset.
+     * @param passengerIndex is the index the passenger is currently in.
+     * @return the zOffset when positioning the rider.
+     */
+    public float getRiderZOffset(int passengerIndex) {
+        return 0;
     }
 
 }

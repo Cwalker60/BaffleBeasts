@@ -507,9 +507,6 @@
 			"animation_length": 2,
 			"bones": {
 				"rfoot": {
-					"relative_to": {
-						"rotation": "entity"
-					},
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -523,9 +520,6 @@
 					}
 				},
 				"lfoot": {
-					"relative_to": {
-						"rotation": "entity"
-					},
 					"rotation": {
 						"0.0": {
 							"vector": [0, 0, 0]
@@ -3378,7 +3372,7 @@
 			}
 		},
 		"animation.amaro.idle2": {
-			"animation_length": 1.54167,
+			"animation_length": 1.5417,
 			"bones": {
 				"rightwing": {
 					"rotation": {
@@ -4522,6 +4516,5 @@
 				}
 			}
 		}
-	},
-	"geckolib_format_version": 2
+	}
 }

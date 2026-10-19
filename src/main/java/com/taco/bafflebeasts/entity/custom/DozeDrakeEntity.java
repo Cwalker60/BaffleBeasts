@@ -245,7 +245,7 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
         }
 
 
-        return PlayState.CONTINUE;
+        return PlayState.STOP;
     }
 
     private <E extends GeoAnimatable> PlayState attackPredicate(AnimationState<E> event) {
@@ -480,11 +480,64 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
     }
 
     @Override
+    public float getRiderXOffset(int passengerIndex) {
+        float xOffset = 0;
+        switch (passengerIndex) {
+            // Top left passenger
+            case 0:
+                xOffset = (float)(xOffset + 0.8 * Math.cos(Math.toRadians(this.getYRot() + 50)));
+                break;
+            // Top right passenger
+            case 1:
+                xOffset = (float)(xOffset - 0.8 * Math.cos(Math.toRadians(this.getYRot() - 50)));
+                break;
+            // Bottom left passenger
+            case 2:
+                xOffset = (float)(xOffset + 0.8 * Math.cos(Math.toRadians(this.getYRot() - 50)));
+                break;
+            // Bottom right passenger
+            case 3:
+                xOffset = (float)(xOffset - 0.8 * Math.cos(Math.toRadians(this.getYRot() + 50)));
+                break;
+        }
+        return xOffset;
+    }
+
+    @Override
+    public float getRiderYOffset(int index) {
+        return (this.getBbHeight() / 2);
+    }
+
+    @Override
+    public float getRiderZOffset(int passengerIndex) {
+        float zOffset = 0;
+        switch (passengerIndex) {
+            // Top left passenger
+            case 0 :
+                zOffset = (float)(zOffset + 0.8 * Math.sin(Math.toRadians(this.getYRot() + 50)));
+                break;
+            // Top right passenger
+            case 1 :
+                zOffset = (float)(zOffset - 0.8 * Math.sin(Math.toRadians(this.getYRot() - 50)));
+                break;
+            // Bottom left passenger
+            case 2 :
+                zOffset = (float)(zOffset + 0.8 * Math.sin(Math.toRadians(this.getYRot() - 50)));
+                break;
+            // Bottom right passenger
+            case 3 :
+                zOffset = (float)(zOffset - 0.8 * Math.sin(Math.toRadians(this.getYRot() + 50)));
+                break;
+        }
+        return zOffset;
+    }
+
+    @Override
     public void positionRider(Entity passenger, Entity.MoveFunction pCallback) {
         super.positionRider(passenger, pCallback);
 
         Entity rider = this.getControllingPassenger();
-        int index = this.getPassengers().indexOf(passenger) + 1;
+        int index = this.getPassengers().indexOf(passenger);
         // Try to position the rider at 2.0
         double yOffset = this.getBbHeight() - 2.0;
         // Controlling Rider Position
@@ -494,24 +547,8 @@ public class DozeDrakeEntity extends RideableFlightEntity implements GeoEntity, 
             double yPass = this.getY() + (this.getBbHeight() - yOffset);
             double zPass = this.getZ();
 
-            switch (index) {
-            // Top left passenger
-                case 1 :
-                    xPass = xPass + 0.8 * Math.cos(Math.toRadians(this.getYRot() + 50));
-                    zPass = zPass + 0.8 * Math.sin(Math.toRadians(this.getYRot() + 50)); break;
-            // Top right passenger
-                case 2 :
-                    xPass = xPass - 0.8 * Math.cos(Math.toRadians(this.getYRot() - 50));
-                    zPass = zPass - 0.8 * Math.sin(Math.toRadians(this.getYRot() - 50)); break;
-            // Bottom left passenger
-                case 3 :
-                    xPass = xPass + 0.8 * Math.cos(Math.toRadians(this.getYRot() - 50));
-                    zPass = zPass + 0.8 * Math.sin(Math.toRadians(this.getYRot() - 50)); break;
-            // Bottom right passenger
-                case 4 :
-                    xPass = xPass - 0.8 * Math.cos(Math.toRadians(this.getYRot() + 50));
-                    zPass = zPass - 0.8 * Math.sin(Math.toRadians(this.getYRot() + 50)); break;
-            }
+            xPass += this.getRiderXOffset(index);
+            zPass += this.getRiderZOffset(index);
 
             passenger.setPos(xPass, yPass, zPass);
 

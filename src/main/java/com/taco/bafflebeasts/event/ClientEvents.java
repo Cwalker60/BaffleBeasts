@@ -6,10 +6,7 @@ import com.taco.bafflebeasts.entity.client.BubblePowerHud;
 import com.taco.bafflebeasts.entity.client.FlightPowerHud;
 import com.taco.bafflebeasts.entity.client.SeikretInventoryMenu;
 import com.taco.bafflebeasts.entity.client.WrymistPowerHud;
-import com.taco.bafflebeasts.entity.custom.DozeDrakeEntity;
-import com.taco.bafflebeasts.entity.custom.RideableFlightEntity;
-import com.taco.bafflebeasts.entity.custom.SeikretEntity;
-import com.taco.bafflebeasts.entity.custom.WrymistEntity;
+import com.taco.bafflebeasts.entity.custom.*;
 import com.taco.bafflebeasts.flight.FlightPower;
 import com.taco.bafflebeasts.flight.FlightPowerProvider;
 import com.taco.bafflebeasts.item.JellyDonutItem;
@@ -24,7 +21,9 @@ import com.taco.bafflebeasts.particle.WrymistSlashParticle;
 import com.taco.bafflebeasts.util.KeyBindings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,6 +33,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.joml.Quaternionf;
 
 public class ClientEvents {
     @Mod.EventBusSubscriber(modid = BaffleBeasts.MODID, value = Dist.CLIENT)
@@ -141,8 +141,8 @@ public class ClientEvents {
             if (event.getEntity().getVehicle() != null) {
                 if (event.getEntity().getVehicle() instanceof RideableFlightEntity flightEntity) {
                     if (flightEntity.isElytraFlying()) {
-                        float pXRot = flightEntity.getXRot() % 360;
-                        float pYRot = flightEntity.getYRot();
+                        float pXRot = flightEntity.getXRot() % 360; // Pitch
+                        float pYRot = flightEntity.getYRot(); // Yaw
 
                         if (pYRot < 0) {
                             pYRot += 360;
@@ -150,9 +150,16 @@ public class ClientEvents {
                             pYRot = pYRot % 360;
                         }
 
-                        // Face the player wherever the flightEntity is tilting
-                        event.getPoseStack().mulPose(Axis.XP.rotationDegrees((float) Math.cos(((pYRot * Math.PI) / 180)) * pXRot));
-                        event.getPoseStack().mulPose(Axis.ZP.rotationDegrees((float) Math.sin(((pYRot * Math.PI) / 180)) * pXRot));
+                        int passengerIndex = flightEntity.getPassengers().indexOf(event.getEntity());
+                        float yOffset = -flightEntity.getRiderYOffset(passengerIndex);
+                        float xOffset = flightEntity.getRiderXOffset(passengerIndex);
+                        float zOffset = flightEntity.getRiderZOffset(passengerIndex);
+
+                        // Set the pitch rotation for the player.
+                        event.getPoseStack().rotateAround(Axis.XP.rotationDegrees((float) Math.cos(((pYRot * Math.PI) / 180)) * pXRot),
+                                -xOffset, yOffset, -zOffset);
+                        event.getPoseStack().rotateAround(Axis.ZP.rotationDegrees((float) Math.sin(((pYRot * Math.PI) / 180)) * pXRot),
+                                -xOffset, yOffset, -zOffset);
 
 
                         Vec3 vec3 = flightEntity.getViewVector(event.getPartialTick());
@@ -166,9 +173,13 @@ public class ClientEvents {
                             // Apply Movement tilt on the X/Z axis where the flightEntity is facing
                             // Invert cos/sin to change the Z tilt when facing N, instead of X tilt when facing N
                             // d4 needs to be inverted to tilt when facing S
-                            event.getPoseStack().mulPose(Axis.ZP.rotation((float)Math.cos( ((pYRot * Math.PI) / 180)) * d4));
-                            event.getPoseStack().mulPose(Axis.XP.rotation((float)Math.sin( ((pYRot * Math.PI) / 180)) * -d4));
+                            event.getPoseStack().rotateAround(Axis.ZP.rotation((float)Math.cos( ((pYRot * Math.PI) / 180)) * d4),
+                                    -xOffset, yOffset, -zOffset);
+                            event.getPoseStack().rotateAround(Axis.XP.rotation((float)Math.sin( ((pYRot * Math.PI) / 180)) * -d4),
+                                    -xOffset, yOffset, -zOffset);
+
                         }
+
                     }
 
                 }

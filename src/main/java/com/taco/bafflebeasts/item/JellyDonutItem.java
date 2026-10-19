@@ -28,6 +28,30 @@ public class JellyDonutItem extends Item {
         color = c;
     }
 
+    /**
+     * resolvePotion
+     * @param tag Itemtag related to a potion.
+     * @param pLivingEntity LivingEntity that will have effects applied too.
+     * @return
+     */
+    protected Potion resolvePotion(CompoundTag tag, LivingEntity pLivingEntity) {
+        Potion p = null;
+        // If the tag is empty, return a null potion. Null potions will be skipped when applying effects.
+        if (tag == null) {
+            return p;
+        // Check if there's a "CustomPotionEffectTag", or a regular "Potion" tag.
+        } else {
+            if (tag.contains("CustomPotionEffects")) {
+                List<MobEffectInstance> effects = PotionUtils.getCustomEffects(tag);
+                applyCustomPotionEffects(pLivingEntity, effects);
+            } else {
+                p = PotionUtils.getPotion(tag);
+            }
+        }
+
+        return p;
+    }
+
     // Called when using the item. Creates potions based off of the NBT_EFFECTS string and SECONDARY_NBT_EFFECTS and applies
     // them to the player when called
     @Override
@@ -38,29 +62,11 @@ public class JellyDonutItem extends Item {
             Potion p = null;
             Potion p2 = null;
             // Check if the tag has a custom potion effect data, else get the regular potion.
-            CompoundTag tag = pStack.getTagElement("Potion");
-            if (tag.contains("CustomPotionEffects")) {
-                List<MobEffectInstance> effects = PotionUtils.getCustomEffects(tag);
-                applyCustomPotionEffects(pLivingEntity, effects);
-            } else {
-                p = PotionUtils.getPotion(tag);
-            }
+            CompoundTag primaryPotionTag = pStack.getTagElement("Potion");
+            CompoundTag secondaryPotionTag = pStack.getTagElement(SECONDARY_NBT_EFFECTS);
 
-            // If there is no secondary effect, skip.
-            CompoundTag secondaryPotionTag = new CompoundTag();
-            if (pStack.getOrCreateTag().get(SECONDARY_NBT_EFFECTS) != null) {
-                secondaryPotionTag.put("Potion", pStack.getOrCreateTag().get(SECONDARY_NBT_EFFECTS));
-            }
-
-            // Check if it is custom potion effects and apply that to the secondary effect
-            secondaryPotionTag = secondaryPotionTag.getCompound("Potion");
-            if (secondaryPotionTag.contains("CustomPotionEffects")) {
-                List<MobEffectInstance> effects = PotionUtils.getCustomEffects(secondaryPotionTag);
-                applyCustomPotionEffects(pLivingEntity, effects);
-            } else {
-                p2 = PotionUtils.getPotion(secondaryPotionTag);
-            }
-
+            p = resolvePotion(primaryPotionTag, pLivingEntity);
+            p2 = resolvePotion(secondaryPotionTag, pLivingEntity);
 
             // For each effects of the potion, apply the the entity using the item.
             // Check if the effect is instantaneous, and then apply it.

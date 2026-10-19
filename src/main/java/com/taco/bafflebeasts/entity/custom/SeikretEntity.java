@@ -77,6 +77,7 @@ public class SeikretEntity extends IdleAnimatedEntity implements GeoEntity, Play
     private static final RawAnimation SEIKRET_JUMP = RawAnimation.begin().thenPlay("seikret.jump");
     private static final RawAnimation SEIKRET_SIT = RawAnimation.begin().thenPlay("seikret.sitdown").thenLoop("seikret.sit");
     private static final RawAnimation SEIKRET_SLEEP = RawAnimation.begin().thenPlay("seikret.gotosleep").thenLoop("seikret.sleep");
+    private static final RawAnimation SEIKRET_WAKEUP = RawAnimation.begin().thenPlay("seikret.wakeup");
     private static final RawAnimation SEIKRET_ATTACK = RawAnimation.begin().thenPlay("seikret.attack");
     private static final RawAnimation SEIKRET_BOWSTANCE = RawAnimation.begin().thenLoop("seikret.bowstance");
     private static final RawAnimation SEIKRET_IDLE1 = RawAnimation.begin().thenPlay("seikret.idle1");
@@ -700,6 +701,13 @@ public class SeikretEntity extends IdleAnimatedEntity implements GeoEntity, Play
         ItemStack itemStack = player.getItemInHand(hand);
         // Tame Interacts
         if (this.isTame()) {
+            // Heal Check
+            if (this.isHealItem(itemStack.getItem())) {
+                itemStack.shrink(1);
+                this.spawnTamingParticles(true);
+                this.heal(4.0f);
+                return InteractionResult.sidedSuccess(level().isClientSide());
+            }
             // Breed Check
             if (itemStack.is(Items.HAY_BLOCK) && this.age == 0 && this.canFallInLove()) {
                 this.setInLove(player);
@@ -757,13 +765,6 @@ public class SeikretEntity extends IdleAnimatedEntity implements GeoEntity, Play
                 return InteractionResult.sidedSuccess(level().isClientSide());
             }
 
-            // Heal Check
-            if (this.isHealItem(itemStack.getItem())) {
-                itemStack.shrink(1);
-                this.spawnTamingParticles(true);
-                this.heal(4.0f);
-                return InteractionResult.sidedSuccess(level().isClientSide());
-            }
         }
 
         return super.mobInteract(player, hand);
